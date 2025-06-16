@@ -2469,64 +2469,93 @@ if (y <= 14) {
   }
 
   function updateAirwayCalculations(ageYears) {
-  // 1) clear out any old notes
+  // 1) clear old notes
   document.querySelectorAll('.airway-note, .depth-note-row').forEach(el => el.remove());
 
-  // 2) grab weight and convert age→months
-  const w      = parseFloat(weightIn.value) || 0;
-  const months = ageUnit === 'months'
-    ? parseFloat(ageInput.value)
-    : ageYears * 12;
+  const w = parseFloat(weightIn.value) || 0;  
+    
+  // normalize age to years
+  const y = ageUnit === 'months'
+          ? parseFloat(ageInput.value) / 12
+          : ageYears;
 
-  // 3) calculate uncuffed/cuffed sizes + length
-  let unc, cuff, len;
-  if (isNaN(months) || months < 0) {
-    unc = cuff = len = null;
-  } else if (months < 12) {
-  // neonate/infant rule
-  if      (w < 1)    { unc = 2.5; len = 6.5; }
-  else if (w < 1.9)  { unc = 3.0; len = 7.0; }
-  else if (w < 3.7)  { unc = 3.5; len = 8.0; }
-  else if (w < 4)    { unc = 3.5; len = 9.0; }
-  else               { unc = 4.0; len = 10.0; }
-
-  // only show a cuffed ETT if the baby is older than 0 months
-  if (months > 0) {
-    cuff = unc - 0.5;
-  } else {
-    cuff = null;
-  }
-  } else {
-    // older child
-    unc  = ageYears / 4 + 4;
-    cuff = ageYears / 4 + 3.5;
-    len  = ageYears / 2 + 12;
+  if (isNaN(y) || y < 0) {
+    // hide all if invalid
+    ['ett-uncuffed','ett-cuffed','ett-depth-lips'].forEach(id => {
+      const el = document.getElementById(id);
+      el.textContent = '';
+      el.style.display = 'none';
+      const u = el.nextElementSibling;
+      if (u && u.classList.contains('unit')) u.style.display = 'none';
+    });
+    return;
   }
 
-  const uncText  = unc  != null ? stripZeros(unc.toFixed(2))  : '';
-  const cuffText = (cuff != null && w >= 3.5) 
-                     ? stripZeros(cuff.toFixed(2)) 
-                     : '';
-  const lenText  = len  != null ? stripZeros(len.toFixed(2))  : '';
+  // your age→ETT size table
+  const table = [
+    { maxAge: 0.0833, unc: '3.0',     cuff: null    },  // <1 mo
+    { maxAge: 1/12,   unc: '3.0–3.5',  cuff: '3.0'    }, // =1 mo
+    { maxAge: 2/12,   unc: '3.0–3.5',  cuff: '3.0'    }, // =1 mo
+    { maxAge: 3/12,   unc: '3.5',      cuff: '3.0'    }, // 3 mo
+    { maxAge: 6/12,   unc: '3.5',      cuff: '3.0'    }, // 6 mo
+    { maxAge: 1,      unc: '4.0',      cuff: '3.5'    }, // 1 yr
+    { maxAge: 2,      unc: '4.5',      cuff: '4.0'    },
+    { maxAge: 3,      unc: '4.5–5.0',  cuff: '4.0–4.5'},
+    { maxAge: 4,      unc: '5.0',      cuff: '4.5'    },
+    { maxAge: 5,      unc: '5.0–5.5',  cuff: '4.5–5.0'},
+    { maxAge: 6,      unc: '5.5',      cuff: '5.0'    },
+    { maxAge: 7,      unc: '5.5–6.0',  cuff: '5.0–5.5'},
+    { maxAge: 8,      unc: '6.0',      cuff: '6.0–6.5'},
+    { maxAge: 10,     unc: null,       cuff: '6.5'    },
+    { maxAge: 12,     unc: null,       cuff: '7.0'    },
+    { maxAge: 14,     unc: null,       cuff: '7.0–7.5'},
+    { maxAge: 17,     unc: null,       cuff: '7.0–8.0'},
+    { maxAge: Infinity,unc: null,      cuff: '7.0–8.0'}
+  ];
 
-  // 4) inject ETT *size* values
-  const uncSpan  = document.getElementById('ett-uncuffed');
-  const cuffSpan = document.getElementById('ett-cuffed');
-  
+  const row = table.find(r => y <= r.maxAge);
 
-  uncSpan.textContent   = uncText;
-  uncSpan.style.display = uncText  ? 'inline' : 'none';
+  // 3) inject uncuffed
+  const uncEl = document.getElementById('ett-uncuffed');
+  if (row.unc) {
+    uncEl.textContent   = row.unc;
+    uncEl.style.display = 'inline';
+  } else {
+    uncEl.textContent   = '';
+    uncEl.style.display = 'none';
+  }
 
-  cuffSpan.textContent  = cuffText;
-  cuffSpan.style.display = cuffText ? 'inline' : 'none';
+  // 4) inject cuffed (only if ≥ 3.5 kg)
+  const cuffEl = document.getElementById('ett-cuffed');
+  if (row.cuff && w >= 3.5) {
+    cuffEl.textContent   = row.cuff;
+    cuffEl.style.display = 'inline';
+  } else {
+    cuffEl.textContent   = '';
+    cuffEl.style.display = 'none';
+  }
 
-  // 6) inject ETT *depth* table values
-  const lipsEl      = document.getElementById('ett-depth-lips');
-  const lipsUnit    = lipsEl.nextElementSibling;
-  lipsEl.textContent      = lenText;
-  lipsEl.style.display    = lenText ? 'inline' : 'none';
-  if (lipsUnit && lipsUnit.classList.contains('unit')) {
-    lipsUnit.style.display = lenText ? 'inline' : 'none';
+  // 5) calculate depth
+  let depth = '';
+  if (y >= 1) {
+    depth = stripZeros((y/2 + 12).toFixed(2));
+  } else if (w > 0) {
+    depth = 1.17 * w + 5.58;
+    if (depth > 12) depth = 12;
+    depth = stripZeros(depth.toFixed(2));
+  }
+
+  // inject depth
+  const depthEl = document.getElementById('ett-depth-lips');
+  const depthUnit = depthEl.nextElementSibling;
+  if (depth) {
+    depthEl.textContent   = depth;
+    depthEl.style.display = 'inline';
+    depthUnit.style.display = 'inline';
+  } else {
+    depthEl.textContent   = '';
+    depthEl.style.display = 'none';
+    depthUnit.style.display = 'none';
   }
 
   // 8) now your i-Gel, LMA, tidal-volume & blade sizing exactly as before:
