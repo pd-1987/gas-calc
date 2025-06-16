@@ -1300,6 +1300,21 @@
               <small></small>
             </td>
           </tr>
+  <tr style="background-color: #fff;">
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              <strong>Teicoplanin</strong>
+            </td>
+            <td id="teicoplanin-dosing" style="padding: 8px; border: 1px solid #ccc;"></td>
+            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+              <span id="teicoplanin"></span>
+              <span class="static unit">mg</span>
+            </td>
+          </tr>
+          <tr style="background-color: #f5f5f5;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+              <small id="teicoplanin-note"></small>
+            </td>
+          </tr>
   
     </table>
   </div>
@@ -3025,6 +3040,66 @@ if (w > 0 && !isNaN(w)) {
 }
 
 function updateAntibiotics(w) {
+ // ── Teicoplanin ─────────────────────────────────────────────
+  const dosingEl    = document.getElementById('teicoplanin-dosing');
+  const teiEl       = document.getElementById('teicoplanin');
+  const teiUnitSpan = teiEl.nextElementSibling;    // the “mg” span
+  const noteEl      = document.getElementById('teicoplanin-note');
+  const rawAge      = parseFloat(ageInput.value) || 0;
+  const ageMonths   = ageUnit === 'months' ? rawAge : rawAge * 12;
+  const ageYears    = ageMonths / 12;
+
+  // prepare outputs
+  let doseText   = '';
+  let noteText   = '';
+  let numericMg  = 0;
+
+  if (w > 0 && ageMonths >= 2) {
+    if (ageYears < 11) {
+      doseText  = '10 mg/kg (Max 400 mg)';
+      noteText  = 'Children aged 2 months – 11 years';
+      numericMg = Math.min(10 * w, 400);
+    } else if (ageYears < 18) {
+      doseText  = '6 mg/kg (Max 400 mg)';
+      noteText  = 'Children aged 12 – 17 years';
+      numericMg = Math.min(6 * w, 400);
+    }
+  }
+
+  // always keep the cell but toggle its contents
+  dosingEl.textContent      = doseText;
+  dosingEl.style.display    = 'table-cell';         // leave empty cell when blank
+
+  // show or hide the number + unit
+  teiEl.textContent         = numericMg ? stripZeros(numericMg.toFixed(2)) : '';
+  teiEl.style.display       = numericMg ? 'inline' : 'none';
+  teiUnitSpan.style.display = numericMg ? 'inline' : 'none';
+
+  // note below
+  noteEl.textContent        = noteText;
+
+  // show or hide
+  if (doseText) {
+    dosingEl.textContent    = doseText;
+    dosingEl.style.display  = 'table-cell';
+
+    teiEl.textContent       = stripZeros(numericMg.toFixed(2));
+    teiEl.style.display     = 'inline';
+    teiUnitSpan.style.display = 'inline';
+
+    noteEl.textContent      = noteText;
+ } else {
+  // clear everything and hide the number + unit
+  dosingEl.textContent       = '';
+  dosingEl.style.display     = 'table-cell';
+
+  teiEl.textContent          = '';
+  teiEl.style.display        = 'none';
+  teiUnitSpan.style.display  = 'none';
+
+  noteEl.textContent         = '';
+}
+  
   const meds = [
     { id: 'amoxicillin',    dosePerKg: 30, max: 1000 },
     { id: 'cefuroxime',     dosePerKg: 50, max: 1500 },
@@ -3198,10 +3273,11 @@ function updateAntibiotics(w) {
      expandOpenAccordion();
   });
 
-  document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
   clearWeight();
-  weightIn.disabled = true;          // ← ADD: make sure weight is editable by default
-  estToggle.checked = true;    // ← ADD: initial button text
+  weightIn.disabled = true;
+  estToggle.checked = true;
+  updateAntibiotics(0);    // ← this will hide all antibiotics on load
 });
   
   // Reset everything back to the initial state
