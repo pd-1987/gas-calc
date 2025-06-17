@@ -2948,12 +2948,12 @@ function updateSedation(w) {
     // Midazolam sedation: 3 mg/kg in 50 mL bag → 1 mL/h = 1 mcg/kg/min
     const midazTotal = 3 * w;
     midazEl.textContent = 
-      `${stripZeros(midazTotal.toFixed(2))} mg in 50 mL 0.9% sodium chloride; 1 mL/h = 1 mcg/kg/min`;
+      `${stripZeros(midazTotal.toFixed(2))} mg in 50 mL 0.9% sodium chloride`;
 
     // Morphine sedation: 1 mg/kg in 50 mL bag → 1 mL/h = 20 mcg/kg/h
     const morphTotal = 1 * w;
     morphEl.textContent = 
-      `${stripZeros(morphTotal.toFixed(2))} mg in 50 mL 0.9% sodium chloride; 1 mL/h = 20 mcg/kg/h`;
+      `${stripZeros(morphTotal.toFixed(2))} mg in 50 mL 0.9% sodium chloride`;
 
     // Propofol sedation: 1–4 mg/kg/h at 10 mg/mL
     const propMin = 1 * w;
