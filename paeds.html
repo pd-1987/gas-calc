@@ -472,7 +472,14 @@
   <div class="accordion-content-inner">
       <div class="result">
     <table style="width: 100%; border-collapse: collapse;">
-  <!-- Fentanyl -->
+   <thead>
+      <tr>
+        <th colspan="3" style="background-color: #FFFFFF; border:1px solid #ccc; padding:8px;">
+          Induction
+        </th>
+      </tr>
+    </thead>
+      <!-- Fentanyl -->
   <tr style="background-color: #98c9ee;">
     <td style="padding: 8px; border: 1px solid #ccc;">
       <strong>Fentanyl</strong>
@@ -528,8 +535,68 @@
 </table>
 
 <br>
+        <table style="width: 100%; border-collapse: collapse;">
+   <thead>
+      <tr>
+        <th colspan="3" style="background-color: #FFFFFF; border:1px solid #ccc; padding:8px;">
+          Maintenance infusions
+        </th>
+      </tr>
+    </thead>
+      <!-- Fentanyl -->
+  <tr style="background-color: #98c9ee;">
+    <td style="padding: 8px; border: 1px solid #ccc;">
+      <strong>Morphine</strong>
+    </td>
+    <td style="padding: 8px; border: 1px solid #ccc;">
+      10–40 mcg/kg/h (0.5–2 ml/h)
+    </td>
+  </tr>
+  <tr style="background-color: #e0effa;">
+    <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+      <small id="morphine-sed"></small>
+    </td>
+  </tr>
+
+  <tr style="background-color: rgba(250, 119, 10, 0.8);">
+    <td style="padding: 8px; border: 1px solid #ccc;">
+      <strong>Midazolam</strong>
+    </td>
+    <td style="padding: 8px; border: 1px solid #ccc;">
+      1–3 mcg/kg/min (1–3 ml/h)
+    </td>
+  </tr>
+  <tr style="background-color: #fff3e0;">
+    <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+      <small id="midaz-sed"></small>
+    </td>
+  </tr>
+          
+            <tr style="background-color: #ffe733;">
+    <td style="padding: 8px; border: 1px solid #ccc;">
+      <strong>Propofol</strong>
+    </td>
+    <td style="padding: 8px; border: 1px solid #ccc;">
+      1–4 mg/kg/h (4–10 mg/kg/h in routine anaesthesia)
+    </td>
+  </tr>
+  <tr style="background-color: #fff9bf;">
+    <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+      <small id="propofol-sed"></small>
+    </td>
+  </tr>
+        </table>
+        <br>
+          
 
 <table style="width: 100%; border-collapse: collapse;">
+   <thead>
+      <tr>
+        <th colspan="3" style="background-color: #FFFFFF; border:1px solid #ccc; padding:8px;">
+          Emergency Drugs
+        </th>
+      </tr>
+    </thead>
   <!-- Atropine -->
   <tr style="background-color: #a3ce6f;">
     <td style="padding: 8px; border: 1px solid #ccc;">
@@ -565,11 +632,7 @@
       <small id="adrenalineiv-vol-extra"></small>
     </td>
   </tr>
-</table>
 
-<br>
-
-<table style="width: 100%; border-collapse: collapse;">
   <!-- Suxamethonium IV -->
   <tr style="background-color: #ec6f73;">
     <td style="padding: 8px; border: 1px solid #ccc;">
@@ -610,6 +673,13 @@
 <br>
 
 <table style="width: 100%; border-collapse: collapse;">
+   <thead>
+      <tr>
+        <th colspan="3" style="background-color: #FFFFFF; border:1px solid #ccc; padding:8px;">
+          Other
+        </th>
+      </tr>
+    </thead>
   <!-- Non‐drug items (single rows) -->
   <tr>
     <td style="padding: 8px; border: 1px solid #ccc; background-color: #bcbdc0;">
@@ -1073,7 +1143,7 @@
     <strong>Paracetamol PO</strong>
   </td>
   <td style="padding: 8px; border: 1px solid #ccc;">
-    Per age/weight
+    
   </td>
   <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
     <span id="paracetamol-po"></span><span class="static unit">mg</span>
@@ -1501,11 +1571,19 @@
     <div class="accordion-content">
 
       <div class="accordion-content-inner general-section">      
- <p><a href="https://www.paedspro.com/">Paeds Prescribing Pro Drug Calculator</a></p>
+        <p><a href="https://www.paedspro.com/">Paeds Prescribing Pro Drug Calculator</a></p>
+        <br>
+        <p><u>Advanced Paediatric Life Support (APLS) 2021 Resources</u>
+        <p>Advanced Paediatric Life Support (APLS) Algorithm</p>
+        <p>Neonatal Life Support Algorithm</p>
+        <p>APLS Paediatric Cardiac Arrhythmias Algorithm</p>
+        <p>APLS Paediatric Emergency Algorithms and Resources</p>
+        <p><a href="https://www.resus.org.uk/library/2021-resuscitation-guidelines/paediatric-advanced-life-support-guidelines">Paediatric Advanced Life Support Guidelines (Resuscitation Council UK)</a></p>
         <p><a href="/guidelines/paediatrics/apls-2021-paediatric-emergency-drug-chart.pdf">APLS Paediatric emergency drug chart 2021</a></p>
+        <br>
         <p><a href="https://www.evelinalondon.nhs.uk/our-services/hospital/south-thames-retrieval-service/clinical-guidelines.aspx">South Thames Retrieval Service (STRS) Clinical Guidelines and Drug Calculators</a></p>
         <p><a href="https://cats.nhs.uk/clinical-guidelines/">Children’s Acute Transport Service (CATS) Clinical Guidelines</a></p>
-        <p><a href="https://www.resus.org.uk/library/2021-resuscitation-guidelines/paediatric-advanced-life-support-guidelines">Paediatric Advanced Life Support Guidelines (Resuscitation Council UK)</a></p>
+        
         
   </div>
     </div>
@@ -2672,11 +2750,12 @@ if (w > 0) {
 
   // 9) finally, update the drug tables
   updateEmergencyDrugs(w);
+  updateSedation(w);
   updateGADrugs(w);
   updateAnalgesics(w);
-    updatePremedication(w);
-    updateReversal(w);
-    updateAntibiotics(w);
+  updatePremedication(w);
+  updateReversal(w);
+  updateAntibiotics(w);
 }
   
 function updateEmergencyDrugs(w) {
@@ -2857,6 +2936,37 @@ function updateEmergencyDrugs(w) {
     if (glucoseUnit && glucoseUnit.classList.contains('unit')) {
       glucoseUnit.style.display = 'none';
     }
+  }
+}
+  
+function updateSedation(w) {
+  const midazEl = document.getElementById('midaz-sed');
+  const morphEl = document.getElementById('morphine-sed');
+  const propEl  = document.getElementById('propofol-sed');
+
+  if (w > 0 && !isNaN(w)) {
+    // Midazolam sedation: 3 mg/kg in 50 mL bag → 1 mL/h = 1 mcg/kg/min
+    const midazTotal = 3 * w;
+    midazEl.textContent = 
+      `${stripZeros(midazTotal.toFixed(2))} mg in 50 mL 0.9% sodium chloride; 1 mL/h = 1 mcg/kg/min`;
+
+    // Morphine sedation: 1 mg/kg in 50 mL bag → 1 mL/h = 20 mcg/kg/h
+    const morphTotal = 1 * w;
+    morphEl.textContent = 
+      `${stripZeros(morphTotal.toFixed(2))} mg in 50 mL 0.9% sodium chloride; 1 mL/h = 20 mcg/kg/h`;
+
+    // Propofol sedation: 1–4 mg/kg/h at 10 mg/mL
+    const propMin = 1 * w;
+    const propMax = 4 * w;
+    const mlMin   = propMin / 10;
+    const mlMax   = propMax / 10;
+    propEl.textContent =
+      `${stripZeros(propMin.toFixed(2))}–${stripZeros(propMax.toFixed(2))} mg/hr; ` +
+      `${stripZeros(mlMin.toFixed(2))}–${stripZeros(mlMax.toFixed(2))} mL/h`;
+  } else {
+    midazEl.textContent = '';
+    morphEl.textContent = '';
+    propEl.textContent  = '';
   }
 }
   
