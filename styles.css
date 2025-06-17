@@ -539,6 +539,16 @@ button.active small {
   border: 2px solid hsl(0,0%,85%); /* light grey outline */
 }
 
+.paeds-btn {
+   background: linear-gradient(130deg, #E38BA3 0%, #B94874 100%);
+  color: white;
+  font-family: 'Roboto', sans-serif;
+   font-weight: 400;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  border-radius: 0.5rem; /* same as banner */
+  border: 2px solid hsl(0,0%,85%); /* light grey outline */
+}
+
 .critical-btn {
   background: linear-gradient(130deg, #5E35B1 0%, #3a0f81 100%);
   color: white;
