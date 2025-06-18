@@ -1143,7 +1143,7 @@
     <strong>Paracetamol PO</strong>
   </td>
   <td style="padding: 8px; border: 1px solid #ccc;">
-    
+     <span id="paracetamol-po-dose"></span>
   </td>
   <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
     <span id="paracetamol-po"></span><span class="static unit">mg</span>
@@ -2096,26 +2096,53 @@ function updateReversal(w) {
     pIvNoteEl.textContent   = '';
     pIvNoteEl.style.display = 'none';
   }
+    
+  // ── PARACETAMOL PO dosing & note ──
+  if (w > 0 && w <= 10) {
+    paraPODose = 10 * w;
+    paraPONote = `Every 4–6 h; max 30 mg/kg/day = ${stripZeros((30*w).toFixed(2))} mg`;
+  } else if (w <= 50) {
+    paraPODose = 15 * w;
+    paraPONote = `Every 4–6 h; max 60 mg/kg/day = ${stripZeros((60*w).toFixed(2))} mg`;
+  } else if (w > 50) {
+    paraPODose = 1000;
+    paraPONote = `Every 4–6 h; max 4 g/day`;
+  } else {
+    paraPODose = 0;
+    paraPONote = '';
+  }
 
-  // 4) Update PO span & note for Paracetamol
+  // ── NEW: calculate and display the mg/kg PO dose (or flat adult cutoff) ──
+  const pPoDoseEl   = document.getElementById('paracetamol-po-dose');
+  let pPoDoseText   = '';
+  if (w > 0 && w <= 10) {
+    pPoDoseText = '10 mg/kg';
+  } else if (w > 10 && w <= 50) {
+    pPoDoseText = '15 mg/kg';
+  } else if (w > 50) {
+    pPoDoseText = '>50 kg';
+  }
+  pPoDoseEl.textContent     = pPoDoseText;
+  pPoDoseEl.style.display   = pPoDoseText ? 'inline' : 'none';
+
+  // now your existing code that writes the absolute PO dose & note…
   const pPoEl     = document.getElementById('paracetamol-po');
-  const pPoUnit   = pPoEl.nextElementSibling; // the “ mg” span
+  const pPoUnit   = pPoEl.nextElementSibling;
   const pPoNoteEl = document.getElementById('paracetamol-po-note');
-
   if (paraPODose > 0) {
     pPoEl.textContent   = stripZeros(paraPODose.toFixed(2));
     pPoEl.style.display = 'inline';
     if (pPoUnit) pPoUnit.style.display = 'inline';
 
-    pPoNoteEl.innerHTML     = `${paraPONote}`;
+    pPoNoteEl.textContent   = paraPONote;
     pPoNoteEl.style.display = 'inline';
   } else {
-    pPoEl.textContent     = '';
-    pPoEl.style.display   = 'none';
+    pPoEl.textContent   = '';
+    pPoEl.style.display = 'none';
     if (pPoUnit) pPoUnit.style.display = 'none';
 
-    pPoNoteEl.textContent     = '';
-    pPoNoteEl.style.display   = 'none';
+    pPoNoteEl.textContent   = '';
+    pPoNoteEl.style.display = 'none';
   }
   
   // — IBUPROFEN IV dosing & note —
