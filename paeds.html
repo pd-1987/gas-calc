@@ -2048,7 +2048,7 @@ function updateReversal(w) {
 // — PARACETAMOL dosing & note —
 
  // 1) Calculate the absolute IV dose and the wording for the note
-  let paraIVDose, paraIVNote;
+  let paraIVDose, paraIVNote, paraPODose, paraPONote;
   if (w > 0 && w <= 10) {
     paraIVDose    = 10 * w;
     paraIVNote    = `Every 4–6 h; max 30 mg/kg/day = ${stripZeros((30 * w).toFixed(2))} mg`;
