@@ -982,7 +982,7 @@
     <strong>Paracetamol IV</strong>
   </td>
   <td style="padding: 8px; border: 1px solid #ccc;">
-   
+    <span id="paracetamol-iv-dose"></span>
   </td>
   <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
     <span id="paracetamol-iv"></span><span class="static unit">mg</span>
@@ -1000,7 +1000,7 @@
     <strong>Ibuprofen IV</strong>
   </td>
   <td style="padding: 8px; border: 1px solid #ccc;">
-   
+   <span id="ibuprofen-iv-dose"></span>
   </td>
   <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
     <span id="ibuprofeniv"></span><span class="static unit">mg</span>
@@ -1577,7 +1577,7 @@
         <p>Paediatric Emergency Tools: <a href="https://apps.apple.com/gb/app/paediatric-emergency-tools/id415663345">Apple</a> / <a href="https://play.google.com/store/apps/details?id=com.ubqo.paedscalc&hl=en_GB&pli=1">Android</a></p>
         <br>
         <p><strong>Emergency guidelines</strong></p>
-                <p><a href="https://www.evelinalondon.nhs.uk/our-services/hospital/south-thames-retrieval-service/clinical-guidelines.aspx">South Thames Retrieval Service (STRS) Clinical Guidelines and Drug Calculators</a></p>
+                <p><a href="https://www.evelinalondon.nhs.uk/our-services/hospital/south-thames-retrieval-service/clinical-guidelines.aspx">South Thames Retrieval Service (STRS) Clinical Guidelines</a></p>
         <p><a href="https://cats.nhs.uk/clinical-guidelines/">Children’s Acute Transport Service (CATS) Clinical Guidelines</a></p>
         <p><a href="/guidelines/paediatrics/strs-intubation-guideline.pdf">STRS Intubation Guideline and Checklist</a></p>
         <p><a href="/guidelines/paediatrics/cats-intubation-checklist.pdf">CATS Intubation Checklist</a></p>
@@ -2047,43 +2047,36 @@ function updateReversal(w) {
 
 // — PARACETAMOL dosing & note —
 
-  // 1) Calculate IV dose & note
+ // 1) Calculate the absolute IV dose and the wording for the note
   let paraIVDose, paraIVNote;
   if (w > 0 && w <= 10) {
-    paraIVDose = 10 * w;
-    const maxDailyLowIV = stripZeros((30 * w).toFixed(2));
-    paraIVNote = `10 mg/kg every 4–6 h; max 30 mg/kg/day = ${maxDailyLowIV} mg`;
+    paraIVDose    = 10 * w;
+    paraIVNote    = `Every 4–6 h; max 30 mg/kg/day = ${stripZeros((30 * w).toFixed(2))} mg`;
   } else if (w <= 50) {
-    paraIVDose = 15 * w;
-    const maxDailyHighIV = stripZeros((60 * w).toFixed(2));
-    paraIVNote = `15 mg/kg every 4–6 h; max 60 mg/kg/day = ${maxDailyHighIV} mg`;
+    paraIVDose    = 15 * w;
+    paraIVNote    = `Every 4–6 h; max 60 mg/kg/day = ${stripZeros((60 * w).toFixed(2))} mg`;
   } else if (w > 50) {
-    paraIVDose = 1000;
-    paraIVNote = `1 g every 4–6 h; max 4 g/day`;
+    paraIVDose    = 1000;
+    paraIVNote    = `Every 4–6 h; max 4 g/day`;
   } else {
-    paraIVDose = 0;
-    paraIVNote = '';
+    paraIVDose    = 0;
+    paraIVNote    = '';
   }
 
-  // 2) Calculate PO dose & note
-  let paraPODose, paraPONote;
+  // ── NEW: calculate and display the mg/kg dose (or flat adult dose) ──
+  const pIvDoseEl = document.getElementById('paracetamol-iv-dose');
+  let pIvDoseText = '';
   if (w > 0 && w <= 10) {
-    paraPODose = 10 * w;
-    const maxDailyLowPO = stripZeros((30 * w).toFixed(2));
-    paraPONote = `10 mg/kg every 4–6 h; max 30 mg/kg/day = ${maxDailyLowPO} mg`;
-  } else if (w <= 50) {
-    paraPODose = 15 * w;
-    const maxDailyHighPO = stripZeros((60 * w).toFixed(2));
-    paraPONote = `15 mg/kg every 4–6 h; max 60 mg/kg/day = ${maxDailyHighPO} mg`;
+    pIvDoseText = '10 mg/kg';
+  } else if (w > 10 && w <= 50) {
+    pIvDoseText = '15 mg/kg';
   } else if (w > 50) {
-    paraPODose = 1000;
-    paraPONote = `1 g every 4–6 h; max 4 g/day`;
-  } else {
-    paraPODose = 0;
-    paraPONote = '';
+    pIvDoseText = '>50 kg';
   }
+  pIvDoseEl.textContent = pIvDoseText;
+  pIvDoseEl.style.display = pIvDoseText ? 'inline' : 'none';
 
-  // 3) Update IV span & note for Paracetamol
+  // 2) Update the absolute IV span & note for Paracetamol
   const pIvEl     = document.getElementById('paracetamol-iv');
   const pIvUnit   = pIvEl.nextElementSibling; // the “ mg” span
   const pIvNoteEl = document.getElementById('paracetamol-iv-note');
@@ -2093,15 +2086,15 @@ function updateReversal(w) {
     pIvEl.style.display = 'inline';
     if (pIvUnit) pIvUnit.style.display = 'inline';
 
-    pIvNoteEl.innerHTML     = `${paraIVNote}`;
-    pIvNoteEl.style.display = 'inline';
+    pIvNoteEl.textContent     = paraIVNote;
+    pIvNoteEl.style.display   = 'inline';
   } else {
-    pIvEl.textContent     = '';
-    pIvEl.style.display   = 'none';
-    if (pIvUnit) pIvUnit.style.display = 'none';
+    pIvEl.textContent   = '';
+    pIvEl.style.display = 'none';
+    if (pIvUnit) pIvUnit.style.display   = 'none';
 
-    pIvNoteEl.textContent     = '';
-    pIvNoteEl.style.display   = 'none';
+    pIvNoteEl.textContent   = '';
+    pIvNoteEl.style.display = 'none';
   }
 
   // 4) Update PO span & note for Paracetamol
@@ -2140,13 +2133,13 @@ function updateReversal(w) {
   } else if (ageY < 18) {
     if (w <= 29) {
       ibuText = '200';
-      ibuNote = '200 mg TDS, 6–8 h; max 600 mg/day';
+      ibuNote = 'TDS, 6–8 h; max 600 mg/day';
     } else if (w <= 39) {
       ibuText = '200';
-      ibuNote = '200 mg QDS, 6 h; max 800 mg/day';
+      ibuNote = 'QDS, 6 h; max 800 mg/day';
     } else {
       ibuText = '200–400';
-      ibuNote = '200–400 mg TDS, 6–8 h; max 1200 mg/day';
+      ibuNote = 'TDS, 6–8 h; max 1200 mg/day';
     }
   }
 
