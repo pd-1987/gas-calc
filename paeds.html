@@ -982,7 +982,7 @@
     <strong>Paracetamol IV</strong>
   </td>
   <td style="padding: 8px; border: 1px solid #ccc;">
-    <span id="paracetamol-iv-dose"></span>
+   
   </td>
   <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
     <span id="paracetamol-iv"></span><span class="static unit">mg</span>
@@ -1143,7 +1143,7 @@
     <strong>Paracetamol PO</strong>
   </td>
   <td style="padding: 8px; border: 1px solid #ccc;">
-     <span id="paracetamol-po-dose"></span>
+    
   </td>
   <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
     <span id="paracetamol-po"></span><span class="static unit">mg</span>
@@ -1576,12 +1576,22 @@
         <p><a href="https://www.paedspro.com/">Paeds Prescribing Pro Drug Calculator</a></p>
         <p>Paediatric Emergency Tools: <a href="https://apps.apple.com/gb/app/paediatric-emergency-tools/id415663345">Apple</a> / <a href="https://play.google.com/store/apps/details?id=com.ubqo.paedscalc&hl=en_GB&pli=1">Android</a></p>
         <br>
-        <p><strong>Emergency guidelines</strong></p>
+        <p><strong>Emergency Guidelines</strong></p>
                 <p><a href="https://www.evelinalondon.nhs.uk/our-services/hospital/south-thames-retrieval-service/clinical-guidelines.aspx">South Thames Retrieval Service (STRS) Clinical Guidelines</a></p>
         <p><a href="https://cats.nhs.uk/clinical-guidelines/">Children’s Acute Transport Service (CATS) Clinical Guidelines</a></p>
         <p><a href="/guidelines/paediatrics/strs-intubation-guideline.pdf">STRS Intubation Guideline and Checklist</a></p>
         <p><a href="/guidelines/paediatrics/cats-intubation-checklist.pdf">CATS Intubation Checklist</a></p>
         <p><a href="/guidelines/paediatrics/apls-emergency-drug-chart-2021.pdf">APLS Emergency Drug Chart</a></p>
+        <br>
+                <p><strong>Airway Guidelines</strong></p>
+        <p><a href="https://cats.nhs.uk/das-paediatric-difficult-bmv.pdf/">DAS Difficult mask ventilation during routine induction of anaesthesia in a child aged 1–8 years guideline</a></p>
+        <p><a href="/guidelines/paediatrics/das-paediatric-difficult-intubation.pdf">DAS Difficult intubation during routine induction of anaesthesia in a child aged 1–8 years guideline</a></p>
+        <p><a href="/guidelines/paediatrics/das-paediatric-cicv.pdf">DAS Cannot Intubate and Cannot Ventilate (CICV) in a paralysed anaesthetised child aged 1–8 years</a></p>
+        <br>
+        <p><strong>Anaphylaxis Guidelines</strong></p>
+        <p><a href="/guidelines/paediatrics/apls-perioperative-anaphylaxis-2021.pdf">APLS Perioperative Anaphylaxis algorithm</a></p>
+        <p><a href="/guidelines/paediatrics/apls-anaphylaxis-2021.pdf">APLS Anaphylaxis algorithm</a></p>
+        <p><a href="/guidelines/paediatrics/apls-refractory-anaphylaxis-2021.pdf">APLS Refractory Anaphylaxis algorithm</a></p>
         <br>
         <p><strong>Advanced Paediatric Life Support (APLS) 2021 Resources</strong></p>
            <p><a href="/guidelines/paediatrics/apls-algorithm-2021.pdf">Advanced Paediatric Life Support (APLS) Algorithm</a></p>
@@ -1677,7 +1687,7 @@
   
   <footer>
     <small> 
-    <p>SBP: Systolic blood pressure; HR: Heart rate; RR: Respiratory rate; LMA: Laryngeal mask airway; RSI: Rapid sequence intubation; PO: By mouth; NAS: Intranasal; TOF: Train-of-four; PTC: Post-tetanic count</p>
+    <p>SBP: Systolic blood pressure; HR: Heart rate; RR: Respiratory rate; LMA: Laryngeal mask airway; ARDS: Acute respiratory distress syndrome; PO: By mouth; NAS: Intranasal; TOF: Train-of-four; PTC: Post-tetanic count</p>
       <p>
         <a href="references.html">References</a> - 
         <a href="disclaimer.html">Disclaimer</a>
@@ -2047,36 +2057,43 @@ function updateReversal(w) {
 
 // — PARACETAMOL dosing & note —
 
- // 1) Calculate the absolute IV dose and the wording for the note
-  let paraIVDose, paraIVNote, paraPODose, paraPONote;
+  // 1) Calculate IV dose & note
+  let paraIVDose, paraIVNote;
   if (w > 0 && w <= 10) {
-    paraIVDose    = 10 * w;
-    paraIVNote    = `Every 4–6 h; max 30 mg/kg/day = ${stripZeros((30 * w).toFixed(2))} mg`;
+    paraIVDose = 10 * w;
+    const maxDailyLowIV = stripZeros((30 * w).toFixed(2));
+    paraIVNote = `10 mg/kg every 4–6 h; max 30 mg/kg/day = ${maxDailyLowIV} mg`;
   } else if (w <= 50) {
-    paraIVDose    = 15 * w;
-    paraIVNote    = `Every 4–6 h; max 60 mg/kg/day = ${stripZeros((60 * w).toFixed(2))} mg`;
+    paraIVDose = 15 * w;
+    const maxDailyHighIV = stripZeros((60 * w).toFixed(2));
+    paraIVNote = `15 mg/kg every 4–6 h; max 60 mg/kg/day = ${maxDailyHighIV} mg`;
   } else if (w > 50) {
-    paraIVDose    = 1000;
-    paraIVNote    = `Every 4–6 h; max 4 g/day`;
+    paraIVDose = 1000;
+    paraIVNote = `1 g every 4–6 h; max 4 g/day`;
   } else {
-    paraIVDose    = 0;
-    paraIVNote    = '';
+    paraIVDose = 0;
+    paraIVNote = '';
   }
 
-  // ── NEW: calculate and display the mg/kg dose (or flat adult dose) ──
-  const pIvDoseEl = document.getElementById('paracetamol-iv-dose');
-  let pIvDoseText = '';
+  // 2) Calculate PO dose & note
+  let paraPODose, paraPONote;
   if (w > 0 && w <= 10) {
-    pIvDoseText = '10 mg/kg';
-  } else if (w > 10 && w <= 50) {
-    pIvDoseText = '15 mg/kg';
+    paraPODose = 10 * w;
+    const maxDailyLowPO = stripZeros((30 * w).toFixed(2));
+    paraPONote = `10 mg/kg every 4–6 h; max 30 mg/kg/day = ${maxDailyLowPO} mg`;
+  } else if (w <= 50) {
+    paraPODose = 15 * w;
+    const maxDailyHighPO = stripZeros((60 * w).toFixed(2));
+    paraPONote = `15 mg/kg every 4–6 h; max 60 mg/kg/day = ${maxDailyHighPO} mg`;
   } else if (w > 50) {
-    pIvDoseText = '>50 kg';
+    paraPODose = 1000;
+    paraPONote = `1 g every 4–6 h; max 4 g/day`;
+  } else {
+    paraPODose = 0;
+    paraPONote = '';
   }
-  pIvDoseEl.textContent = pIvDoseText;
-  pIvDoseEl.style.display = pIvDoseText ? 'inline' : 'none';
 
-  // 2) Update the absolute IV span & note for Paracetamol
+  // 3) Update IV span & note for Paracetamol
   const pIvEl     = document.getElementById('paracetamol-iv');
   const pIvUnit   = pIvEl.nextElementSibling; // the “ mg” span
   const pIvNoteEl = document.getElementById('paracetamol-iv-note');
@@ -2086,63 +2103,36 @@ function updateReversal(w) {
     pIvEl.style.display = 'inline';
     if (pIvUnit) pIvUnit.style.display = 'inline';
 
-    pIvNoteEl.textContent     = paraIVNote;
-    pIvNoteEl.style.display   = 'inline';
+    pIvNoteEl.innerHTML     = `${paraIVNote}`;
+    pIvNoteEl.style.display = 'inline';
   } else {
-    pIvEl.textContent   = '';
-    pIvEl.style.display = 'none';
-    if (pIvUnit) pIvUnit.style.display   = 'none';
+    pIvEl.textContent     = '';
+    pIvEl.style.display   = 'none';
+    if (pIvUnit) pIvUnit.style.display = 'none';
 
-    pIvNoteEl.textContent   = '';
-    pIvNoteEl.style.display = 'none';
-  }
-    
-  // ── PARACETAMOL PO dosing & note ──
-  if (w > 0 && w <= 10) {
-    paraPODose = 10 * w;
-    paraPONote = `Every 4–6 h; max 30 mg/kg/day = ${stripZeros((30*w).toFixed(2))} mg`;
-  } else if (w <= 50) {
-    paraPODose = 15 * w;
-    paraPONote = `Every 4–6 h; max 60 mg/kg/day = ${stripZeros((60*w).toFixed(2))} mg`;
-  } else if (w > 50) {
-    paraPODose = 1000;
-    paraPONote = `Every 4–6 h; max 4 g/day`;
-  } else {
-    paraPODose = 0;
-    paraPONote = '';
+    pIvNoteEl.textContent     = '';
+    pIvNoteEl.style.display   = 'none';
   }
 
-  // ── NEW: calculate and display the mg/kg PO dose (or flat adult cutoff) ──
-  const pPoDoseEl   = document.getElementById('paracetamol-po-dose');
-  let pPoDoseText   = '';
-  if (w > 0 && w <= 10) {
-    pPoDoseText = '10 mg/kg';
-  } else if (w > 10 && w <= 50) {
-    pPoDoseText = '15 mg/kg';
-  } else if (w > 50) {
-    pPoDoseText = '>50 kg';
-  }
-  pPoDoseEl.textContent     = pPoDoseText;
-  pPoDoseEl.style.display   = pPoDoseText ? 'inline' : 'none';
-
-  // now your existing code that writes the absolute PO dose & note…
+  // 4) Update PO span & note for Paracetamol
   const pPoEl     = document.getElementById('paracetamol-po');
-  const pPoUnit   = pPoEl.nextElementSibling;
+  const pPoUnit   = pPoEl.nextElementSibling; // the “ mg” span
   const pPoNoteEl = document.getElementById('paracetamol-po-note');
+
   if (paraPODose > 0) {
     pPoEl.textContent   = stripZeros(paraPODose.toFixed(2));
     pPoEl.style.display = 'inline';
     if (pPoUnit) pPoUnit.style.display = 'inline';
 
-    pPoNoteEl.textContent   = paraPONote;
+    pPoNoteEl.innerHTML     = `${paraPONote}`;
     pPoNoteEl.style.display = 'inline';
   } else {
-    pPoEl.textContent   = '';
-    pPoEl.style.display = 'none';
+    pPoEl.textContent     = '';
+    pPoEl.style.display   = 'none';
     if (pPoUnit) pPoUnit.style.display = 'none';
 
-    pPoNoteEl.textContent   = '';
-    pPoNoteEl.style.display = 'none';
+    pPoNoteEl.textContent     = '';
+    pPoNoteEl.style.display   = 'none';
   }
   
   // — IBUPROFEN IV dosing & note —
@@ -2160,13 +2150,13 @@ function updateReversal(w) {
   } else if (ageY < 18) {
     if (w <= 29) {
       ibuText = '200';
-      ibuNote = 'TDS, 6–8 h; max 600 mg/day';
+      ibuNote = '200 mg TDS, 6–8 h; max 600 mg/day';
     } else if (w <= 39) {
       ibuText = '200';
-      ibuNote = 'QDS, 6 h; max 800 mg/day';
+      ibuNote = '200 mg QDS, 6 h; max 800 mg/day';
     } else {
       ibuText = '200–400';
-      ibuNote = 'TDS, 6–8 h; max 1200 mg/day';
+      ibuNote = '200–400 mg TDS, 6–8 h; max 1200 mg/day';
     }
   }
 
@@ -2596,11 +2586,31 @@ if (y <= 14) {
     return;
   }
 
+      if (w > 0 && w < 1) {
+    // always give uncuffed size 2.5
+    const uncEl  = document.getElementById('ett-uncuffed');
+    const cuffEl = document.getElementById('ett-cuffed');
+    uncEl.textContent   = '2.5';
+    uncEl.style.display = 'inline';
+    cuffEl.textContent   = '';
+    cuffEl.style.display = 'none';
+        
+         const depth         = stripZeros((1.17 * w + 5.58).toFixed(2));
+  const depthEl       = document.getElementById('ett-depth-lips');
+  const depthUnit     = depthEl.nextElementSibling;
+  depthEl.textContent   = depth;
+  depthEl.style.display = 'inline';
+  depthUnit.style.display = 'inline';
+
+  return; // now you can safely exit
+  }
+  else {
+    
   // your age→ETT size table
   const table = [
     { maxAge: 0.0833, unc: '3.0',     cuff: null    },  // <1 mo
-    { maxAge: 1/12,   unc: '3.0–3.5',  cuff: '3.0'    }, // =1 mo
-    { maxAge: 2/12,   unc: '3.0–3.5',  cuff: '3.0'    }, // =1 mo
+    { maxAge: 1/12,   unc: '3.5',  cuff: '3.0'    }, // =1 mo
+    { maxAge: 2/12,   unc: '3.5',  cuff: '3.0'    }, // =1 mo
     { maxAge: 3/12,   unc: '3.5',      cuff: '3.0'    }, // 3 mo
     { maxAge: 6/12,   unc: '3.5',      cuff: '3.0'    }, // 6 mo
     { maxAge: 1,      unc: '4.0',      cuff: '3.5'    }, // 1 yr
@@ -2662,7 +2672,7 @@ if (y <= 14) {
     depthEl.style.display = 'none';
     depthUnit.style.display = 'none';
   }
-
+  }
   // 8) now your i-Gel, LMA, tidal-volume & blade sizing exactly as before:
   // — i-Gel —
   const igelEl = document.getElementById('igel');
