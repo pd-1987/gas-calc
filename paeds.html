@@ -640,8 +640,9 @@
       <strong>Suxamethonium IV</strong>
     </td>
     <td style="padding: 8px; border: 1px solid #ccc;">
-      1–2 mg/kg
-    </td>
+  <span id="sux-range">1–2</span>
+  <span class="unit">mg/kg</span>
+</td>
     <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
       <span id="sux-iv"></span><span class="static unit">mg</span>
     </td>
@@ -1227,8 +1228,8 @@
     <strong>Suxamethonium IV</strong>
   </td>
   <td style="padding: 8px; border: 1px solid #ccc;">
-    1-2 mg/kg
-  </td>
+  <span id="sux-ga-range">1–2</span> <span class="unit">mg/kg</span>
+</td>
   <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
     <span class="sux-iv-dose"></span><span class="static unit">mg</span>
   </td>
@@ -1706,7 +1707,7 @@
     </thead>
     <tbody>
            <tr>
-        <th style="border:1px solid #ccc; padding:8px; text-align:center;">Minimal target SBP</th>
+        <th style="border:1px solid #ccc; padding:8px; text-align:center;">Lowest acceptable SBP</th>
         <td style="border:1px solid #ccc; padding:8px; text-align:center;">
           <p>&lt;1 month: &ge;60 mmHg</p>
           <p>1 month to 1 year: &ge;70 mmHg</p>
@@ -1714,9 +1715,9 @@
         </td>
       </tr>
       <tr>
-        <th style="border:1px solid #ccc; padding:8px; text-align:center;">Minimal target MAP</th>
+        <th style="border:1px solid #ccc; padding:8px; text-align:center;">Lowest acceptable MAP</th>
         <td style="border:1px solid #ccc; padding:8px; text-align:center;">
-          <p>Age (in years) x 1.5 + 40 mHg</p> 
+          <p>Age (in years) x 1.5 + 40 mmHg</p> 
         </td>
       </tr>
             <tr>
@@ -1738,8 +1739,8 @@
   
   <footer>
     <small> 
-    <p>SBP: Systolic blood pressure; HR: Heart rate; RR: Respiratory rate; LMA: Laryngeal mask airway; ARDS: Acute respiratory distress syndrome; STRS: South Thames Retrieval Service; PO: By mouth; NAS: Intranasal; TOF: Train-of-four; PTC: Post-tetanic count</p>
-      <p>
+    <p>SBP: Systolic blood pressure; HR: Heart rate; RR: Respiratory rate; LMA: Laryngeal mask airway; ARDS: Acute respiratory distress syndrome; PO: By mouth; NAS: Intranasal; TOF: Train-of-four; PTC: Post-tetanic count</p>
+      <p>We shall not be liable for any claims or losses arising from the use or misuse of these web applications, their content, any omissions from their content, or otherwise. They are not to be used as the sole basis for the care of any patients, results should be verified and must be used in conjunction with the appropriate training, professional judgement and according to your local hospital policies and procedures. These tools and calculators do not have approval by the MHRA as medical devices and clinicians need to be aware that they use them at their own risk.</p>
         <a href="references.html">References</a> - 
         <a href="disclaimer.html">Disclaimer</a>
       </p>
@@ -2543,15 +2544,16 @@ function updateReversal(w) {
   return;
 }
     
-  const y = m / 12;
+const y = m / 12;
 if (y <= 14) {
   const w1 = Math.round((2 * y + 8) * 10) / 10;
   let html = `<p>(2 × Age) + 8 = ${w1} <span class="unit">kg</span></p>`;
-  if (y >= 6) {
+  // show the 3A+7 line for any age above 1 year
+  if (y > 1) {
     const w2 = Math.round((3 * y + 7) * 10) / 10;
     html += `<p>(3 × Age) + 7 = ${w2} <span class="unit">kg</span></p>`;
   }
-  weightIn.value = w1;
+  weightIn.value    = w1;
   calcDiv.innerHTML = html;
 
   if (autoEstimate) {                          // ← ADD this block
@@ -2752,8 +2754,10 @@ if (y <= 14) {
     else if (w <= 70)  lmaSize = '4.0 <small>(50–70 kg)</small>';
     else if (w <= 100) lmaSize = '5.0 <small>(70–100 kg)</small>';
   }
-  lmaEl.innerHTML             = lmaSize;
-  display = lmaSize ? 'block' : 'nolmaEl.parentElement.style.ne';
+    
+lmaEl.innerHTML = lmaSize;
+lmaEl.style.display = lmaSize ? 'inline-block' : 'none';
+
 
   // — Tidal volume —
   const tvEl = document.getElementById('tidalvolume');
@@ -2932,17 +2936,33 @@ function updateEmergencyDrugs(w) {
 
     atropineExtra.innerHTML = `${stripZeros(aVol)} mL of 600 mcg/mL`;
 
-    // — SUXAMETHONIUM IV: 1–2 mg/kg @ 50 mg/mL —
-    const sIVmin   = 1   * w,                // mg
-          sIVmax   = 2   * w,                // mg
-          ivVolMin = (sIVmin  / 50).toFixed(2), // mL
-          ivVolMax = (sIVmax  / 50).toFixed(2); // mL
+// — SUXAMETHONIUM IV: age-tailored dose @ 50 mg/mL —
+const rawAge = parseFloat(ageInput.value) || 0;
+const ageY   = ageUnit === 'months' ? rawAge/12 : rawAge;
 
-    suxIvEl.textContent   = `${stripZeros(sIVmin.toFixed(1))}–${stripZeros(sIVmax.toFixed(1))}`;
-    suxIvEl.style.display = 'inline';
-    suxIvEl.nextElementSibling.style.display = 'inline'; // “ mg”
+// neonates & infants (<1yr) get 2 mg/kg, older get 1 mg/kg
+const suxDose = (ageY < 1 ? 2 : 1) * w;
 
-    suxIvExtra.innerHTML = `${stripZeros(ivVolMin)}–${stripZeros(ivVolMax)} mL of 50 mg/mL`;
+// write dose
+suxIvEl.textContent   = stripZeros(suxDose.toFixed(1));
+suxIvEl.style.display = 'inline';
+suxIvEl.nextElementSibling.style.display = 'inline'; // “ mg”
+
+// and volume
+const suxVol = stripZeros((suxDose/50).toFixed(2));
+suxIvExtra.innerHTML  = `${suxVol} mL of 50 mg/mL`;
+    
+    // grab the new span
+const suxRange = document.getElementById('sux-range');
+
+// your age-based rule: for example,
+//  -- under 1 year → 2 mg/kg
+//  -- 1 year and over → 1 mg/kg
+if (ageY < 1) {
+  suxRange.textContent = '2';
+} else {
+  suxRange.textContent = '1';
+}
 
     // — SUXAMETHONIUM IM: 4 mg/kg (max 150 mg) @ 50 mg/mL —
     let imDose = 4 * w;
@@ -3141,14 +3161,10 @@ document.querySelectorAll('.atropine-extra').forEach(el => {
   el.textContent = `${vol} mL of 600 mcg/mL`;
 });
 
-// SUXAMETHONIUM IV (1–2 mg/kg @ 50 mg/mL)
+// SUXAMETHONIUM IV: age-tailored dose @ 50 mg/mL
 document.querySelectorAll('.sux-iv-dose').forEach(el => {
-  const minDose = 1 * w;   // mg
-  const maxDose = 2 * w;
-  const doseText = (Math.abs(minDose - maxDose) < 0.01)
-    ? stripZeros(minDose.toFixed(1))
-    : `${stripZeros(minDose.toFixed(1))}–${stripZeros(maxDose.toFixed(1))}`;
-  el.textContent   = doseText;
+  const suxDose = (ageY < 1 ? 2 : 1) * w;
+  el.textContent   = stripZeros(suxDose.toFixed(1));
   el.style.display = 'inline';
   const unit = el.nextElementSibling;
   if (unit && unit.classList.contains('unit')) {
@@ -3156,9 +3172,9 @@ document.querySelectorAll('.sux-iv-dose').forEach(el => {
   }
 });
 document.querySelectorAll('.sux-iv-extra').forEach(el => {
-  const minVol = stripZeros(((1 * w) / 50).toFixed(2));
-  const maxVol = stripZeros(((2 * w) / 50).toFixed(2));
-  el.textContent = `${minVol}–${maxVol} mL of 50 mg/mL`;
+  const suxDose = (ageY < 1 ? 2 : 1) * w;
+  const vol     = stripZeros((suxDose/50).toFixed(2));
+  el.textContent = `${vol} mL of 50 mg/mL`;
 });
 
 // SUXAMETHONIUM IM (4 mg/kg, capped at 150 mg @ 50 mg/mL)
@@ -3179,6 +3195,16 @@ document.querySelectorAll('.sux-im-extra').forEach(el => {
   const vol = stripZeros((dose / 50).toFixed(2));
   el.textContent = `${vol} mL of 50 mg/mL`;
 });
+
+// --- at top of updateGADrugs, after ageY is known ---
+const suxGaRange = document.getElementById('sux-ga-range');
+
+// decide your rule, e.g. under 1 year → 2 mg/kg, otherwise 1–2
+if (ageY < 1) {
+  suxGaRange.textContent = '2';
+} else {
+  suxGaRange.textContent = '1';
+}      
       
        // — Cyclizine (0.5–1 mg/kg; max 25 mg <12 y; 50 mg ≥12 y; 50 mg/mL) —
   const cylEl    = document.getElementById('cyclizine');
