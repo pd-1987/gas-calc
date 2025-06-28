@@ -1740,7 +1740,7 @@
   <footer>
     <small> 
     <p>SBP: Systolic blood pressure; HR: Heart rate; RR: Respiratory rate; LMA: Laryngeal mask airway; ARDS: Acute respiratory distress syndrome; PO: By mouth; NAS: Intranasal; TOF: Train-of-four; PTC: Post-tetanic count</p>
-      <p>We are not be liable for any claims or losses arising from the use or misuse of these web applications, their content, any omissions from their content, or otherwise. They are not to be used as the sole basis for the care of any patients, results should be verified and must be used in conjunction with the appropriate training, professional judgement and according to your local hospital policies and procedures. These tools and calculators do not have approval by the MHRA as medical devices and clinicians need to be aware that they use them at their own risk.</p>
+      <p>These tools and calculators do not have approval by the MHRA as medical devices and clinicians need to be aware that they use them at their own risk. Results should be verified and used in conjunction with the appropriate training and professional judgement, and according to your local hospital policies and procedures.</p>
         <a href="references.html">References</a> - 
         <a href="disclaimer.html">Disclaimer</a>
       </p>
@@ -2661,11 +2661,12 @@ if (y <= 14) {
     
   // your age→ETT size table
   const table = [
-    { maxAge: 0.0833, unc: '3.0',     cuff: null    },  // <1 mo
+    { maxAge: 0.0833, unc: '3.0',     cuff: '2.5'    },  // <1 mo
     { maxAge: 1/12,   unc: '3.5',  cuff: '3.0'    }, // =1 mo
     { maxAge: 2/12,   unc: '3.5',  cuff: '3.0'    }, // =1 mo
-    { maxAge: 3/12,   unc: '3.5',      cuff: '3.0'    }, // 3 mo
-    { maxAge: 6/12,   unc: '3.5',      cuff: '3.0'    }, // 6 mo
+    { maxAge: 4/12,   unc: '3.5',      cuff: '3.0'    }, // 3 mo
+    { maxAge: 5/12,   unc: '4.0',      cuff: '3.5'    }, // 5 mo
+    { maxAge: 6/12,   unc: '4.0',      cuff: '3.5'    }, // 6 mo
     { maxAge: 1,      unc: '4.0',      cuff: '3.5'    }, // 1 yr
     { maxAge: 2,      unc: '4.5',      cuff: '4.0'    },
     { maxAge: 3,      unc: '4.5–5.0',  cuff: '4.0–4.5'},
