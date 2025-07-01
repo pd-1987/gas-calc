@@ -2654,8 +2654,6 @@ if (y <= 14) {
   depthEl.textContent   = depth;
   depthEl.style.display = 'inline';
   depthUnit.style.display = 'inline';
-
-  return; // now you can safely exit
   }
   else {
     
@@ -2749,7 +2747,7 @@ if (y >= 1) {
   // — i-Gel —
   const igelEl = document.getElementById('igel');
   let igelSize = '';
-  if (w > 0) {
+  if (w >= 2) {
     if      (w <= 5)  igelSize = '1.0 <small>(2–5 kg)</small>';
     else if (w <= 10) igelSize = '1.5 <small>(5–12 kg)</small>';
     else if (w <= 25) igelSize = '2.0 <small>(10–25 kg)</small>';
