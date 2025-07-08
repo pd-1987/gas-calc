@@ -16,10 +16,12 @@
   <title>LA 50:50 combined maximum calculator</title>
 
   <style>
+   :root {
+  --section-gap: 1rem;  /* or 20px, whichever you prefer */
+}
     header.banner {
       background: linear-gradient(130deg, #2e8b57 0%, #1b5e20 100%);
     }
-
     /* Inputs */
     .input-group {
       display: flex;
@@ -37,7 +39,6 @@
     }
     .input-note {
       font-size: 0.9em;
-      margin-bottom: 20px;
       color: #555;
     }
 
@@ -45,7 +46,6 @@
     /* LA sections – single column */
 .la-sections {
   display: block;
-  margin-bottom: 20px;
 }
 
 .la-column {
@@ -53,8 +53,7 @@
   border: 1px solid #ddd;
   border-radius: 6px;
   padding: 10px;
-  margin-bottom: 1rem;
-   box-sizing: border-box;
+  box-sizing: border-box;
 
   /* LEFT-ALIGN EVERYTHING inside */
   text-align: left;
@@ -107,8 +106,7 @@
   border: 1px solid #ddd;
   border-radius: 6px;
       padding: 10px;
-      margin-bottom: 20px;
-       box-sizing: border-box;
+      box-sizing: border-box;
       text-align: center;
     }
     .combined-box h2 {
@@ -159,8 +157,7 @@
  background-color: #fafafa;  /* or white if you prefer */
   border: 1px solid #ddd;
   border-radius: 6px;
-      padding: 10px;
-  margin-bottom: 20px;
+  padding: 10px;
   text-align: left;
   display: flex;
   align-items: center;
@@ -206,7 +203,6 @@
   border: 1px solid #ddd;
   border-radius: 6px;
   padding: 10px;
-  margin-bottom: 20px;
   display: flex;
   justify-content: center;
   gap: 1rem;
@@ -225,6 +221,13 @@
   background-color: #0078d7;
   color: #fff;
 }
+    .mode-box,
+.la-column,
+.combined-box,
+.given-volume-box,
+.input-note, .la-sections {
+  margin-bottom: var(--section-gap);
+}
   </style>
 </head>
 <body>
@@ -238,8 +241,8 @@
   <p class="input-note">Use ideal body weight if BMI ≥ 30 kg/m².</p>
 
   <div class="mode-box">
-  <button type="button" id="mode-dose"   class="mode-btn">By dose</button>
-    <button type="button" id="mode-volume" class="mode-btn active">By volume</button>
+  <button type="button" id="mode-dose"   class="mode-btn active">By dose</button>
+    <button type="button" id="mode-volume" class="mode-btn">By volume</button>
 </div>
   
   <div class="la-sections">
@@ -509,6 +512,11 @@ function getMainLabel(btn) {
     doseButtons.forEach(b => b.classList.remove('active'));
     la2NameBtn.textContent = 'Levobupivacaine 0.5%';
 
+    // reset mode toggle back to “By dose”
+  mode = 'dose';
+  modeDoseBtn.classList.add('active');
+  modeVolumeBtn.classList.remove('active');
+    
     // zero out displays
     la1Max.textContent    = '0';
     la2Max.textContent    = '0';
