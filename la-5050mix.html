@@ -13,7 +13,7 @@
   href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
   rel="stylesheet"
 />
-  <title>LA 50:50 combined maximum dose calculator</title>
+  <title>LA 50:50 combined maximum calculator</title>
 
   <style>
     header.banner {
@@ -201,11 +201,35 @@
   color: #555;
   margin-bottom: 0px;
 }
+    .mode-box {
+  background-color: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  box-sizing: border-box;
+}
+.mode-btn {
+  background-color: #e7f3fe;
+  border: 1px solid #bcdffc;
+  border-radius: 15px;
+  color: #0078d7;
+  cursor: pointer;
+  padding: 6px 12px;
+  font-size: 14px;
+}
+.mode-btn.active {
+  background-color: #0078d7;
+  color: #fff;
+}
   </style>
 </head>
 <body>
 
-  <header class="banner">LA 50:50 combined maximum dose</header>
+  <header class="banner">LA 50:50 combined maximum</header>
 
   <div class="input-group">
     <label for="weight">Weight (kg):</label>
@@ -213,6 +237,11 @@
   </div>
   <p class="input-note">Use ideal body weight if BMI ≥ 30 kg/m².</p>
 
+  <div class="mode-box">
+  <button type="button" id="mode-dose"   class="mode-btn">By dose</button>
+    <button type="button" id="mode-volume" class="mode-btn active">By volume</button>
+</div>
+  
   <div class="la-sections">
     <!-- LA 1 -->
     <div class="la-column" id="la1">
@@ -313,6 +342,23 @@
   const givenVolInput = document.getElementById('given-vol');
   const givenPercSpan = document.getElementById('given-perc');
 
+  const modeVolumeBtn = document.getElementById('mode-volume');
+const modeDoseBtn   = document.getElementById('mode-dose');
+let   mode          = 'volume';  // default
+
+modeVolumeBtn.addEventListener('click', () => {
+  mode = 'volume';
+  modeVolumeBtn.classList.add('active');
+  modeDoseBtn.classList.remove('active');
+  updateDoses();
+});
+modeDoseBtn.addEventListener('click', () => {
+  mode = 'dose';
+  modeDoseBtn.classList.add('active');
+  modeVolumeBtn.classList.remove('active');
+  updateDoses();
+});
+  
   let levaPerKg = null;   // selected mg/kg for LA-2
   let isLevo    = true;   // are we showing Levobupivacaine? (true) or Bupivacaine? (false)
 
@@ -369,31 +415,50 @@ function getMainLabel(btn) {
   }
 
   // Calculate and display 50:50 combined volumes, doses & percents
-  function updateCombined(s1, s2) {
-    const c1 = 2   * 10;  // 2% lidocaine → 20 mg/mL
-    const c2 = 0.5 * 10;  // 0.5% LA-2 → 5 mg/mL
+ function updateCombined(s1, s2) {
+  const c1 = 2   * 10;  // 2% → 20 mg/mL
+  const c2 = 0.5 * 10;  // 0.5% → 5  mg/mL
 
-    let V = 0, d1 = 0, d2 = 0;
-    if (s1 > 0 && s2 > 0) {
-      const sum = (c1 / s1) + (c2 / s2);
-      V  = 1 / sum;
+  let d1 = 0, d2 = 0, V1 = 0, V2 = 0;
+
+  if (s1 > 0 && s2 > 0) {
+    if (mode === 'volume') {
+      // existing 50:50‐by‐volume logic
+      const sum = (c1/s1) + (c2/s2);
+      const V   = 1 / sum;
       d1 = c1 * V;
       d2 = c2 * V;
+      V1 = V;
+      V2 = V;
+    } else {
+      // new 50:50‐by‐dose logic
+      d1 = s1 / 2;
+      d2 = s2 / 2;
+      V1 = d1 / c1;
+      V2 = d2 / c2;
     }
-
-    // component and total volumes
-    comb1Vol.textContent   = fmt2(V);
-    comb2Vol.textContent   = fmt2(V);
-    totalVolSpan.textContent = fmt2(2 * V);
-
-    // component doses & percents
-    comb1Dose.textContent = Math.round(d1);
-    comb1Perc.textContent = fmt2(s1 ? (d1 / s1) * 100 : 0);
-    comb2Dose.textContent = Math.round(d2);
-    comb2Perc.textContent = fmt2(s2 ? (d2 / s2) * 100 : 0);
-
-    updateGivenPerc();
   }
+
+  // write out volumes
+  comb1Vol.textContent   = fmt2(V1);
+  comb2Vol.textContent   = fmt2(V2);
+  totalVolSpan.textContent = fmt2(V1 + V2);
+
+  // write out doses
+  comb1Dose.textContent  = Math.round(d1);
+  comb2Dose.textContent  = Math.round(d2);
+
+  // write out percents
+  if (mode === 'volume') {
+    comb1Perc.textContent = fmt2(s1 ? (d1/s1)*100 : 0);
+    comb2Perc.textContent = fmt2(s2 ? (d2/s2)*100 : 0);
+  } else {
+    comb1Perc.textContent = fmt2(s1 ? (d1/s1)*100 : 0);  // always 50%
+    comb2Perc.textContent = fmt2(s2 ? (d2/s2)*100 : 0);
+  }
+
+  updateGivenPerc();
+}
 
   // Update “given volume” percentage
   function updateGivenPerc() {
