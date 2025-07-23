@@ -1219,7 +1219,7 @@
     20 mcg/kg
   </td>
   <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
-    <span class="atropine-dose"></span><span class="static unit">mg</span>
+    <span class="atropine-dose"></span><span class="static unit">mcg</span>
   </td>
 </tr>
 <tr style="background-color: #e3f0d4;">
@@ -1377,6 +1377,23 @@
             </td>
           </tr>
           <tr style="background-color: #f5f5f5;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+              <small></small>
+            </td>
+          </tr>
+   <tr style="background-color: #fff;">
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              <strong>Metronidazole</strong>
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              30 mg/kg (Max 500 mg)
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+              <span id="metronidazole"></span>
+              <span class="static unit">mg</span>
+            </td>
+          </tr>
+            <tr style="background-color: #f5f5f5;">
             <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
               <small></small>
             </td>
@@ -2298,7 +2315,7 @@ function updateReversal(w) {
       kDoseMax = 15;
     }
 
-    // Build dose text (if min === max, show “15 (m​ax)”)
+    // Build dose text (if min === max, show “15 (max)”)
     let doseText;
     if (Math.abs(kDoseMin - kDoseMax) < 0.001) {
   // capped exactly at 15 mg → show "15" in kEl and "mg (max)" in kUnit
@@ -2325,7 +2342,7 @@ function updateReversal(w) {
     let volText;
     if (Math.abs(kDoseMin - kDoseMax) < 0.001) {
       // capped: show “0.50 mL (max) of 30 mg/mL”
-      volText = `${stripZeros(vMin)} (max)`;
+      volText = `${stripZeros(vMin)}`;
     } else {
       volText = `${stripZeros(vMin)}–${stripZeros(vMax)}`;
     }
@@ -3381,7 +3398,8 @@ function updateAntibiotics(w) {
     { id: 'cefuroxime',     dosePerKg: 50, max: 1500 },
     { id: 'co-amoxiclav',   dosePerKg: 30, max: 1200 },
     { id: 'flucloxacillin', dosePerKgMin: 12.5, dosePerKgMax: 25, max: 1000 },
-    { id: 'gentamicin',     dosePerKg: 2,  max: 480 }
+    { id: 'gentamicin',     dosePerKg: 2.5,  max: 480 },
+    { id: 'metronidazole',  dosePerKg: 30,   max: 500 }
   ];
 
   meds.forEach(m => {
