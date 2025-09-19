@@ -241,8 +241,8 @@
   <p class="input-note">Use ideal body weight if BMI ≥ 30 kg/m².</p>
 
   <div class="mode-box">
-  <button type="button" id="mode-dose"   class="mode-btn active">50:50 Dose</button>
-    <button type="button" id="mode-volume" class="mode-btn">50:50 Volume</button>
+    <button type="button" id="mode-volume" class="mode-btn active">50:50 Volume</button>
+    <button type="button" id="mode-dose"   class="mode-btn">50:50 Dose</button>
 </div>
   
   <div class="la-sections">
@@ -268,7 +268,7 @@
   <button type="button" id="la2-name-btn">
   Levobupivacaine 0.5%</button>
 </div>
-      <div class="dose-options">
+      <div class="dose-options" id="dose-options">
         <button class="concentration-btn active" data-dose="2">Max: <br>2 mg/kg</button>
         <button class="concentration-btn" data-dose="2.5">Max: <br>2.5 mg/kg</button>
         <button class="concentration-btn" data-dose="3">Max: <br>3 mg/kg</button>
@@ -349,18 +349,39 @@
 
   const modeVolumeBtn = document.getElementById('mode-volume');
 const modeDoseBtn   = document.getElementById('mode-dose');
-let   mode          = 'dose';  // default
+let mode = 'volume';  // default
 
+const doseOptions = document.getElementById('dose-options');
+const extraDoseButtons = doseOptions.querySelectorAll('[data-dose="2.5"], [data-dose="3"]');
+
+// function to toggle extra buttons
+function toggleExtraDoseButtons() {
+  if (mode === 'dose') {
+    extraDoseButtons.forEach(btn => btn.style.display = 'none');
+  } else {
+    extraDoseButtons.forEach(btn => btn.style.display = 'inline-block');
+  }
+}  
+  
 modeVolumeBtn.addEventListener('click', () => {
   mode = 'volume';
   modeVolumeBtn.classList.add('active');
   modeDoseBtn.classList.remove('active');
+  toggleExtraDoseButtons();
   updateDoses();
 });
+
 modeDoseBtn.addEventListener('click', () => {
   mode = 'dose';
   modeDoseBtn.classList.add('active');
   modeVolumeBtn.classList.remove('active');
+  toggleExtraDoseButtons();
+
+  // force-select 2 mg/kg when switching to Dose mode
+  doseButtons.forEach(b => b.classList.remove('active'));
+  defaultDoseBtn.classList.add('active');
+  levaPerKg = parseFloat(defaultDoseBtn.dataset.dose);
+
   updateDoses();
 });
   
@@ -516,9 +537,10 @@ function getMainLabel(btn) {
   la2NameBtn.textContent = 'Levobupivacaine 0.5%';
 
   // reset mode toggle
-  mode = 'dose';
-  modeDoseBtn.classList.add('active');
-  modeVolumeBtn.classList.remove('active');
+  mode = 'volume';
+modeVolumeBtn.classList.add('active');
+modeDoseBtn.classList.remove('active');
+toggleExtraDoseButtons();
 
   // clear & restore the dose-buttons
   doseButtons.forEach(b => b.classList.remove('active'));
@@ -548,7 +570,10 @@ function getMainLabel(btn) {
   });
 
   // Initial calculation on page load
-  document.addEventListener('DOMContentLoaded', updateDoses);
+  document.addEventListener('DOMContentLoaded', () => {
+  updateDoses();
+  toggleExtraDoseButtons();
+});
 </script>
 
 </body>
