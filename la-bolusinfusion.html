@@ -115,6 +115,10 @@
   font-size: 0.5em;
   margin-top: 8px;
 }
+  .over-limit {
+    color: darkred;
+    font-weight: bold;
+  }
   </style>
 </head>
 <body>
@@ -186,31 +190,29 @@
     <button class="infusion-concentration-btn" onclick="selectInfusionConcentration('0.2%')">0.2%</button>
   </div>
 
-<div class="instruction-header" style="text-align:center;">
-  <u>Maximum Infusion Rate</u>:
-  </div>
+<!-- Infusion Rate Entry Group -->
+<div class="input-group bolus-group">
+  <label for="infusionRate">Infusion Rate:</label>
+  <input type="number" id="infusionRate" placeholder="0" min="0">
+  <span class="unit">mL/h</span>
+</div>
   
-  <!-- Maximum Infusion Rate for the First 4 Hours Display -->
-  <div class="result max-infusion-rate">
-    <strong>First 4 hours -</strong>
-    <span id="maxInfRate4">0</span>
-    <span class="unit">mL/hr</span>
-  </div>
+  <!-- Infusion Dose Display -->
+<div class="result first4hours">
+  <strong><u>Dose over first 4 hours</u>:</strong>
+  <span id="4HoursDose">0</span>
+  <span class="unit">mg</span>
+  <span id="4HoursPct"></span>
+</div>
   
-  <!-- Maximum Infusion Rate for the Following 20 Hours Display -->
-  <div class="result max-infusion-rate">
-    <strong>Following 20 hours -</strong>
-    <span id="maxInfRate20">0</span>
-    <span class="unit">mL/hr</span>
-  </div>
-  
-  <!-- Thereafter Infusion Rate Display -->
-  <div class="result thereafter-rate">
-    <strong>Thereafter -</strong>
-    <span id="thereafterRate">0</span>
-    <span class="unit">mL/hr</span>
-  </div>
-<small class="dose-note">Bupivacaine / Levobupivacaine: 0.1% capped at 16 mL/hr and 0.125% capped at 13 mL/hr (400 mg/24h); Ropivacaine: 0.2% capped at 14 mL/hr (675 mg/24h).</small>
+ <div class="result first24hours">
+  <strong><u>Dose over first 24 hours</u>:</strong>
+  <span id="24HoursDose">0</span>
+  <span class="unit">mg</span>
+  <span id="24HoursPct"></span>
+</div>
+    
+<small class="dose-note">Bupivacaine / Levobupivacaine: 0.1% max rate 16.66 mL/hr and 0.125% 13.33 mL/hr (400 mg/24h); Ropivacaine: 0.2% max rate 14 mL/hr (675 mg/24h).</small>
   </div>
     
   <!-- Home and Reset Buttons -->
@@ -312,6 +314,12 @@ updateInfusionRates();
   "0.5%": 5
 };
     
+const infusionConcMap = {
+  "0.1%": 1.0,
+  "0.125%": 1.25,
+  "0.2%": 2.0
+};    
+    
     function updateBolusDose() {
       const volume = Math.max(parseFloat(document.getElementById("bolusVolume").value), 0);
       const doseDisplay = document.getElementById("bolusDose");
@@ -320,7 +328,7 @@ updateInfusionRates();
         const concValue = concMap[activeConcBtn.textContent.trim()];
         if (concValue) {
           const bolusDose = Math.max(volume * concValue, 0);
-          doseDisplay.textContent = bolusDose.toFixed(2);
+          doseDisplay.textContent = Number(bolusDose.toFixed(1));
           doseDisplay.style.color = (maxBolusValue > 0 && bolusDose > maxBolusValue)
             ? "darkred" : "inherit";
           updateInfusionRates();
@@ -368,94 +376,82 @@ updateInfusionRates();
     return;
   }
 
-  const finalDose = Math.round(Math.min(dose, cap));
-  maxBolusValue = finalDose;
-  document.getElementById("maxSafeDose").textContent = finalDose;
-}
-    
-    // --- Infusion Rate Calculations ---
-    // Maximum infusion rate for the first 4 hours (mL/hr) = (maxBolusValue - bolusDose) / (infusionConc * 4),
-    // but capped at the "Thereafter" rate.
-    // Maximum infusion rate for the following 20 hours (mL/hr) = (threshold - maxBolusValue) / (infusionConc * 20),
-    // but also capped at the "Thereafter" rate.
-    // Thereafter (mL/hr) = threshold / (infusionConc * 24).
-    // For Bupivacaine/Levobupivacaine, threshold = 400 mg; for Ropivacaine, threshold = 675 mg.
-    const infusionConcMap = {
-      "0.1%": 1.0,
-      "0.125%": 1.25,
-      "0.2%": 2.0
-    };
-    
-   function updateInfusionRates() {
+ const finalDose = Math.min(dose, cap);
+maxBolusValue = finalDose;
+document.getElementById("maxSafeDose").textContent = Number(finalDose.toFixed(1));
+   }
+  
+ function updateInfusionRates() {
   const weightStr = document.getElementById("weight").value;
   let weight = Math.max(parseFloat(weightStr), 0);
+
+  const pctSpan4 = document.getElementById("4HoursPct");
+  const pctSpan24 = document.getElementById("24HoursPct");
+
+  // Clear % by default
+  pctSpan4.textContent = "";
+  pctSpan4.classList.remove("over-limit");
+  pctSpan24.textContent = "";
+  pctSpan24.classList.remove("over-limit");
+
   if (!weightStr || isNaN(weight) || weight < 45) {
-    ["maxInfRate4","maxInfRate20","thereafterRate"].forEach(id => {
-      document.getElementById(id).textContent = "0";
-    });
+    document.getElementById("4HoursDose").textContent = "0";
+    document.getElementById("24HoursDose").textContent = "0";
     return;
   }
 
-  // find active infusion button & its concentration string
   const activeInfBtn = document.querySelector(".infusion-concentration-btn.active");
   if (!activeInfBtn) {
-    ["maxInfRate4","maxInfRate20","thereafterRate"].forEach(id => {
-      document.getElementById(id).textContent = "0";
-    });
+    document.getElementById("4HoursDose").textContent = "0";
+    document.getElementById("24HoursDose").textContent = "0";
     return;
   }
-  const concText = activeInfBtn.textContent.trim(); // "0.1%", etc.
 
-  // map concentration to mg/mL
-  const infusionConcMap = { "0.1%": 1.0, "0.125%": 1.25, "0.2%": 2.0 };
+  const concText = activeInfBtn.textContent.trim();
   const conc = infusionConcMap[concText] || 0;
   if (conc === 0) return;
 
-  // determine threshold & caps based on drug
-  const isBupiLevo = document.getElementById("bupivacaineBtn").classList.contains("active")
-                  || document.getElementById("levobupivacaineBtn").classList.contains("active");
-  const isRopi     = document.getElementById("ropivacaineBtn").classList.contains("active");
-  const threshold  = isRopi ? 675 : isBupiLevo ? 400 : 0;
-  const caps = { "0.1%": 16, "0.125%": 13, "0.2%": 14 };
-  const cap = caps[concText] || Infinity;
+  const bolusDose = parseFloat(document.getElementById("bolusDose").textContent) || 0;
+  const rate = parseFloat(document.getElementById("infusionRate").value) || 0; // mL/h
 
-  // bolus dose from UI
-  let bolusDose = parseFloat(document.getElementById("bolusDose").textContent) || 0;
+  // Calculate doses
+  const doseOver4h  = bolusDose + (rate * conc * 4);
+  const doseOver24h = bolusDose + (rate * conc * 24);
 
-  // 1) First 4h
-  let remaining = Math.max(maxBolusValue - bolusDose, 0);         // mg
-  let rate4    = remaining / (conc * 4);                         // mL/hr
-  rate4        = Math.min(rate4, cap);                           // cap
-  // dose delivered in 4h
-  let doseIn4  = bolusDose + (rate4 * conc * 4);                 // mg
+  // Update UI
+  document.getElementById("4HoursDose").textContent  = Number(doseOver4h.toFixed(1));
+  document.getElementById("24HoursDose").textContent = Number(doseOver24h.toFixed(1));
 
-  // 2) Following 20h
-  let rem20    = Math.max(threshold - doseIn4, 0);                // mg left
-  let rate20   = rem20 / (conc * 20);                             // mL/hr
-  rate20       = Math.min(rate20, cap);
+  // Show % of max bolus for 4 hours
+  if (maxBolusValue > 0) {
+    const pct = (doseOver4h / maxBolusValue) * 100;
+    pctSpan4.textContent = ` (${pct.toFixed(0)}%)`;
+    pctSpan4.classList.toggle("over-limit", pct > 100);
+  }
 
-  // 3) Thereafter
-  let rateAfter = (threshold / (conc * 24));                      // mL/hr
-  rateAfter     = Math.min(rateAfter, cap);
-
-  // write out
-  document.getElementById("maxInfRate4").textContent      = rate4.toFixed(2);
-  document.getElementById("maxInfRate20").textContent     = rate20.toFixed(2);
-  document.getElementById("thereafterRate").textContent   = rateAfter.toFixed(2);
+  // Show % of max for 24 hours
+  if (maxBolusValue > 0) {
+    const pct24 = (doseOver24h / 400) * 100;
+    pctSpan24.textContent = ` (${pct24.toFixed(0)}%)`;
+    pctSpan24.classList.toggle("over-limit", pct24 > 100);
+  }
 }
 
     // Attach event listeners.
+// Attach event listeners.
 document.getElementById("weight").addEventListener("input", function() {
   updateMaxSafeDose();
   updateBolusDose();      // Recalculate bolus dose based on current volume.
   updateInfusionRates();
 });
 
-// *** NEW: listen for changes in bolusVolume too ***
-document
-  .getElementById("bolusVolume")
+// Listen for changes in bolus volume
+document.getElementById("bolusVolume")
   .addEventListener("input", updateBolusDose);
 
+// Listen for changes in infusion rate
+document.getElementById("infusionRate")
+  .addEventListener("input", updateInfusionRates);
    
    function updateBolusOptions() {
     const isBupi = document.getElementById('bupivacaineBtn').classList.contains('active');
@@ -493,37 +489,47 @@ document
       if (!show) btn.classList.remove('active');
     });
   }
-     function resetCalculator() {
-  // Reset weight input.
+  function resetCalculator() {
+  // Reset weight
   document.getElementById("weight").value = "";
-  // Removed weightUnitBtn reference because it's not present on this page.
-  
-  // Reset bolus volume and bolus dose.
+
+  // Reset bolus volume and dose
   document.getElementById("bolusVolume").value = "";
   document.getElementById("bolusDose").textContent = "0";
-  
-  // Reset local anesthetic (LA) selection buttons.
+
+  // Reset infusion rate and doses
+  document.getElementById("infusionRate").value = "";
+  document.getElementById("4HoursDose").textContent = "0";
+  document.getElementById("24HoursDose").textContent = "0";
+
+  // Reset percentage spans
+  const pct4 = document.getElementById("4HoursPct");
+  const pct24 = document.getElementById("24HoursPct");
+  pct4.textContent = "";
+  pct24.textContent = "";
+  pct4.classList.remove("over-limit");
+  pct24.classList.remove("over-limit");
+
+  // Reset LA selection buttons
   document.getElementById("bupivacaineBtn").classList.remove("active");
   document.getElementById("levobupivacaineBtn").classList.remove("active");
   document.getElementById("ropivacaineBtn").classList.remove("active");
-  
-  // Reset bolus concentration selection buttons.
+
+  // Reset bolus concentration selection
   document.querySelectorAll(".concentration-btn").forEach(btn => btn.classList.remove("active"));
-  // Reset infusion concentration selection buttons.
+
+  // Reset infusion concentration selection
   document.querySelectorAll(".infusion-concentration-btn").forEach(btn => btn.classList.remove("active"));
-  
-  // Reset Maximum Bolus display.
+
+  // Reset max bolus display
   document.getElementById("maxSafeDose").textContent = "0";
   maxBolusValue = 0;
-  
-  // Reset infusion rate displays.
-  document.getElementById("maxInfRate4").textContent = "0";
-  document.getElementById("maxInfRate20").textContent = "0";
-  document.getElementById("thereafterRate").textContent = "0";
-       
-      updateInfusionOptions();  // show all infusion buttons again
-    updateBolusOptions();     // show all bolus buttons again
+
+  // Restore all bolus and infusion options
+  updateInfusionOptions();
+  updateBolusOptions();
 }
+
     function goHome() {
       window.location.href = "index.html";
     }
