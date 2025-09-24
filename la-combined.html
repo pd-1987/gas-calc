@@ -401,7 +401,7 @@
   };
 
   const concOptions = {
-    'Lidocaine':       ['1%','1.5%','2%'],
+    'Lidocaine':       ['0.5%','1%','1.5%','2%'],
     'Levobupivacaine': ['0.1%','0.125%','0.25%','0.375%','0.5%'],
     'Bupivacaine':     ['0.1%','0.125%','0.25%','0.375%','0.5%'],
     'Ropivacaine':     ['0.2%','0.25%','0.375%','0.5%','0.75%']
@@ -434,28 +434,39 @@
   }
 
   function updateBlockTotals(block) {
+  const safe = getSafeDose(block.dataset.drug, block.dataset.withad==='1');
+  let sum = 0;
+  block.querySelectorAll('.bubble-value').forEach(el=> sum += parseFloat(el.textContent)||0);
+  const pct = safe ? (sum/safe)*100 : 0;
+
+  block.querySelector('.given-total').textContent = fmt2(sum);
+  block.querySelector('.given-pct').textContent   = fmt2(pct);
+
+  // 🔹 Remaining now based on combinedRemainingPct, not just this block
+  const remaining = (combinedRemainingPct/100) * safe;
+  block.querySelector('.remaining').textContent = fmt2(Math.max(remaining,0));
+
+  block.querySelector('.given-pct').classList.toggle('overlimit', pct>100);
+}
+
+  let combinedRemainingPct = 100;
+
+function updateCombinedTotals() {
+  let totalPct = 0;
+  resultsContainer.querySelectorAll('.la-block').forEach(block => {
     const safe = getSafeDose(block.dataset.drug, block.dataset.withad==='1');
     let sum = 0;
     block.querySelectorAll('.bubble-value').forEach(el=> sum += parseFloat(el.textContent)||0);
-    const pct = safe ? (sum/safe)*100 : 0;
+    totalPct += safe ? (sum/safe)*100 : 0;
+  });
 
-    block.querySelector('.given-total').textContent = fmt2(sum);
-    block.querySelector('.given-pct').textContent   = fmt2(pct);
-    block.querySelector('.remaining').textContent   = fmt2(Math.max(safe-sum,0));
-    block.querySelector('.given-pct').classList.toggle('overlimit', pct>100);
-  }
+  combinedRemainingPct = Math.max(0, 100 - totalPct); // 🔹 save remaining %
+  combinedPctSpan.textContent = fmt2(totalPct);
+  combinedPctSpan.classList.toggle('overlimit', totalPct>100);
 
-  function updateCombinedTotals() {
-    let totalPct = 0;
-    resultsContainer.querySelectorAll('.la-block').forEach(block => {
-      const safe = getSafeDose(block.dataset.drug, block.dataset.withad==='1');
-      let sum = 0;
-      block.querySelectorAll('.bubble-value').forEach(el=> sum += parseFloat(el.textContent)||0);
-      totalPct += safe ? (sum/safe)*100 : 0;
-    });
-    combinedPctSpan.textContent = fmt2(totalPct);
-    combinedPctSpan.classList.toggle('overlimit', totalPct>100);
-  }
+  // refresh all block Remaining values with the new combinedRemainingPct
+  resultsContainer.querySelectorAll('.la-block').forEach(updateBlockTotals);
+}
 
   function addConcRow(block, conc) {
     const dynRows = block.querySelector('.dyn-rows');
