@@ -237,6 +237,20 @@
       
     // --- Local Anaesthetic Selection (toggleable) ---
     function selectLA(selectedLA) {
+      // Reset bolus volume and dose
+  document.getElementById("bolusVolume").value = "";
+  document.getElementById("bolusDose").textContent = "0";
+  document.getElementById("bolusDose").style.color = "inherit";
+      
+      // Reset bolus concentration selection
+  document.querySelectorAll(".concentration-btn").forEach(btn => btn.classList.remove("active"));
+      
+       // Reset infusion concentration selection
+  document.querySelectorAll(".infusion-concentration-btn").forEach(btn => btn.classList.remove("active"));
+
+  // Reset infusion rate
+  document.getElementById("infusionRate").value = "";
+      
       const bupBtn = document.getElementById("bupivacaineBtn");
       const levoBtn = document.getElementById("levobupivacaineBtn");
       const ropiBtn = document.getElementById("ropivacaineBtn");
@@ -430,13 +444,18 @@ document.getElementById("maxSafeDose").textContent = Number(finalDose.toFixed(1)
   }
 
   // Show % of max for 24 hours
-  if (maxBolusValue > 0) {
-    const pct24 = (doseOver24h / 400) * 100;
-    pctSpan24.textContent = ` (${pct24.toFixed(0)}%)`;
-    pctSpan24.classList.toggle("over-limit", pct24 > 100);
+if (maxBolusValue > 0) {
+  let max24h = 400; // default for Bupi/Levo
+  const ropiBtn = document.getElementById("ropivacaineBtn");
+  if (ropiBtn && ropiBtn.classList.contains("active")) {
+    max24h = 675;
   }
+  
+  const pct24 = (doseOver24h / max24h) * 100;
+  pctSpan24.textContent = ` (${pct24.toFixed(0)}%)`;
+  pctSpan24.classList.toggle("over-limit", pct24 > 100);
 }
-
+ }
     // Attach event listeners.
 // Attach event listeners.
 document.getElementById("weight").addEventListener("input", function() {
