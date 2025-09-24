@@ -429,17 +429,12 @@ document.getElementById("maxSafeDose").textContent = Number(finalDose.toFixed(1)
     pctSpan4.classList.toggle("over-limit", pct > 100);
   }
 
- // --- work out 24h max depending on drug ---
-let max24h = 400; // default for bupi/levo
-if (document.getElementById("ropivacaineBtn").classList.contains("active")) {
-  max24h = 675;
-}
-
-// Show % of max for 24 hours
-if (maxBolusValue > 0) {
-  const pct24 = (doseOver24h / max24h) * 100;
-  pctSpan24.textContent = ` (${pct24.toFixed(0)}%)`;
-  pctSpan24.classList.toggle("over-limit", pct24 > 100);
+  // Show % of max for 24 hours
+  if (maxBolusValue > 0) {
+    const pct24 = (doseOver24h / 400) * 100;
+    pctSpan24.textContent = ` (${pct24.toFixed(0)}%)`;
+    pctSpan24.classList.toggle("over-limit", pct24 > 100);
+  }
 }
 
     // Attach event listeners.
