@@ -18,6 +18,7 @@
     header.banner {
  background: linear-gradient(130deg, #2e8b57 0%, #1b5e20 100%   /* dark green */
   );
+    margin-bottom: 5px;
     }
     /* Local Anesthetic Buttons */
     .gender-buttons {
@@ -25,10 +26,20 @@
       grid-template-columns: repeat(2, 1fr);
       row-gap: 4px;         /* only 8px between the two rows */
   column-gap: 8px;      /* 8px between the two columns */
- margin: 15px 0;        /* only vertical margins */
+ margin: 5px 0;        /* only vertical margins */
   justify-items: center; /* center buttons horizontally in each cell */
     }
-/* place Ropi under the first two, spanning both columns, and center it */
+    .gender-buttons button {
+  flex: 1;
+  font-size: 14px;
+  padding: 4px;
+ margin: 3px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f0f0f0;
+  transition: background-color 0.2s ease;
+}
 .gender-buttons button:nth-child(3) {
   grid-column: 1 / -1;
   justify-self: center;
@@ -36,7 +47,7 @@
 }    
     .gender-buttons button small {
       display: block;
-      font-size: 12px;
+      font-size: 0.8em;
       color: #555;
       margin-top: 3px;
     }
@@ -47,13 +58,13 @@
     /* Bolus Concentration */
     .concentration-label {
       margin: 10px 15px;
-      font-size: 16px;
+      font-size: 14px;
     }
     .concentration-buttons, 
     .infusion-concentration-buttons {
       display: flex;
       justify-content: space-around;
-      margin: 15px 0;
+      margin: 8px 0;
     }
 .concentration-btn,
 .infusion-concentration-btn {
@@ -61,7 +72,7 @@
   min-width: 0;
   margin: 0 3px;
   padding: 6px 6px;
-  font-size: 16px;
+  font-size: 14px;
 
   /* shared look & feel */
   background-color: #e7f3fe;
@@ -74,38 +85,63 @@
     .infusion-concentration-btn.active {
       background-color: #0078d7;
       color: white;
-    }   
+    }
+    .input-group {
+  display: flex;
+  align-items: center;
+  margin: 2px 0 0;
+}
+    .input-group label {
+  font-size: 14px;
+  margin: 0px 10px 0 0;
+  font-weight: 700;
+   width: auto;
+    flex-shrink: 0;
+}
+
+.input-group input {
+  width: 50px;
+  padding: 5px;
+  font-size: 14px;
+  box-sizing: border-box;
+  margin: 5px 0;
+}
+    .input-note {
+  font-size: 0.6em;
+  color: #555;
+  margin-bottom: 10px; /* top 0 | right 0 | bottom 15px | left 0 */
+}
     /* Bolus Volume Group */
     .input-group.bolus-group {
-      margin: 15px 0;
+      margin: 5px 0;
     }
     .input-group.bolus-group label {
-      margin-right: 10px;
-      font-size: 16px;
+      margin-right: 5px;
+      font-size: 14px;
     }
     .input-group.bolus-group input {
       width: 50px;
       padding: 5px;
-      font-size: 16px;
+      font-size: 14px;
     }
     .input-group.bolus-group .unit {
       margin-left: 5px;
-      font-size: 16px;
+      font-size: 14px;
     }
 .result {
-  margin: 10px 0;
-  font-size: 16px;
+  margin: 4px;
+  font-size: 14px;
   text-align: center;
 }
 .result span.unit {
-  font-size: 16px;
+  font-size: 14px;
   margin-left: 2px;
 }
     .boxed-section {
   border: 1px solid #ddd;
   border-radius: 6px;
   padding: 8px;
-  margin: 10px;
+  margin-bottom: 0.5rem;
   box-sizing: border-box;
   background-color: #fafafa;
 }
