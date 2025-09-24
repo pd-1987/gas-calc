@@ -259,7 +259,7 @@
   display: flex;              /* block flex container */
   flex-wrap: nowrap;
   align-items: center;
-  justify-content: flex-start; /* or space-between, if you prefer */
+  justify-content: center;
   background-color: #f0f0f0;
   margin: 5px 0;              /* no auto-centering */
   gap: 8px;
@@ -287,7 +287,9 @@
   color: darkred;
   font-size: 16px;
   cursor: pointer;
-  padding: 2px 6px;
+  padding: 0px;
+  line-height: 1;
+  width: 20px;
 }
 
     .concentration-row input {
@@ -590,10 +592,23 @@ function renderBubbles() {
   });
 
   weightInput.addEventListener('input', ()=>{
-    resultsContainer.querySelectorAll('.la-block').forEach(updateBlockTotals);
-    updateCombinedTotals();
-    updateSelectorInfo();
+  // update totals
+  resultsContainer.querySelectorAll('.la-block').forEach(block => {
+    updateBlockTotals(block);
+
+    // 🔹 also update the header max dose
+    const drug   = block.dataset.drug;
+    const withAd = block.dataset.withad === '1';
+    const safe   = getSafeDose(drug, withAd);
+    const header = block.querySelector('.instruction.header');
+    if (header) {
+      header.textContent = `${drug} ${withAd ? '(+Ad)' : ''} – Max single dose: ${Math.round(safe)} mg`;
+    }
   });
+
+  updateCombinedTotals();
+  updateSelectorInfo(); // keeps la1 display in sync
+});
 
   resetBtn.addEventListener('click', ()=>{
     weightInput.value='';
