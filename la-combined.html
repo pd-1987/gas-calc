@@ -141,9 +141,9 @@
 }
     .instruction.header {
       font-weight: 700;
-        text-align: left;
+        text-align: center;
+      margin-bottom: 10px;
     }
-/* Increase the gap under the "Max 50:50 volume" heading */
 .combined-box .instruction.header {
   margin-bottom: 10px; /* or whatever spacing you like */
   text-align: center;
@@ -188,7 +188,7 @@
     /* small text for per-kg and total limits */
 .dose-info {
   text-align: center;
-  margin: 4px 0;
+  margin: 10px 0 0;
 }
 .dose-info small {
   font-size: 0.8em;
@@ -251,6 +251,50 @@
   font-size: 0.5em;
   margin-top: 5px;
 }
+
+    .concentration-row {
+      background-color: #f0f0f0;
+      margin-top: 5px;
+  justify-content: center;
+  row-gap: 4px;    /* very tight vertical spacing */
+  column-gap: 8px; /* horizontal spacing */
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 10px;
+    } 
+.concentration-row .concentration-label {
+  background: none;       /* no background */
+  border: none;           /* no border */
+  padding: 0;             /* remove padding */
+  color: #000;            /* text color */
+  font-weight: 400;       /* optional, keep bold */
+  min-width: 60px;
+  text-align: left;
+}      
+    
+.concentration-row .remove-conc {
+  margin-left: auto;       /* push X to the far right */
+  background: transparent;
+  border: none;
+  color: darkred;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+    #la1 .concentration-bubbles {
+  margin-bottom: 0px;
+      padding-bottom: 0px;
+}
+    #la1 {
+  padding-bottom: 0px;
+}
+    #la1 .maxresult {
+  margin-bottom: 8px; /* was 15px, reduce */
+}
+    #la1 .concentration-boxes {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
 </style>
 </head>
 <body>
@@ -264,9 +308,9 @@
   <p class="input-note">Use ideal body weight if BMI ≥ 30 kg/m².</p>
 
   <div class="la-sections">
-    <!-- LA 1 -->
+
     <div class="la-column" id="la1">
-      <div class="instruction header">LA 1</div>
+      <div class="instruction header">Local anaesthetic selection</div>
      <div class="la-buttons">
   <button type="button" class="la-cycle-btn">
     <span class="drug-label">Lidocaine</span>
@@ -283,47 +327,10 @@
         Max single dose: <span id="la1-max">0</span><span class="unit"> mg</span>
       </div>
 <div class="concentration-bubbles" id="la1-conc-bubbles"></div>
-      <div id="la1-conc-dyn" class="concentration-boxes"></div>
-       <div class="dose-info">
-      Dose given: 
-        <span id="la1-given-total">0</span><span class="unit"> mg</span>
-    (<span id="la1-given-pct">0</span><span class="unit">%</span>)
+      <div id="la1-conc-dyn" class="concentration-boxes"></div>     
     </div>
-      <div class="dose-info dose-remaining">
-  Dose remaining: <span id="la1-remaining">0</span><span class="unit"> mg</span>
-</div>
-    </div>
-
-    <!-- LA 2 -->
-    <div class="la-column" id="la2">
-      <div class="instruction header">LA 2</div>
-     <div class="la-buttons">
-  <button type="button" class="la-cycle-btn">
-    <span class="drug-label">Levobupivacaine</span>
-    <span class="dose-label">Max: 0 mg/kg; 0 mg</span>
-  </button>
-</div>
-      <div class="toggle-container">
-        <input type="checkbox" id="la2-ad-toggle" class="ad-toggle" />
-        <label for="la2-ad-toggle" class="toggle-label">Without Adrenaline</label>
-        <label for="la2-ad-toggle" class="toggle-label">With Adrenaline</label>
-        <div class="toggle-slider"></div>
-      </div>
-      <div class="maxresult">
-        Max single dose: <span id="la2-max">0</span><span class="unit"> mg</span>
-      </div>
-      <div class="concentration-bubbles" id="la2-conc-bubbles"></div>
-      <div id="la2-conc-dyn" class="concentration-boxes"></div>
-       <div class="dose-info">
-      Dose given:  <span id="la2-given-total">0</span><span class="unit"> mg</span>
-    (<span id="la2-given-pct">0</span><span class="unit">%</span>)
-    </div>
-      <div class="dose-info dose-remaining">
-  Dose remaining: <span id="la2-remaining">0</span><span class="unit"> mg</span>
-</div>
-    </div>
-  </div> 
-
+    
+    <div id="la-results"></div>
  <div class="combined-box">
   <div class="instruction header">Combined Dose:</div>
   <div class="combined-results">
@@ -346,13 +353,14 @@
   </footer>
 
 <script>
-  // 0) DATA
+  // --- DRUG DATA ---
   const drugParams = {
     'Lidocaine':       { withoutAd:{ perKg:3.0, maxTotal:200 }, withAd:{ perKg:7.0, maxTotal:500 } },
     'Levobupivacaine': { withoutAd:{ perKg:2.0, maxTotal:200 }, withAd:{ perKg:3.0, maxTotal:225 } },
     'Bupivacaine':     { withoutAd:{ perKg:2.0, maxTotal:175 }, withAd:{ perKg:3.0, maxTotal:225 } },
     'Ropivacaine':     { withoutAd:{ perKg:3.0, maxTotal:200 }, withAd:{ perKg:3.0, maxTotal:250 } }
   };
+
   const concOptions = {
     'Lidocaine':       ['1%','1.5%','2%'],
     'Levobupivacaine': ['0.1%','0.125%','0.25%','0.375%','0.5%'],
@@ -360,197 +368,215 @@
     'Ropivacaine':     ['0.2%','0.25%','0.375%','0.5%','0.75%']
   };
 
-  // 1) DOM REFS
-  const weightInput     = document.getElementById('weight');
-  const la1Btn          = document.querySelector('#la1 .la-cycle-btn');
-  const la2Btn          = document.querySelector('#la2 .la-cycle-btn');
-  const la1NameSpan     = la1Btn.querySelector('.drug-label');
-  const la1DoseSpan     = la1Btn.querySelector('.dose-label');
-  const la2NameSpan     = la2Btn.querySelector('.drug-label');
-  const la2DoseSpan     = la2Btn.querySelector('.dose-label');
-  const la1AdToggle     = document.getElementById('la1-ad-toggle');
-  const la2AdToggle     = document.getElementById('la2-ad-toggle');
-  const la1MaxSpan      = document.getElementById('la1-max');
-  const la2MaxSpan      = document.getElementById('la2-max');
-  const la1ConcBubbles  = document.getElementById('la1-conc-bubbles');
-  const la2ConcBubbles  = document.getElementById('la2-conc-bubbles');
-  const la1ConcDyn      = document.getElementById('la1-conc-dyn');
-  const la2ConcDyn      = document.getElementById('la2-conc-dyn');
-  const la1GivenTotal   = document.getElementById('la1-given-total');
-  const la1GivenPct     = document.getElementById('la1-given-pct');
-  const la2GivenTotal   = document.getElementById('la2-given-total');
-  const la2GivenPct     = document.getElementById('la2-given-pct');
-  const combinedPctSpan = document.getElementById('combined-dose-percent');
-  const resetBtn        = document.querySelector('.reset-btn');
-  const homeBtn         = document.querySelector('.home-btn');
+  // --- DOM refs ---
+  const weightInput      = document.getElementById('weight');
+  const laBtn            = document.querySelector('#la1 .la-cycle-btn');
+  const laNameSpan       = laBtn.querySelector('.drug-label');
+  const laDoseSpan       = laBtn.querySelector('.dose-label');
+  const adToggle         = document.getElementById('la1-ad-toggle');
+  const concBubbles      = document.getElementById('la1-conc-bubbles');
+  const resultsContainer = document.getElementById('la-results');
+  const combinedPctSpan  = document.getElementById('combined-dose-percent');
+  const resetBtn         = document.querySelector('.reset-btn');
+  const homeBtn          = document.querySelector('.home-btn');
 
-  // 2) STATE
-  let la1WithAd   = false;
-  let la2WithAd   = false;
-  let la1SelConcs = [];
-  let la2SelConcs = [];
+  // --- STATE ---
+  let currentDrug   = 'Lidocaine';
+  let currentWithAd = false;
 
-  // 3) HELPERS
-  const fmt2    = v => v.toFixed(2).replace(/\.00$/,'');
+  const fmt2 = v => v.toFixed(2).replace(/\.00$/,'');
   const pctToNum = s => parseFloat(s.replace('%',''))/100;
 
-  // 4) SAFE DOSES
-  function getSafeDoses() {
-    const w  = parseFloat(weightInput.value) || 0;
-    const n1 = la1Btn.querySelector('.drug-label').textContent.trim();
-    const n2 = la2Btn.querySelector('.drug-label').textContent.trim();
-    const k1 = la1WithAd ? 'withAd' : 'withoutAd';
-    const k2 = la2WithAd ? 'withAd' : 'withoutAd';
-    const p1 = drugParams[n1][k1];
-    const p2 = drugParams[n2][k2];
-    return {
-      s1: Math.min(w * p1.perKg, p1.maxTotal),
-      s2: Math.min(w * p2.perKg, p2.maxTotal)
-    };
+  function getSafeDose(drug, withAd) {
+    const w = parseFloat(weightInput.value) || 0;
+    const key = withAd ? 'withAd' : 'withoutAd';
+    const p = drugParams[drug][key];
+    return Math.min(w * p.perKg, p.maxTotal);
   }
 
-  // 5) RENDER BUBBLES
-  function renderBubbles(btnEl, container, selArr) {
-    const drug = btnEl.querySelector('.drug-label').textContent.trim();
-    container.innerHTML = '';
-    (concOptions[drug] || []).forEach(opt => {
-      const b = document.createElement('button');
-      b.textContent = opt;
-      b.className = 'bubble' + (selArr.includes(opt) ? ' active' : '');
-      b.addEventListener('click', () => {
-        const idx = selArr.indexOf(opt);
-        idx < 0 ? selArr.push(opt) : selArr.splice(idx,1);
-        updateAll();
-      });
-      container.appendChild(b);
-    });
-    // tighten spacing if >4
-    container.style.gap = container.children.length > 4 ? '0.25rem' : '';
+  function updateBlockTotals(block) {
+    const safe = getSafeDose(block.dataset.drug, block.dataset.withad==='1');
+    let sum = 0;
+    block.querySelectorAll('.bubble-value').forEach(el=> sum += parseFloat(el.textContent)||0);
+    const pct = safe ? (sum/safe)*100 : 0;
+
+    block.querySelector('.given-total').textContent = fmt2(sum);
+    block.querySelector('.given-pct').textContent   = fmt2(pct);
+    block.querySelector('.remaining').textContent   = fmt2(Math.max(safe-sum,0));
+    block.querySelector('.given-pct').classList.toggle('overlimit', pct>100);
   }
 
-  // 6) RENDER ROWS
-  function renderRows(btnEl, dynContainer, selArr) {
-    const old = {};
-    dynContainer.querySelectorAll('.concentration-row').forEach(r => {
-      const lbl = r.querySelector('.concentration-label').textContent;
-      old[lbl] = r.querySelector('input').value;
+  function updateCombinedTotals() {
+    let totalPct = 0;
+    resultsContainer.querySelectorAll('.la-block').forEach(block => {
+      const safe = getSafeDose(block.dataset.drug, block.dataset.withad==='1');
+      let sum = 0;
+      block.querySelectorAll('.bubble-value').forEach(el=> sum += parseFloat(el.textContent)||0);
+      totalPct += safe ? (sum/safe)*100 : 0;
     });
-    dynContainer.innerHTML = '';
-    selArr.forEach(opt => {
-      const row = document.createElement('div');
-      row.className = 'concentration-row';
-      row.innerHTML = `
-        <div class="concentration-label">${opt}</div>
-        <div class="concentration-extras">
-          <input type="number" min="0" placeholder="0" data-conc="${pctToNum(opt)}"/>
-          <span class="unit-label">mL</span>
-          <span class="bubble"><span class="bubble-value">0</span>mg</span>
-        </div>`;
-      const inp = row.querySelector('input');
-      const bub = row.querySelector('.bubble-value');
-      const mgpm = pctToNum(opt)*1000;
-      if (old[opt]) {
-        inp.value = old[opt];
-        bub.textContent = fmt2(old[opt]*mgpm);
-      }
-      inp.addEventListener('input', () => {
+    combinedPctSpan.textContent = fmt2(totalPct);
+    combinedPctSpan.classList.toggle('overlimit', totalPct>100);
+  }
+
+  function addConcRow(block, conc) {
+    const dynRows = block.querySelector('.dyn-rows');
+
+    const row = document.createElement('div');
+    row.className = 'concentration-row';
+    row.innerHTML = `
+      <div class="concentration-label">${conc}</div>
+      <input type="number" min="0" placeholder="0" data-conc="${pctToNum(conc)}"/>
+      <span class="unit-label">mL</span>
+      <span class="bubble"><span class="bubble-value">0</span>mg</span>
+      <button type="button" class="remove-conc">✖</button>
+    `;
+
+    const inp = row.querySelector('input');
+    const bub = row.querySelector('.bubble-value');
+    const mgpm = pctToNum(conc) * 1000;
+    const removeBtn = row.querySelector('.remove-conc');
+
+    inp.addEventListener('input', () => {
         const v = parseFloat(inp.value) || 0;
-        bub.textContent = fmt2(v*mgpm);
-        updateTotalsAndCombined();
-      });
-      dynContainer.appendChild(row);
+        bub.textContent = fmt2(v * mgpm);
+        updateBlockTotals(block);
+        updateCombinedTotals();
     });
+
+removeBtn.addEventListener('click', () => {
+    row.remove();
+    // deactivate the corresponding bubble
+    const b = Array.from(concBubbles.children).find(btn => btn.textContent === conc);
+    if (b) b.classList.remove('active');
+
+    // if no more rows in this block, remove the block itself
+    if (dynRows.children.length === 0) {
+        const column = block.closest('.la-column');
+        if (column) column.remove(); // removes the entire block including its header
+        updateCombinedTotals();      // update totals after removal
+        return;                      // exit early because block no longer exists
+    }
+
+    updateBlockTotals(block);
+    updateCombinedTotals();
+});
+
+    dynRows.appendChild(row);
+}
+
+  function createBlock(drug, withAd) {
+    // check if block already exists
+    let block = resultsContainer.querySelector(`.la-block[data-drug="${drug}"][data-withad="${withAd?'1':'0'}"]`);
+    if (block) return block;
+
+    const safe = getSafeDose(drug, withAd);
+
+    // create column wrapper
+    const column = document.createElement('div');
+    column.className = 'la-column';
+
+    block = document.createElement('div');
+    block.className = 'la-block';
+    block.dataset.drug = drug;
+    block.dataset.withad = withAd?'1':'0';
+    block.innerHTML = `
+  <div class="instruction header">
+    ${drug} ${withAd?'(+Ad)':''} – Max single dose: ${Math.round(safe)} mg
+  </div>
+  <div class="dyn-rows"></div>
+  <div class="dose-info la-totals">
+    Given: <span class="given-total">0</span><span class="unit"> mg</span> 
+    (<span class="given-pct">0</span><span class="unit">%</span>) | 
+    Remaining: <span class="remaining">0</span><span class="unit"> mg</span>
+  </div>
+`;
+
+    // attach block to column
+    column.appendChild(block);
+    // attach column to results container
+    resultsContainer.appendChild(column);
+
+    return block;
+}
+
+function renderBubbles() {
+    concBubbles.innerHTML = '';
+
+    (concOptions[currentDrug] || []).forEach(opt => {
+        const b = document.createElement('button');
+        b.textContent = opt;
+        b.className = 'bubble';
+
+        b.addEventListener('click', () => {
+            // Always create or get the block
+            let block = resultsContainer.querySelector(`.la-block[data-drug="${currentDrug}"][data-withad="${currentWithAd?'1':'0'}"]`);
+            if (!block) {
+                block = createBlock(currentDrug, currentWithAd);
+            }
+
+            // Always add a new concentration row, allow duplicates
+            addConcRow(block, opt);
+
+            // Update totals
+            updateBlockTotals(block);
+            updateCombinedTotals();
+        });
+
+        concBubbles.appendChild(b);
+    });
+}
+
+  function updateSelectorInfo() {
+    const key = currentWithAd ? 'withAd' : 'withoutAd';
+    const p = drugParams[currentDrug][key];
+    const w = parseFloat(weightInput.value) || 0;
+    const safe = Math.min(w*p.perKg, p.maxTotal);
+
+    laDoseSpan.textContent = `Max: ${p.perKg} mg/kg; ${p.maxTotal} mg`;
+    document.getElementById('la1-max').textContent = fmt2(safe);
   }
 
-  // 7) UPDATE TOTALS & COMBINED PCT
-  function updateTotalsAndCombined() {
-    const { s1, s2 } = getSafeDoses();
-    let sum1=0, sum2=0;
-    la1ConcDyn.querySelectorAll('.bubble-value').forEach(el=> sum1 += parseFloat(el.textContent)||0);
-    la2ConcDyn.querySelectorAll('.bubble-value').forEach(el=> sum2 += parseFloat(el.textContent)||0);
-
-    const pct1 = s1 ? (sum1/s1)*100 : 0;
-    const pct2 = s2 ? (sum2/s2)*100 : 0;
-    const totalPct = pct1 + pct2;
-
-    la1GivenTotal.textContent = fmt2(sum1);
-    la1GivenPct.textContent   = fmt2(pct1);
-    la2GivenTotal.textContent = fmt2(sum2);
-    la2GivenPct.textContent   = fmt2(pct2);
-    combinedPctSpan.textContent= fmt2(totalPct);
-
-    [la1GivenPct, la2GivenPct, combinedPctSpan].forEach(el =>
-      el.classList.toggle('overlimit', totalPct > 100)
-    );
-    // compute remaining
-const remainingFraction = Math.max(1 - totalPct/100, 0);
-    const rem1 = s1 * remainingFraction;
-    const rem2 = s2 * remainingFraction;
-
-// update the new elements
-document.getElementById('la1-remaining').textContent = fmt2(rem1);
-document.getElementById('la2-remaining').textContent = fmt2(rem2);
-  }
-
-  // 8) UPDATE ALL
-  function updateAll() {
-    // pull params
-    const n1 = la1NameSpan.textContent.trim();
-    const n2 = la2NameSpan.textContent.trim();
-    const p1 = drugParams[n1][ la1WithAd ? 'withAd' : 'withoutAd' ];
-    const p2 = drugParams[n2][ la2WithAd ? 'withAd' : 'withoutAd' ];
-
-    // move onto buttons
-    la1DoseSpan.textContent = `Max: ${p1.perKg} mg/kg; ${p1.maxTotal} mg`;
-    la2DoseSpan.textContent = `Max: ${p2.perKg} mg/kg; ${p2.maxTotal} mg`;
-
-    // update max-single
-    la1MaxSpan.textContent = Math.round(getSafeDoses().s1);
-    la2MaxSpan.textContent = Math.round(getSafeDoses().s2);
-
-    // re-render UI
-    renderBubbles(la1Btn, la1ConcBubbles, la1SelConcs);
-    renderRows  (la1Btn, la1ConcDyn,     la1SelConcs);
-    renderBubbles(la2Btn, la2ConcBubbles, la2SelConcs);
-    renderRows  (la2Btn, la2ConcDyn,     la2SelConcs);
-    updateTotalsAndCombined();
-  }
-
-  // 9) EVENT HOOKS
-  la1Btn.addEventListener('click', () => {
-    const arr = ['Lidocaine','Levobupivacaine','Bupivacaine','Ropivacaine'];
-    let i = arr.indexOf(la1NameSpan.textContent);
-    la1NameSpan.textContent = arr[(i+1)%arr.length];
-    la1SelConcs = [];
-    updateAll();
+  // --- EVENTS ---
+  laBtn.addEventListener('click', ()=>{
+    const arr=['Lidocaine','Levobupivacaine','Bupivacaine','Ropivacaine'];
+    let i=arr.indexOf(currentDrug);
+    currentDrug = arr[(i+1)%arr.length];
+    laNameSpan.textContent = currentDrug;
+    renderBubbles();
+    updateSelectorInfo();
   });
-  la2Btn.addEventListener('click', () => {
-    const arr = ['Lidocaine','Levobupivacaine','Bupivacaine','Ropivacaine'];
-    let i = arr.indexOf(la2NameSpan.textContent);
-    la2NameSpan.textContent = arr[(i+1)%arr.length];
-    la2SelConcs = [];
-    updateAll();
+
+  adToggle.addEventListener('change', ()=>{
+    currentWithAd = adToggle.checked;
+    renderBubbles();
+    updateSelectorInfo();
   });
-  la1AdToggle .addEventListener('change', ()=>{ la1WithAd = la1AdToggle.checked; updateAll(); });
-  la2AdToggle .addEventListener('change', ()=>{ la2WithAd = la2AdToggle.checked; updateAll(); });
-  weightInput .addEventListener('input', updateAll);
-  resetBtn    .addEventListener('click', ()=> {
-    weightInput.value = '';
-    la1WithAd = la2WithAd = false;
-    la1AdToggle.checked = la2AdToggle.checked = false;
-    la1SelConcs = []; la2SelConcs = [];
-    document.querySelectorAll('.bubble.active').forEach(b=>b.classList.remove('active'));
-    la1ConcDyn.innerHTML = '';
-    la2ConcDyn.innerHTML = '';
-    la1MaxSpan.textContent = la2MaxSpan.textContent = '0';
-    la1GivenTotal.textContent = la2GivenTotal.textContent = '0';
-    la1GivenPct.textContent = la2GivenPct.textContent = '0';
-    combinedPctSpan.textContent = '0';
-    [la1GivenPct, la2GivenPct, combinedPctSpan].forEach(el=>el.classList.remove('overlimit'));
-    updateAll();
+
+  weightInput.addEventListener('input', ()=>{
+    resultsContainer.querySelectorAll('.la-block').forEach(updateBlockTotals);
+    updateCombinedTotals();
+    updateSelectorInfo();
   });
-  homeBtn.addEventListener('click', ()=> window.location.href = '/');
-  document.addEventListener('DOMContentLoaded', updateAll);
+
+  resetBtn.addEventListener('click', ()=>{
+    weightInput.value='';
+    currentDrug='Lidocaine';
+    currentWithAd=false;
+    adToggle.checked=false;
+    resultsContainer.innerHTML='';
+    combinedPctSpan.textContent='0';
+    combinedPctSpan.classList.remove('overlimit');
+    renderBubbles();
+    updateSelectorInfo();
+  });
+
+  homeBtn.addEventListener('click', ()=>window.location.href='/');
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    renderBubbles();
+    updateSelectorInfo();
+  });
 </script>
+
 </body>
 </html>
