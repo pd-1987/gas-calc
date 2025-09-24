@@ -141,6 +141,7 @@
 }
     .instruction.header {
       font-weight: 700;
+      font-size: 14px;
         text-align: center;
       margin-bottom: 10px;
     }
@@ -149,6 +150,7 @@
   text-align: center;
 }
     .maxresult {
+      font-size: 14px;
       text-align: center;
       margin-bottom: 15px;
     }
@@ -187,6 +189,7 @@
 }
     /* small text for per-kg and total limits */
 .dose-info {
+  font-size: 14px;
   text-align: center;
   margin: 10px 0 0;
 }
@@ -252,16 +255,20 @@
   margin-top: 5px;
 }
 
-    .concentration-row {
-      background-color: #f0f0f0;
-      margin-top: 5px;
-  justify-content: center;
-  row-gap: 4px;    /* very tight vertical spacing */
-  column-gap: 8px; /* horizontal spacing */
-  width: 100%;
-  box-sizing: border-box;
-  padding: 0 10px;
-    } 
+.concentration-row {
+  display: flex;              /* block flex container */
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start; /* or space-between, if you prefer */
+  background-color: #f0f0f0;
+  margin: 5px 0;              /* no auto-centering */
+  gap: 8px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  box-sizing: border-box;     /* stay within parent */
+  width: 100%;                /* take full width of la-column */
+}
+    
 .concentration-row .concentration-label {
   background: none;       /* no background */
   border: none;           /* no border */
@@ -273,13 +280,43 @@
 }      
     
 .concentration-row .remove-conc {
-  margin-left: auto;       /* push X to the far right */
+  flex: 0 0 auto;
+  margin-left: 0;
   background: transparent;
   border: none;
   color: darkred;
   font-size: 16px;
   cursor: pointer;
   padding: 2px 6px;
+}
+
+    .concentration-row input {
+  flex: 0 1 40px;   /* narrow input box */
+  min-width: 30px;  /* prevents collapsing too much */
+  max-width: 50px;  /* optional: cap width */
+  padding: 3px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+    .concentration-row .bubble {
+  flex: 0 0 50px;       /* fixed width */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 4px;     /* smaller padding */
+  font-size: 12px;      /* smaller text */
+  font-weight: 700;
+  background-color: #e7f3fe;
+  border: 1px solid #bcdffc;
+  border-radius: 8px;   /* smaller radius */
+  color: #0078d7;
+}
+    .concentration-row .concentration-label,
+.concentration-row input,
+.concentration-row .unit-label,
+.concentration-row .bubble,
+.concentration-row .remove-conc {
+  flex: 0 0 auto;           /* prevent stretching, size to content */
 }
     #la1 .concentration-bubbles {
   margin-bottom: 0px;
@@ -577,6 +614,7 @@ function renderBubbles() {
     updateSelectorInfo();
   });
 </script>
+
 
 </body>
 </html>
