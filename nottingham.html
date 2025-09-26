@@ -79,10 +79,13 @@
   </div>
 
   <p class="result">
-    <u>NHFS Score</u>: <span id="nhfsScore">0</span>
+    NHFS Score: <span id="nhfsScore">0</span>
+  </p>
+    <p class="result">
+    30-day Mortality (Moppett, 2012): <span id="nhfsRisk2">—</span>
   </p>
   <p class="result">
-    <u>30-day Mortality</u>: <span id="nhfsRisk">—</span>
+    30-day Mortality (Maxwell, 2008): <span id="nhfsRisk1">—</span>
   </p>
   <p><small><strong>NHFS ≤4:</strong> low risk; 30-day survival 96.5%, 1-year survival 84.1%. <strong>NHFS ≥5:</strong> high risk; 30-day survival 86.3%, 1-year survival 54.5%.</small></p>
 
@@ -134,25 +137,35 @@
 
     //–– CALCULATION ––//
     function calculateNHFS() {
-     const age    = Number(document.getElementById('nhfsAge').value);
-const amts   = Number(document.getElementById('nhfsAMTS').value);
-const comorb = Number(document.getElementById('nhfsComorb').value);
-const hgb    = Number(document.getElementById('nhfsHgb').value);
-      let score = 0;
+    const age    = Number(document.getElementById('nhfsAge').value);
+    const amts   = Number(document.getElementById('nhfsAMTS').value);
+    const comorb = Number(document.getElementById('nhfsComorb').value);
+    const hgb    = Number(document.getElementById('nhfsHgb').value);
+    
+    let score = 0;
 
-      if      (age >= 86) score += 4;
-      else if (age >= 66) score += 3;
-      if (gender==='male')      score += 1;
-      if (amts < 7)             score += 1;
-      if (residence==='inst')   score += 1;
-      if (comorb > 2)           score += 1;
-      if (hgb < 100)            score += 1;
-      if (malignancy)           score += 1;
+    if      (age >= 86) score += 4;
+    else if (age >= 66) score += 3;
+    if (gender==='male')      score += 1;
+    if (amts < 7)             score += 1;
+    if (residence==='inst')   score += 1;
+    if (comorb >= 2)          score += 1;  // original ≥2
+    if (hgb < 100)            score += 1;
+    if (malignancy)           score += 1;
 
-      nhfsScore.textContent = score;
-      const pct = 100 / (1 + Math.exp(5.012 - 0.481 * score));
-      nhfsRisk.textContent = pct.toFixed(1) + '%';
-    }
+    // Display NHFS
+    nhfsScore.textContent = score;
+
+// Original Maxwell 2008
+const risk1 = 100 / (1 + Math.exp(4.718 - (score / 2)));
+nhfsRisk1.textContent = risk1.toFixed(1) + '%';
+nhfsRisk1.textContent = risk1.toFixed(1) + '%';
+
+// Moppett 2012
+const logit2 = -5.012 + 0.481 * score;
+const risk2 = 100 / (1 + Math.exp(-logit2));
+nhfsRisk2.textContent = risk2.toFixed(1) + '%';
+}
 
     //–– RESET ––//
     function resetForm() {
