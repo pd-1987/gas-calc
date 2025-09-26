@@ -30,12 +30,13 @@
     }
     .input-group label {
       font-weight: 700;
+      font-size: 14px;
       margin-right: 10px;
     }
     .input-group input {
       width: 60px;
       padding: 5px;
-      font-size: 16px;
+      font-size: 14px;
     }
     .input-note {
       font-size: 0.9em;
@@ -60,20 +61,20 @@
 }
     .la-column h2 {
       font-family: 'Poppins', sans-serif;
-      font-size: 18px;
+      font-size: 14px;
       font-weight: 400;
       margin-bottom: 8px;
       text-align: center;
     }
     .la-label {
       text-align: center;
-      font-size: 16px;
+      font-size: 14px;
       margin: 8px 0;
       color: #333;
     }
     .result {
       text-align: center;
-      font-size: 16px;
+      font-size: 14px;
       margin-top: 8px;
     }
 
@@ -84,6 +85,7 @@
   justify-content: flex-start;  /* instead of center */
   margin: 8px 0 12px;            /* same vertical spacing */
   width: auto;                   /* shrink-wrap */
+  font-size: 14px;
 }
     .dose-options .concentration-btn {
       background-color: #e7f3fe;
@@ -113,14 +115,14 @@
       text-align: center;
       margin-bottom: 10px;
       font-family: 'Poppins', sans-serif;
-      font-size: 18px;
+      font-size: 14px;
       font-weight: 400;
     }
     /* Override combined-results to be block, not flex */
 .combined-results {
   display: block;       /* stack them vertically */
   margin-bottom: 10px;
-  font-size: 16px;
+  font-size: 14px;
   text-align: left;     /* left-align content */
   font-weight: 400;
 }
@@ -139,12 +141,13 @@
 .combined-percent {
   display: inline;     /* instead of block */
   margin: 0;           /* cancel any top/bottom margins */
-  font-size: 16px;
+  font-size: 14px;
   color: #555;
 }
     .instruction.header {
       font-weight: 700;
         text-align: left;
+      font-size: 14px;
     }
 /* Increase the gap under the "Max 50:50 volume" heading */
 .combined-box .instruction.header {
@@ -152,12 +155,14 @@
 }
     .maxresult {
       text-align: center;
+      font-size: 14px;
     }
     .given-volume-box {
  background-color: #fafafa;  /* or white if you prefer */
   border: 1px solid #ddd;
   border-radius: 6px;
   padding: 10px;
+      font-size: 14px;
   text-align: left;
   display: flex;
   align-items: center;
@@ -171,7 +176,7 @@
 .given-volume-box input {
   width: 60px;
   padding: 5px;
-  font-size: 16px;
+  font-size: 14px;
   box-sizing: border-box;
 }
 
@@ -200,7 +205,7 @@
 }
     .mode-box {
   background-color: #fafafa;
-  border: 1px solid #ddd;
+  border: 0px solid #ddd;
   border-radius: 6px;
   padding: 10px;
   display: flex;
@@ -228,12 +233,16 @@
 .input-note, .la-sections {
   margin-bottom: var(--section-gap);
 }
+    .la-buttons button {
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
 
   <header class="banner">LA 50:50 combined maximum</header>
-
+  <div class="la-sections">
+    <div class="la-column">
   <div class="input-group">
     <label for="weight">Weight (kg):</label>
     <input type="number" id="weight" min="0" placeholder="0" />
@@ -244,10 +253,9 @@
     <button type="button" id="mode-volume" class="mode-btn active">50:50 Volume</button>
     <button type="button" id="mode-dose"   class="mode-btn">50:50 Dose</button>
 </div>
-  
-  <div class="la-sections">
-    <!-- LA 1 -->
-    <div class="la-column" id="la1">
+    </div>
+  <div class="la-column" id="la1">
+          <!-- LA 1 -->
       <div class="instruction header">LA 1: Short-acting</div>
      <div class="la-buttons">
   <button type="button" disabled>
