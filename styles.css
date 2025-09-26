@@ -529,6 +529,16 @@ button.active small {
   border: 2px solid hsl(0,0%,85%); /* light grey outline */
 }
 
+.risk-btn 
+{ background: linear-gradient(130deg, #adb5bd 0%, #6c757d 100%);
+  color: white;
+  font-family: 'Roboto', sans-serif;
+   font-weight: 400;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  border-radius: 0.5rem; /* same as banner */
+  border: 2px solid hsl(0,0%,85%); /* light grey outline */
+}
+
 .obstetrics-btn {
    background: linear-gradient(130deg, #894070 0%, #5a1f4e 100%);
   color: white;
