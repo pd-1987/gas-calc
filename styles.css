@@ -15,6 +15,7 @@
 =============================================*/
 body {
   font-family: 'Roboto', sans-serif;
+  color: #212529;
   font-weight: 400;
   max-width: 600px;
   margin: 0 auto;
@@ -171,13 +172,13 @@ header.banner2 div {
 =            5. Headings                       =
 =============================================*/
 h1 {
-  color: #222;
+  color: #212529;
   text-align: center;
   font-size: 20px;
   border-bottom: 2px solid #222;
-  padding-bottom: 2px; /* spacing between text and border */
-  margin-bottom: 5px;
-  letter-spacing: 0.5px;
+  padding-bottom: 0px; /* spacing between text and border */
+  margin-bottom: 0px;
+  letter-spacing: 0px;
   font-family: 'Poppins', sans-serif;
   font-weight: 700;
 }
@@ -185,7 +186,7 @@ h1 {
 h2 {
   font-family: 'Poppins', sans-serif;
   font-size: 20px;
-  color: #333; /* Matches your text color used for instructions & results */
+  color: #212529;
   margin-top: 25px;
   margin-bottom: 10px;
   text-align: center; /* Or left-align if that fits your layout better */
@@ -213,7 +214,7 @@ h3 {
 .result {
   font-size: 16px;
   font-weight: 700;
-  color: #000;
+  color: #212529;
   margin-top: 10px;
 }
 
@@ -581,7 +582,7 @@ button.active small {
 
 .grey-btn {
   background-color: #f0f0f0;
-  color: black;
+  color: #212529;
   border: 2px solid hsl(0,0%,85%); /* light grey outline */
 }
 
@@ -643,7 +644,7 @@ button.active small {
   align-items: center;
   justify-content: center;
   background-color: #f0f0f0;
-  color: #333;
+  color: #212529;
   padding: 4px;
   text-align: center;
   font-size: 16px;
@@ -669,7 +670,7 @@ button.active small {
   padding: 5px 10px;  /* Reduced vertical padding for alignment */
   border-radius: 5px;
   font-size: 16px;
-  color: #333;
+  color: #212529;
   user-select: none;
   min-width: 80px;
   margin-right: 10px;
@@ -698,7 +699,7 @@ button.active small {
   text-align: center;
   font-size: 16px;
   font-weight: 700;
-  color: #333;
+  color: #212529;
 }
 
 .max-safe-dose {
@@ -799,7 +800,7 @@ footer a:hover {
     }
     #shockClassificationTable th {
       background-color: #f0f0f0;
-      color: #333;
+      color: #212529;
     }
 
     #toggleBtn {
@@ -815,17 +816,17 @@ footer a:hover {
 
    .classI {
   background-color: #FFEBEE;
-  color: black;
+  color: #212529;
 }
 .classII {
   background-color: #FFCDD2;
-  color: black;
+  color: #212529;
 }
 .classIII {
   background-color: #EF9A9A;
-  color: black;
+  color: #212529;
 }
 .classIV {
   background-color: #E57373;
-  color: black;
+  color: #212529;
 }
