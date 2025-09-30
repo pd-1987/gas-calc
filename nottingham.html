@@ -15,9 +15,6 @@
     rel="stylesheet"
   />
   <style>
-       body {
-  background-color: #f8f9fa; /* mid-light grey */
-}  
     header.banner {
  background: linear-gradient(130deg, #adb5bd 0%, #6c757d 100%);
       margin-bottom: 5px;
@@ -34,29 +31,28 @@
     .boxed-section {
       border: 1px solid #ddd;
       border-radius: 6px;
-      padding: 0px 8px;
-      margin: 10px auto;
-      background-color: #ffffff;
-      box-sizing: border-box;
-      width: 100%;
+      padding: 8px;
+      margin: 10px;
+      background-color: #fafafa;
     }
      .boxed-section small {
-    font-size: 10px;
-    }
+    font-size: 10px;}
     .result {
   font-size: 14px;
   font-weight: 700;
-      margin: 10px 10px 0px;
-      text-align: center;
-} 
-    .result .NHFS {
+  color: #000;
+  margin-top: 20px;
+      margin-left: 10px
+} .result.NHFS {
   font-size: 14px;
   font-weight: 700;
-  text-align: center;
-  margin: 0 10px;
+  text-align: left;
+  color: #000;
+  margin-top: 20px;
+      margin-left: 10px
 }
-    .result span {
-  font-weight: 400;
+    .button-container {
+  margin-top: 10px;
 }
   </style>
 </head>
@@ -108,12 +104,12 @@
     NHFS Score: <span id="nhfsScore">0</span>
   </p>
     <p class="result NHFS">
-      30-day mortality (Moppett, 2012): <span id="nhfsRisk2">—</span> 
+      30-day mortality (Moppett, 2012)<sup>21</sup>: <span id="nhfsRisk2">—</span>
+ 
   <p class="result NHFS">
-    30-day mortality (Maxwell, 2008): <span id="nhfsRisk1">—</span>
+    30-day mortality (Maxwell, 2008)<sup>22</sup>: <span id="nhfsRisk1">—</span>
   </p>
-  <p style="text-align: center; margin-bottom: 10px;"><small><strong>NHFS ≤4:</strong> Low risk; 30-day survival 96.5%, 1-year survival 84.1%
-    <br><strong>NHFS ≥5:</strong> High risk; 30-day survival 86.3%, 1-year survival 54.5%.<sup>23</sup></small></p>
+  <p><small><strong>NHFS ≤4:</strong> low risk; 30-day survival 96.5%, 1-year survival 84.1%<br><strong>NHFS ≥5:</strong> high risk; 30-day survival 86.3%, 1-year survival 54.5%.<sup>23</sup></small></p>
   </div>
   <div class="button-container">
     <button class="reset-btn" onclick="resetForm()">Reset</button>
@@ -121,11 +117,8 @@
   </div>
 
   <footer>
-    <details>
-    <summary>Notes</summary>
-      <small><p><b>Age</b>: 66-85y +3, ≥86y +4; <b>Gender</b>: Male +1; <b>Haemoglobin on admission</b>:	≤100 g/L +1; <b>Cognitive function (AMTS/MMTS)</b>: ≤6 +1; <b>Residence</b>:	Living in an institution +1; Comorbidities:	≥2 +1; <b>Active malignancy</b>: +1.</p>
-      </details> 
-      <p><a href="references.html">References</a> - <a href="disclaimer.html">Disclaimer</a></p>
+    <small><p>Variables - Age: 66-85y +3, ≥86y +4; Gender: Male +1; Haemoglobin on admission:	≤100 g/L +1; Cognitive function (AMTS/MMTS): ≤6 +1; Residence:	Living in an institution +1; Comorbidities:	≥2 +1; Active malignancy: +1.</p>
+       <p><a href="references.html">References</a> - <a href="disclaimer.html">Disclaimer</a></p>
       <p>&copy; 2025 #OneTeam Anaesthesia. All rights reserved.</p></small>
   </footer>
 
