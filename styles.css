@@ -207,12 +207,12 @@ h3 {
 =============================================*/
 .instruction-header {
   margin-top: 20px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
 }
 
 .result {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   color: #212529;
   margin-top: 10px;
@@ -231,7 +231,7 @@ h3 {
 }
 
 .input-group label {
-  font-size: 16px;
+  font-size: 14px;
   margin: 5px 10px 5px 0;
   font-weight: 700;
    width: auto;
@@ -241,7 +241,7 @@ h3 {
 .input-group input {
   width: 50px;
   padding: 5px;
-  font-size: 16px;
+  font-size: 14px;
   box-sizing: border-box;
   margin: 5px 0;
 }
@@ -255,7 +255,7 @@ h3 {
 .concentration-input input {
   width: 60px;
   padding: 5px;
-  font-size: 16px;
+  font-size: 14px;
   text-align: right;
 }
 
@@ -313,7 +313,7 @@ h3 {
 button {
   -webkit-appearance: none;
   appearance: none;      /* iOS Safari fix + standard reset */
-  font-size: 16px;
+  font-size: 14px;
   padding: 10px;
   cursor: pointer;
   border: none;
@@ -334,7 +334,7 @@ button {
 
 .gender-buttons button {
   flex: 1;
-  font-size: 16px;
+  font-size: 14px;
   padding: 10px;
  margin: 5px;
   cursor: pointer;
@@ -351,7 +351,7 @@ button {
 
 .unit-toggle {
     width: 100%;
-  font-size: 16px;
+  font-size: 14px;
      margin: 5px 0;
   padding: 5px;
   cursor: pointer;
@@ -410,7 +410,7 @@ button.active small {
   background-color: #007BFF;
   color: white;
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 14px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
 
@@ -432,7 +432,7 @@ button.active small {
 
     .la-buttons button {
       flex: 1;
-      font-size: 16px;
+      font-size: 14px;
       margin: 5px;
       padding: 10px;
       cursor: pointer;
@@ -467,7 +467,7 @@ button.active small {
   justify-content: center;
   margin-left: 5px;
   padding: 4px 8px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   background-color: #e7f3fe;
   border: 1px solid #bcdffc;
@@ -491,7 +491,7 @@ button.active small {
 
 .spray-units,
 .ml-units {
-  font-size: 16px;
+  font-size: 14px;
   display: inline-block;
   margin-left: 0px;
 }
@@ -590,7 +590,7 @@ button.active small {
 .home-btn {
   flex: 1;
   padding: 10px 20px;
-  font-size: 16px;
+  font-size: 14px;
   border-radius: 5px;
   cursor: pointer;
   border: none;
@@ -647,7 +647,7 @@ button.active small {
   color: #212529;
   padding: 4px;
   text-align: center;
-  font-size: 16px;
+  font-size: 14px;
   user-select: none;
   box-sizing: border-box;
   max-width: 100%;
@@ -669,7 +669,7 @@ button.active small {
   background-color: #f0f0f0;
   padding: 5px 10px;  /* Reduced vertical padding for alignment */
   border-radius: 5px;
-  font-size: 16px;
+  font-size: 14px;
   color: #212529;
   user-select: none;
   min-width: 80px;
@@ -688,7 +688,7 @@ button.active small {
   width: 60px;
   text-align: center;
   padding: 5px;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 /*=============================================
@@ -697,13 +697,13 @@ button.active small {
 .dose-summary {
   margin-top: 20px;
   text-align: center;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   color: #212529;
 }
 
 .max-safe-dose {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   margin: 20px 0;
 }
@@ -761,7 +761,7 @@ footer a:hover {
       margin-top: 0;    
       margin-bottom: 10px;
       text-align: center; 
-      font-size: 16px; 
+      font-size: 14px; 
       font-weight: 700;
     }
 
@@ -780,7 +780,7 @@ footer a:hover {
     .allowable-section p {
       margin: 0 0 10px 0;
       text-align: center;
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 700;
     }
 
@@ -789,7 +789,7 @@ footer a:hover {
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
-      font-size: 16px;
+      font-size: 14px;
       table-layout: fixed; /* This enforces fixed widths */
     }
      #shockClassificationTable th, 
