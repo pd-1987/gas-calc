@@ -45,7 +45,6 @@
     }
 
     /* LA sections – single column */
-    /* LA sections – single column */
 .la-sections {
   display: block;
   margin-bottom: 20px;
@@ -60,45 +59,6 @@
    box-sizing: border-box;
   text-align: left;
 }
-    .la-column h2 {
-      font-family: 'Poppins', sans-serif;
-      font-size: 14px;
-      font-weight: 400;
-      margin-bottom: 8px;
-      text-align: center;
-    }
-    .la-label {
-      text-align: center;
-      font-size: 14px;
-      margin: 8px 0;
-      color: #333;
-    }
-    .result {
-      text-align: center;
-      font-size: 14px;
-      margin-top: 8px;
-    }
-.dose-options {
-  display: flex;
-  justify-content: flex-start;  /* instead of center */
-  margin: 8px 0 12px;            /* same vertical spacing */
-  width: auto;                   /* shrink-wrap */
-}
-    .dose-options .concentration-btn {
-      background-color: #e7f3fe;
-      border: 1px solid #bcdffc;
-      border-radius: 15px;
-      color: #0078d7;
-      cursor: pointer;
-      margin: 0 6px;
-      padding: 4px 8px;
-      font-size: 14px;
-    }
-    .dose-options .concentration-btn.active {
-      background-color: #0078d7;
-      color: white;
-    }
-
     /* Combined box */
     .combined-box {
      background-color: #fafafa;  /* or white if you prefer */
@@ -109,37 +69,22 @@
        box-sizing: border-box;
       text-align: center;
     }
-    .combined-box h2 {
-      text-align: center;
-      margin-bottom: 10px;
-      font-family: 'Poppins', sans-serif;
-      font-size: 14px;
-      font-weight: 400;
-    }
-    /* Override combined-results to be block, not flex */
 .combined-results {
   display: block;       /* stack them vertically */
   margin-bottom: 0px;
-  font-size: 18px;
-  text-align: center;     /* left-align content */
+  font-size: 14px;
+  text-align: center;
   font-weight: 400;
 }
-
 /* Give each inner result its own line and spacing */
 .combined-results > div {
   margin-bottom: 8px;
-}
-
-/* Also left-align that “Max 50:50 volume” header */
-.combined-box .result {
-  text-align: left;
-  font-weight: 400;     /* optional: make it stand out */
 }
     /* Make sure inline percents flow on the same line */
 .combined-percent {
   display: inline;     /* instead of block */
   margin: 0;           /* cancel any top/bottom margins */
-  font-size: 18px;
+  font-size: 14px;
   color: #555;
 }
     .instruction.header {
@@ -148,42 +93,11 @@
         text-align: center;
       margin-bottom: 8px;
     }
-.combined-box .instruction.header {
-  margin-bottom: 8px; /* or whatever spacing you like */
-  text-align: center;
-}
     .maxresult {
       font-size: 14px;
       text-align: center;
-      margin-bottom: 15px;
+      margin-bottom: 8px;
     }
-    .given-volume-box {
- background-color: #fafafa;  /* or white if you prefer */
-  border: 1px solid #ddd;
-  border-radius: 6px;
-      padding: 10px;
-  margin-bottom: 20px;
-  text-align: left;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.given-volume-box label {
-  font-weight: 700;
-}
-
-.given-volume-box input {
-  width: 60px;
-  padding: 5px;
-  font-size: 14px;
-  box-sizing: border-box;
-}
-
-.given-volume-box .given-percent {
-  margin-left: auto;
-  font-weight: 700;
-}
     /* center the With/Without Adrenaline toggles under each LA box */
 .la-column .toggle-container {
   display: flex;
@@ -212,7 +126,6 @@
   border-radius: 15px;
   color: #0078d7;
   cursor: pointer;
-  user-select: none;
 }
     .concentration-bubbles {
  display: flex;
@@ -221,6 +134,7 @@
   align-content: center;
       gap: 0.5rem;             /* spacing between buttons */
   margin-top: 8px;
+        margin-bottom: 0px;
   padding: 0;              /* remove that left/right inset */
   overflow: visible;       /* no scrollbar */
     }
@@ -243,21 +157,17 @@
   align-items: center;
   gap: 2px;              /* a bit of space between name and dose */
   white-space: nowrap;   /* keep each button on one line */
+   
 }
+.la-buttons button {
+         font-size: 14px;
+      margin: 2px;
+      padding: 5px;
+    }  
 .dose-label {
   font-size: 0.8em;
   color: #555;
 }
-.dose-info.dose-remaining {
-  margin-top: 4px;  /* tweak as you like */
-}
-            .dose-note {
-  display: block;
-  text-align: center;
-  font-size: 0.5em;
-  margin-top: 5px;
-}
-
 .concentration-row {
   display: flex;              /* block flex container */
   flex-wrap: nowrap;
@@ -324,26 +234,11 @@
 .concentration-row .remove-conc {
   flex: 0 0 auto;           /* prevent stretching, size to content */
 }
-    #la1 .concentration-bubbles {
-  margin-bottom: 0px;
-      padding-bottom: 0px;
-}
-    #la1 {
-  padding-bottom: 0px;
-}
-    #la1 .maxresult {
-  margin-bottom: 8px; /* was 15px, reduce */
-}
-    #la1 .concentration-boxes {
+.concentration-boxes {
   margin-top: 0;
   margin-bottom: 8px;
 }
-    .la-buttons button {
-      font-size: 14px;
-      margin: 2px;
-      padding: 5px;
-    }
-    
+
 </style>
 </head>
 <body>
