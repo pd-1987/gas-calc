@@ -54,10 +54,10 @@
       margin: 0 5px;
       padding: 8px 12px;
       font-size: 14px;
-      background-color: #e7f3fe;      
-      border: 1px solid #bcdffc;       
+      background-color: #E0CDEA;      
+      border: 1px solid #E0CDEA;       
       border-radius: 15px;
-      color: #0078d7;               
+      color: #000;               
       cursor: pointer;
       text-align: center;
     }
@@ -65,14 +65,14 @@
     .dose-bubble small {
       display: block;
       font-size: 0.75rem;
-      color: #0078d7;
+      color: #000;
     }
     .dose-bubble.selected small {
-      color: white; /* Change to white when the bubble is active */
+      color: #000;
     }
     .dose-bubble.selected {
-      background-color: #0078d7;     /* Active state background purple */
-      color: white;                  /* Active state text color */
+      background-color: #B58FD1;     /* Active state background purple */
+      color: #000;                  /* Active state text color */
           }
 
     /* Infusion input group styling */
@@ -127,28 +127,34 @@
     <input type="number" id="weight" placeholder="0" min="0" oninput="updateInfusionRate()">
   </div>
   <p class="input-note"> Consider using ideal or adjusted body weight if BMI ≥30 kg/m².</p>
-
+  <h3>Noradrenaline / Adrenaline</h3>
   <!-- Noradrenaline/Adrenaline selection buttons -->
   <div class="la-buttons">
-    <button id="NoradBtn" onclick="selectDrug('Noradrenaline')">Noradrenaline</button>
-    <button id="AdBtn" onclick="selectDrug('Adrenaline')">Adrenaline</button>
-  </div>
+  <button id="CentralBtn" onclick="selectDrug('Central')">Central</button>
+  <button id="PeripheralBtn" onclick="selectDrug('Peripheral')">Peripheral</button>
+</div>
 
-  <!-- Dose Bubbles -->
-  <div class="dose-options">
-    <div class="dose-bubble" onclick="selectDose(this)">
-      4mg in 50ml
-      <small>0.08 mg/mL</small>
-    </div>
-    <div class="dose-bubble" onclick="selectDose(this)">
-      8mg in 50ml
-      <small>0.16 mg/mL</small>
-    </div>
-    <div class="dose-bubble" onclick="selectDose(this)">
-      16mg in 50ml
-      <small>0.32 mg/mL</small>
-    </div>
+<div class="dose-options" id="centralDoses">
+  <div class="dose-bubble" data-label="4 mg in 50 ml" data-conc="0.08" onclick="selectDose(this)">
+    4 mg in 50 ml
+    <small>0.08 mg/mL</small>
   </div>
+  <div class="dose-bubble" data-label="8 mg in 50 ml" data-conc="0.16" onclick="selectDose(this)">
+    8 mg in 50 ml
+    <small>0.16 mg/mL</small>
+  </div>
+  <div class="dose-bubble" data-label="16 mg in 50 ml" data-conc="0.32" onclick="selectDose(this)">
+    16 mg in 50 ml
+    <small>0.32 mg/mL</small>
+  </div>
+</div>
+
+<div class="dose-options" id="peripheralDose" style="display:none;">
+  <div class="dose-bubble selected" data-label="4 mg in 246 ml" data-conc="0.016">
+    4 mg in 246 ml
+    <small>0.016 mg/mL</small>
+  </div>
+</div>
 
   <!-- Infusion Input Group -->
   <div class="infusion-input-group">
@@ -180,85 +186,90 @@
 
   <!-- Scripts -->
   <script>
-  let selectedDrug = null;
-  let selectedDose = null;
+ let selectedDrug = null;
+let selectedDose = null;
 
-  const doseData = {
-    "4mg in 50ml": 0.08,
-    "8mg in 50ml": 0.16,
-    "16mg in 50ml": 0.32
-  };
+function goHome() {
+  window.location.href = "index.html";
+}
 
-  function goHome() {
-    window.location.href = "index.html";
+function selectDrug(drug) {
+  const centralBtn     = document.getElementById('CentralBtn');
+  const peripheralBtn  = document.getElementById('PeripheralBtn');
+  const centralDoses   = document.getElementById('centralDoses');
+  const peripheralDose = document.getElementById('peripheralDose');
+
+  selectedDrug = drug;
+
+  // Highlight the selected button
+  centralBtn.classList.toggle('selected-drug', drug === 'Central');
+  peripheralBtn.classList.toggle('selected-drug', drug === 'Peripheral');
+
+  if (drug === 'Central') {
+    // Show central dose options
+    centralDoses.style.display = "flex";
+    peripheralDose.style.display = "none";
+
+    // Clear any previous selection
+    selectedDose = null;
+    document.querySelectorAll('#centralDoses .dose-bubble').forEach(b => b.classList.remove('selected'));
+
+  } else if (drug === 'Peripheral') {
+    // Show only the peripheral option
+    centralDoses.style.display = "none";
+    peripheralDose.style.display = "flex";
+
+    // Auto-select the single peripheral bubble
+    const periphBubble = peripheralDose.querySelector('.dose-bubble');
+    periphBubble.classList.add('selected');
+    selectedDose = {
+      label: periphBubble.getAttribute("data-label"),
+      concentration: parseFloat(periphBubble.getAttribute("data-conc"))
+    };
   }
 
-  function selectDrug(drug) {
-    const noradBtn = document.getElementById('NoradBtn');
-    const adBtn    = document.getElementById('AdBtn');
+  updateInfusionRate();
+}
 
-    if (selectedDrug === drug) {
-      // Deselect if already selected
-      selectedDrug = null;
-      noradBtn.classList.remove('selected-drug');
-      adBtn .classList.remove('selected-drug');
-    } else {
-      selectedDrug = drug;
-      noradBtn.classList.toggle('selected-drug', drug === 'Noradrenaline');
-      adBtn .classList.toggle('selected-drug', drug === 'Adrenaline');
-    }
+function selectDose(element) {
+  const label = element.getAttribute("data-label");
+  const conc  = parseFloat(element.getAttribute("data-conc"));
 
-    updateInfusionRate();
+  if (selectedDose?.label === label) {
+    selectedDose = null;
+    element.classList.remove('selected');
+  } else {
+    document.querySelectorAll('.dose-bubble').forEach(b => b.classList.remove('selected'));
+    element.classList.add('selected');
+    selectedDose = { label, concentration: conc };
   }
 
-  function selectDose(element) {
-    const label = element.childNodes[0].textContent.trim();
+  updateInfusionRate();
+}
 
-    if (selectedDose?.label === label) {
-      // Deselect if already selected
-      selectedDose = null;
-      element.classList.remove('selected');
-    } else {
-      // Clear other selections
-      document.querySelectorAll('.dose-bubble').forEach(b => b.classList.remove('selected'));
-      // Highlight this one
-      element.classList.add('selected');
-      selectedDose = {
-        label: label,
-        concentration: doseData[label]
-      };
-    }
+function toggleUnit() {
+  const unitToggle     = document.getElementById("unitToggle");
+  const infusionInput  = document.getElementById("infusionInput");
 
-    updateInfusionRate();
+  if (infusionInput.value !== "") {
+    infusionInput.value = "";
   }
 
-  function toggleUnit() {
-    const unitToggle     = document.getElementById("unitToggle");
-    const infusionInput  = document.getElementById("infusionInput");
+  unitToggle.textContent =
+    unitToggle.textContent === "ml/hr"
+      ? "mcg/kg/min"
+      : "ml/hr";
 
-    // Clear any existing value
-    if (infusionInput.value !== "") {
-      infusionInput.value = "";
-    }
+  updateInfusionRate();
+}
 
-    // Switch text
-    unitToggle.textContent =
-      unitToggle.textContent === "ml/hr"
-        ? "mcg/kg/min"
-        : "ml/hr";
-
-    updateInfusionRate();
-  }
-
-  function updateInfusionRate() {
+function updateInfusionRate() {
   const weight           = parseFloat(document.getElementById('weight').value);
   const infusionVal      = parseFloat(document.getElementById('infusionInput').value);
   const infusionDisplay  = document.getElementById('infusionRateDisplay');
   const currentUnit      = document.getElementById("unitToggle").textContent;
 
-  // If anything’s missing, show “0 ml/hr” (or the currently-toggled unit) instead of “–”
   if (isNaN(infusionVal) || isNaN(weight) || !selectedDose || weight === 0) {
-    // pick the right unit for the fallback
     const unitText = (currentUnit === "ml/hr")
       ? "ml/hr"
       : "mcg/kg/min";
@@ -266,43 +277,42 @@
     return;
   }
 
-    let resultValue, displayUnit;
-    if (currentUnit === "ml/hr") {
-      // Convert ml/hr → mcg/kg/min
-      resultValue = (infusionVal * selectedDose.concentration * 1000) / (weight * 60);
-      displayUnit = "mcg/kg/min";
-    } else {
-      // Convert mcg/kg/min → ml/hr
-      resultValue = (infusionVal * weight * 60) / (selectedDose.concentration * 1000);
-      displayUnit = "ml/hr";
-    }
+  let resultValue, displayUnit;
+  if (currentUnit === "ml/hr") {
+    resultValue = (infusionVal * selectedDose.concentration * 1000) / (weight * 60);
+    displayUnit = "mcg/kg/min";
+  } else {
+    resultValue = (infusionVal * weight * 60) / (selectedDose.concentration * 1000);
+    displayUnit = "ml/hr";
+  }
 
- const formatted = resultValue.toFixed(2);
+  const formatted = resultValue.toFixed(2);
   infusionDisplay.innerHTML =
     formatted +
     '<span class="unit"> ' + displayUnit + '</span>';
 }
 
-  function resetForm() {
-  // Reset weight
-  const weightInput = document.getElementById('weight');
-  weightInput.value = '';
-  weightInput.placeholder = '0';
-
-  // Clear drug + dose
-  document.getElementById('NoradBtn').classList.remove('selected-drug');
-  document.getElementById('AdBtn')  .classList.remove('selected-drug');
-  selectedDrug = null;
-  document.querySelectorAll('.dose-bubble').forEach(b => b.classList.remove('selected'));
-  selectedDose = null;
-
-  // Reset infusion input + unit toggle
+function resetForm() {
+  document.getElementById('weight').value = '';
+  document.getElementById('weight').placeholder = '0';
   document.getElementById('infusionInput').value = '';
   document.getElementById('unitToggle').textContent = 'ml/hr';
 
-  // **Re-run the update so your fallback shows 0 ml/hr**
+  selectedDrug = null;
+  selectedDose = null;
+
+  document.querySelectorAll('.dose-bubble').forEach(b => b.classList.remove('selected'));
+
+  // Reset to Central default
+  selectDrug('Central');
   updateInfusionRate();
 }
+
+// ✅ Automatically select Central on page load
+window.onload = function() {
+  selectDrug('Central');
+  updateInfusionRate();
+};
 </script>
 </body>
 </html>
