@@ -249,14 +249,16 @@ function selectDose(element) {
   const label = element.getAttribute("data-label");
   const conc  = parseFloat(element.getAttribute("data-conc"));
 
+  // Only switch selection; cannot deselect the current one
   if (selectedDose?.label === label) {
-    selectedDose = null;
-    element.classList.remove('selected');
-  } else {
-    document.querySelectorAll('.dose-bubble').forEach(b => b.classList.remove('selected'));
-    element.classList.add('selected');
-    selectedDose = { label, concentration: conc };
+    // Do nothing if the same dose is clicked
+    return;
   }
+
+  // Remove selection from all, then select the clicked one
+  document.querySelectorAll('.dose-bubble').forEach(b => b.classList.remove('selected'));
+  element.classList.add('selected');
+  selectedDose = { label, concentration: conc };
 
   updateInfusionRate();
 }
