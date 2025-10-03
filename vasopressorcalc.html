@@ -262,48 +262,58 @@ function selectDose(element) {
 }
 
 function toggleUnit() {
-  const unitToggle     = document.getElementById("unitToggle");
-  const infusionInput  = document.getElementById("infusionInput");
+  const unitToggle    = document.getElementById("unitToggle");
+  const infusionInput = document.getElementById("infusionInput");
 
-  if (infusionInput.value !== "") {
-    infusionInput.value = "";
+  if (!selectedDose) return; // safety check
+  const weight = parseFloat(document.getElementById('weight').value);
+  if (isNaN(weight) || weight === 0) return; // can't convert without weight
+
+  const currentUnit = unitToggle.textContent;
+
+  // Convert the value to the other unit
+  let newValue;
+  if (currentUnit === "ml/hr") {
+    // ml/hr → mcg/kg/min
+    newValue = (parseFloat(infusionInput.value) * selectedDose.concentration * 1000) / (weight * 60);
+    unitToggle.textContent = "mcg/kg/min";
+  } else {
+    // mcg/kg/min → ml/hr
+    newValue = (parseFloat(infusionInput.value) * weight * 60) / (selectedDose.concentration * 1000);
+    unitToggle.textContent = "ml/hr";
   }
 
-  unitToggle.textContent =
-    unitToggle.textContent === "ml/hr"
-      ? "mcg/kg/min"
-      : "ml/hr";
+  infusionInput.value = newValue.toFixed(2);
 
   updateInfusionRate();
 }
 
 function updateInfusionRate() {
-  const weight           = parseFloat(document.getElementById('weight').value);
-  const infusionVal      = parseFloat(document.getElementById('infusionInput').value);
-  const infusionDisplay  = document.getElementById('infusionRateDisplay');
-  const currentUnit      = document.getElementById("unitToggle").textContent;
+  const weight          = parseFloat(document.getElementById('weight').value);
+  const infusionVal     = parseFloat(document.getElementById('infusionInput').value);
+  const infusionDisplay = document.getElementById('infusionRateDisplay');
+  const currentUnit     = document.getElementById("unitToggle").textContent;
 
+  // Determine the "display unit" even if input is empty
+  const displayUnit = currentUnit === "ml/hr" ? "mcg/kg/min" : "ml/hr";
+
+  // If input is empty, weight 0, or no dose selected, show 0 in the opposite unit
   if (isNaN(infusionVal) || isNaN(weight) || !selectedDose || weight === 0) {
-    const unitText = (currentUnit === "ml/hr")
-      ? "ml/hr"
-      : "mcg/kg/min";
-    infusionDisplay.innerHTML = `0<span class="unit"> ${unitText}</span>`;
+    infusionDisplay.innerHTML = `0<span class="unit"> ${displayUnit}</span>`;
     return;
   }
 
-  let resultValue, displayUnit;
+  let resultValue;
   if (currentUnit === "ml/hr") {
+    // convert ml/hr → mcg/kg/min
     resultValue = (infusionVal * selectedDose.concentration * 1000) / (weight * 60);
-    displayUnit = "mcg/kg/min";
   } else {
+    // convert mcg/kg/min → ml/hr
     resultValue = (infusionVal * weight * 60) / (selectedDose.concentration * 1000);
-    displayUnit = "ml/hr";
   }
 
-  const formatted = resultValue.toFixed(2);
   infusionDisplay.innerHTML =
-    formatted +
-    '<span class="unit"> ' + displayUnit + '</span>';
+    resultValue.toFixed(2) + '<span class="unit"> ' + displayUnit + '</span>';
 }
 
 function resetForm() {
