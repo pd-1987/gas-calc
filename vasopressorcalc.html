@@ -112,6 +112,12 @@
     .unit-toggle {
       font-size: 14px;
     }
+    /* Remove mobile tap highlight for buttons and clickable divs */
+button,
+.dose-bubble {
+  -webkit-tap-highlight-color: transparent; /* Safari / iOS */
+  outline: none; /* removes focus outline on click/tap */
+}
     </style>
 </head>
 <body onload="updateInfusionRate()">
