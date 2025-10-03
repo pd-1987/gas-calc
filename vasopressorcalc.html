@@ -212,13 +212,21 @@ function selectDrug(drug) {
   peripheralBtn.classList.toggle('selected-drug', drug === 'Peripheral');
 
   if (drug === 'Central') {
-    // Show central dose options
-    centralDoses.style.display = "flex";
-    peripheralDose.style.display = "none";
+  centralDoses.style.display = "flex";
+  peripheralDose.style.display = "none";
 
-    // Clear any previous selection
-    selectedDose = null;
-    document.querySelectorAll('#centralDoses .dose-bubble').forEach(b => b.classList.remove('selected'));
+  // Clear previous selection
+  selectedDose = null;
+  const centralBubbles = document.querySelectorAll('#centralDoses .dose-bubble');
+  centralBubbles.forEach(b => b.classList.remove('selected'));
+
+  // ✅ Auto-select the first bubble (4 mg in 50 ml)
+  const defaultBubble = centralBubbles[0];
+  defaultBubble.classList.add('selected');
+  selectedDose = {
+    label: defaultBubble.getAttribute("data-label"),
+    concentration: parseFloat(defaultBubble.getAttribute("data-conc"))
+  };
 
   } else if (drug === 'Peripheral') {
     // Show only the peripheral option
