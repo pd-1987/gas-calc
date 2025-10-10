@@ -308,7 +308,7 @@
 </div>
   
 <div class="preset-container">
-  <button class="preset-btn" id="tkr-btn">TKR – ESH</button>
+  <button class="preset-btn" id="tkr-btn">TKR – ESH (Spinal, Adductor canal + LIA)</button>
 </div>  
   
   <div class="button-container">
@@ -576,30 +576,30 @@ function renderBubbles() {
     renderBubbles();
     updateSelectorInfo();
   });
-// --- TKR – ESH preset ---
+/// --- TKR – ESH preset ---
 document.getElementById('tkr-btn').addEventListener('click', () => {
   // Clear any previous entries
   resultsContainer.innerHTML = '';
 
-  // 1. 100 ml 0.125% Levobupivacaine (WITH adrenaline)
-  let block1 = createBlock('Levobupivacaine', true);
-  addConcRow(block1, '0.125%');
-  block1.querySelector('.concentration-row input').value = 100;
+  // 1. 2 ml 0.5% Bupivacaine (WITHOUT adrenaline)
+  let block1 = createBlock('Bupivacaine', false);
+  addConcRow(block1, '0.5%');
+  block1.querySelector('.concentration-row input').value = 2;
   block1.querySelector('.concentration-row input').dispatchEvent(new Event('input'));
 
-  // 2. 2 ml 0.5% Bupivacaine (WITHOUT adrenaline)
-  let block2 = createBlock('Bupivacaine', false);
-  addConcRow(block2, '0.5%');
-  block2.querySelector('.concentration-row input').value = 2;
-  block2.querySelector('.concentration-row input').dispatchEvent(new Event('input'));
+  // 2. 10 ml 0.25% Levobupivacaine (WITHOUT adrenaline)
+  let block2 = createBlock('Levobupivacaine', false);
+  addConcRow(block2, '0.25%');
+  const rows2 = block2.querySelectorAll('.concentration-row');
+  const lastRow2 = rows2[rows2.length - 1];
+  lastRow2.querySelector('input').value = 10;
+  lastRow2.querySelector('input').dispatchEvent(new Event('input'));
 
-  // 3. 10 ml 0.25% Levobupivacaine (WITHOUT adrenaline)
-  let block3 = createBlock('Levobupivacaine', false);
-  addConcRow(block3, '0.25%');
-  const rows3 = block3.querySelectorAll('.concentration-row');
-  const lastRow = rows3[rows3.length - 1];
-  lastRow.querySelector('input').value = 10;
-  lastRow.querySelector('input').dispatchEvent(new Event('input'));
+  // 3. 100 ml 0.125% Levobupivacaine (WITH adrenaline)
+  let block3 = createBlock('Levobupivacaine', true);
+  addConcRow(block3, '0.125%');
+  block3.querySelector('.concentration-row input').value = 100;
+  block3.querySelector('.concentration-row input').dispatchEvent(new Event('input'));
 
   updateCombinedTotals();
 });
