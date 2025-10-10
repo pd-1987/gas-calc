@@ -67,21 +67,19 @@
     .age-buttons {
   display: flex;
     justify-content: center;
-    margin: 0;
-    padding: 0 10px;
+    gap: 5px;    
 }
 .age-btn {
   font-size: 14px;
-  padding: 4px 10px;
+  padding: 10px 0; 
   border-radius: 5px;
   border: 1px solid #ccc;
   background-color: #f0f0f0;
   cursor: pointer;
   white-space: nowrap; 
-  flex: 1 1 auto;
+  flex: 1;
   font-size: 14px;
   padding: 10px;
- margin: 5px;
   transition: background-color 0.2s ease;
 }
 .age-btn.active {
@@ -105,9 +103,9 @@
 </div>
     <div class="input-group">
       <label>Gender:</label>
-      <div class="gender-buttons">
-        <button id="nhfsMale" class="gender-btn" onclick="setGender('male')">Male</button>
-        <button id="nhfsFemale" class="gender-btn" onclick="setGender('female')">Female</button>
+      <div class="age-buttons">
+        <button id="nhfsMale" class="age-btn" onclick="setGender('male')">Male</button>
+        <button id="nhfsFemale" class="age-btn" onclick="setGender('female')">Female</button>
       </div>
     </div>
     <div class="input-group">
@@ -128,25 +126,25 @@
 
   <div class="input-group">
 <label>Active malignancy:</label>
-      <div class="gender-buttons">
-        <button id="nhfsMaligNo"  class="gender-btn" onclick="setMalignancy(false)">No</button>
-        <button id="nhfsMaligYes" class="gender-btn" onclick="setMalignancy(true)">Yes</button>
+      <div class="age-buttons">
+        <button id="nhfsMaligNo"  class="age-btn" onclick="setMalignancy(false)">No</button>
+        <button id="nhfsMaligYes" class="age-btn" onclick="setMalignancy(true)">Yes</button>
       </div>
     </div>
   
     <div class="input-group">
   <label>AMTS/MMTS score:</label>
-  <div class="gender-buttons">
-    <button id="amtsLow" class="gender-btn" onclick="setAmts('low')">≤6</button>
-    <button id="amtsHigh" class="gender-btn" onclick="setAmts('high')">&gt;6</button>
+  <div class="age-buttons">
+    <button id="amtsLow" class="age-btn" onclick="setAmts('low')">≤6</button>
+    <button id="amtsHigh" class="age-btn" onclick="setAmts('high')">&gt;6</button>
   </div>
 </div>
 
     <div class="input-group">
       <label>Residence:</label>
-      <div class="gender-buttons">
-        <button id="nhfsHome" class="gender-btn" onclick="setResidence('home')">Home</button>
-        <button id="nhfsInst" class="gender-btn" onclick="setResidence('inst')">Institution</button>
+      <div class="age-buttons">
+        <button id="nhfsHome" class="age-btn" onclick="setResidence('home')">Home</button>
+        <button id="nhfsInst" class="age-btn" onclick="setResidence('inst')">Institution</button>
       </div>
     </div>
 
