@@ -64,6 +64,30 @@
         .button-container {
   margin-top: 10px;
 }
+    .age-buttons {
+  display: flex;
+    justify-content: center;
+    margin: 0;
+    padding: 0 10px;
+}
+.age-btn {
+  font-size: 14px;
+  padding: 4px 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #f0f0f0;
+  cursor: pointer;
+  white-space: nowrap; 
+  flex: 1 1 auto;
+  font-size: 14px;
+  padding: 10px;
+ margin: 5px;
+  transition: background-color 0.2s ease;
+}
+.age-btn.active {
+  background-color: #575757;
+  color: white;
+}
   </style>
 </head>
 <body>
@@ -71,10 +95,14 @@
 
 
     <!-- Inputs in any order -->
-    <div class="input-group">
-      <label for="nhfsAge">Age (years):</label>
-      <input type="number" id="nhfsAge" min="0" max="120" value="70" oninput="calculateNHFS()">
-    </div>
+ <div class="input-group">
+  <label>Age:</label>
+  <div class="age-buttons">
+    <button id="age1" class="age-btn" onclick="setAge('≤65')">≤65 y</button>
+    <button id="age2" class="age-btn" onclick="setAge('66–85')">66–85 y</button>
+    <button id="age3" class="age-btn" onclick="setAge('≥86')">≥86 y</button>
+  </div>
+</div>
     <div class="input-group">
       <label>Gender:</label>
       <div class="gender-buttons">
@@ -83,24 +111,37 @@
       </div>
     </div>
     <div class="input-group">
-      <label for="nhfsHgb">Haemoglobin on admission (g/L):</label>
-      <input type="number" id="nhfsHgb" min="0" value="120" oninput="calculateNHFS()">
-    </div>
+  <label>Haemoglobin on admission:</label>
+  <div class="gender-buttons">
+    <button id="hgbLow"  class="gender-btn" onclick="setHgb('low')">≤100 g/L</button>
+    <button id="hgbHigh" class="gender-btn" onclick="setHgb('high')">&gt;100 g/L</button>
+  </div>
+</div>
+  
     <div class="input-group">
-      <label for="nhfsComorb">Number of major comorbidities:</label>
-      <input type="number" id="nhfsComorb" min="0" value="0" oninput="calculateNHFS()">
-    </div>
-    <div class="input-group">
-      <label>Active malignancy:</label>
+  <label>Number of major comorbidities:</label>
+  <div class="gender-buttons">
+    <button id="comorbLow" class="gender-btn" onclick="setComorb('low')">&lt;2</button>
+    <button id="comorbHigh" class="gender-btn" onclick="setComorb('high')">&ge;2</button>
+  </div>
+</div>
+
+  <div class="input-group">
+<label>Active malignancy:</label>
       <div class="gender-buttons">
         <button id="nhfsMaligNo"  class="gender-btn" onclick="setMalignancy(false)">No</button>
         <button id="nhfsMaligYes" class="gender-btn" onclick="setMalignancy(true)">Yes</button>
       </div>
     </div>
+  
     <div class="input-group">
-      <label for="nhfsAMTS">AMTS/MMTS score (0–10):</label>
-      <input type="number" id="nhfsAMTS" min="0" max="10" value="10" oninput="calculateNHFS()">
-    </div>
+  <label>AMTS/MMTS score:</label>
+  <div class="gender-buttons">
+    <button id="amtsLow" class="gender-btn" onclick="setAmts('low')">≤6</button>
+    <button id="amtsHigh" class="gender-btn" onclick="setAmts('high')">&gt;6</button>
+  </div>
+</div>
+
     <div class="input-group">
       <label>Residence:</label>
       <div class="gender-buttons">
@@ -129,7 +170,6 @@
   <footer>
     <details>
     <summary>Notes</summary>
-      <small><p><b>Age</b>: 66-85y +3, ≥86y +4; <b>Gender</b>: Male +1; <b>Haemoglobin on admission</b>:	≤100 g/L +1; <b>Cognitive function (AMTS/MMTS)</b>: ≤6 +1; <b>Residence</b>:	Living in an institution +1; Comorbidities:	≥2 +1; <b>Active malignancy</b>: +1.</p>
       </details> 
       <p><a href="references.html">References</a> - <a href="disclaimer.html">Disclaimer</a></p>
       <p>&copy; 2025 #OneTeam Anaesthesia. All rights reserved.</p></small>
@@ -150,6 +190,23 @@
     let residence  = 'home';
     let malignancy = false;
 
+   let agePoints = 0;
+
+function setAge(category) {
+  document.querySelectorAll('.age-btn').forEach(btn => btn.classList.remove('active'));
+  if (category === '≤65') {
+    agePoints = 0;
+    document.getElementById('age1').classList.add('active');
+  } else if (category === '66–85') {
+    agePoints = 3;
+    document.getElementById('age2').classList.add('active');
+  } else if (category === '≥86') {
+    agePoints = 4;
+    document.getElementById('age3').classList.add('active');
+  }
+  calculateNHFS();
+} 
+    
     //–– SETTER FUNCTIONS ––//
     function setGender(g) {
       gender = g;
@@ -169,23 +226,44 @@
       document.getElementById('nhfsMaligYes').classList.toggle('active', v);
       calculateNHFS();
     }
+    
+    let hgbLow = false;
+
+function setHgb(level) {
+  hgbLow = (level === 'low');
+  document.getElementById('hgbLow').classList.toggle('active', hgbLow);
+  document.getElementById('hgbHigh').classList.toggle('active', !hgbLow);
+  calculateNHFS();
+}
+    
+    let comorbHigh = false;
+
+function setComorb(level) {
+  comorbHigh = (level === 'high');
+  document.getElementById('comorbLow').classList.toggle('active', !comorbHigh);
+  document.getElementById('comorbHigh').classList.toggle('active', comorbHigh);
+  calculateNHFS();  
+}
+    
+    let amtsLow = false;
+
+function setAmts(level) {
+  amtsLow = (level === 'low');
+  document.getElementById('amtsLow').classList.toggle('active', amtsLow);
+  document.getElementById('amtsHigh').classList.toggle('active', !amtsLow);
+  calculateNHFS();
+}
 
     //–– CALCULATION ––//
     function calculateNHFS() {
-    const age    = Number(document.getElementById('nhfsAge').value);
-    const amts   = Number(document.getElementById('nhfsAMTS').value);
-    const comorb = Number(document.getElementById('nhfsComorb').value);
-    const hgb    = Number(document.getElementById('nhfsHgb').value);
-    
     let score = 0;
 
-    if      (age >= 86) score += 4;
-    else if (age >= 66) score += 3;
+    score += agePoints;
     if (gender==='male')      score += 1;
-    if (amts < 7)             score += 1;
+    if (amtsLow)              score += 1;
     if (residence==='inst')   score += 1;
-    if (comorb >= 2)          score += 1;  // original ≥2
-    if (hgb < 100)            score += 1;
+    if (comorbHigh)           score += 1;
+    if (hgbLow)               score += 1;
     if (malignancy)           score += 1;
 
     // Display NHFS
@@ -204,19 +282,32 @@ nhfsRisk2.textContent = risk2.toFixed(1) + '%';
 
     //–– RESET ––//
     function resetForm() {
-      nhfsAge.value    = 70;
-      nhfsAMTS.value   = 10;
-      nhfsComorb.value = 0;
-      nhfsHgb.value    = 120;
+      agePoints = 3; // default = 66–85y
+document.querySelectorAll('.age-btn').forEach(btn => btn.classList.remove('active'));
+document.getElementById('age2').classList.add('active');
+      hgbLow = false;
+document.getElementById('hgbLow').classList.remove('active');
+document.getElementById('hgbHigh').classList.add('active');
+      comorbHigh = false;
+document.getElementById('comorbLow').classList.add('active');
+document.getElementById('comorbHigh').classList.remove('active');
+      amtsLow = false;
+document.getElementById('amtsLow').classList.remove('active');
+document.getElementById('amtsHigh').classList.add('active');
       clearToggles();
       gender     = 'female';
+      document.getElementById('nhfsFemale').classList.add('active');
       residence  = 'home';
+      document.getElementById('nhfsHome').classList.add('active');
       malignancy = false;
+      document.getElementById('nhfsMaligNo').classList.add('active');
       calculateNHFS();
     }
 
     //–– INITIALIZE ––//
-document.addEventListener('DOMContentLoaded', resetForm);
+document.addEventListener('DOMContentLoaded', () => {
+  resetForm();
+});
   </script>
 </body>
 </html>
