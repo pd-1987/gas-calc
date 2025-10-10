@@ -238,7 +238,33 @@
   margin-top: 0;
   margin-bottom: 8px;
 }
+/* Green preset button – styled like the blue concentration bubbles */
+.preset-container {
+  text-align: center;
+  margin-bottom: 10px;
+}
 
+.preset-btn {
+  background-color: #e6f4ea;       /* pale green background */
+  border: 1px solid #a5d6a7;       /* soft green border */
+  color: #2e7d32;                  /* darker green text */
+  font-weight: 700;
+  border-radius: 15px;
+  padding: 6px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.preset-btn:hover {
+  background-color: #c8e6c9;       /* slightly brighter on hover */
+}
+
+.preset-btn.active {
+  background-color: #2e7d32;       /* dark green active color */
+  border-color: #1b5e20;
+  color: white;
+}
 </style>
 </head>
 <body>
@@ -281,15 +307,23 @@
 </div>
 </div>
   
+<div class="preset-container">
+  <button class="preset-btn" id="tkr-btn">TKR – ESH</button>
+</div>  
+  
   <div class="button-container">
     <button class="reset-btn">Reset</button>
     <button class="home-btn">Home</button>
   </div>
   
   <footer>
+    <details>
+    <summary>Notes</summary>
    <small>
      <p>If mixing LAs, we recommend that the safest practice is not to exceed 100% of the combined maximum dose.<sup>14, 15</sup></p>
+        <p>Levobupivacaine/Bupivacaine with adrenaline: A maximum dose of 3 mg/kg; not to exceed 225 mg per dose.<sup>5</sup></p>
      <p>Adrenaline: There were no differences in blood flow reduction between epinephrine concentrations of 1:100,000, 1:200,000, and 1:400,000.<sup>16</sup> Based on a review of the literature, concentrations between 1:50,000 and 1:400,000 are equally effective and provide superior vasoconstriction compared with more dilute solutions.<sup>17</sup></p>
+     </details>
     <p><a href="references.html">References</a> - <a href="disclaimer.html">Disclaimer</a></p>
       <p>&copy; 2025 #OneTeam Anaesthesia. All rights reserved.</p></small>
   </footer>
@@ -542,6 +576,33 @@ function renderBubbles() {
     renderBubbles();
     updateSelectorInfo();
   });
+// --- TKR – ESH preset ---
+document.getElementById('tkr-btn').addEventListener('click', () => {
+  // Clear any previous entries
+  resultsContainer.innerHTML = '';
+
+  // 1. 100 ml 0.125% Levobupivacaine (WITH adrenaline)
+  let block1 = createBlock('Levobupivacaine', true);
+  addConcRow(block1, '0.125%');
+  block1.querySelector('.concentration-row input').value = 100;
+  block1.querySelector('.concentration-row input').dispatchEvent(new Event('input'));
+
+  // 2. 2 ml 0.5% Bupivacaine (WITHOUT adrenaline)
+  let block2 = createBlock('Bupivacaine', false);
+  addConcRow(block2, '0.5%');
+  block2.querySelector('.concentration-row input').value = 2;
+  block2.querySelector('.concentration-row input').dispatchEvent(new Event('input'));
+
+  // 3. 10 ml 0.25% Levobupivacaine (WITHOUT adrenaline)
+  let block3 = createBlock('Levobupivacaine', false);
+  addConcRow(block3, '0.25%');
+  const rows3 = block3.querySelectorAll('.concentration-row');
+  const lastRow = rows3[rows3.length - 1];
+  lastRow.querySelector('input').value = 10;
+  lastRow.querySelector('input').dispatchEvent(new Event('input'));
+
+  updateCombinedTotals();
+});
 </script>
 
 
