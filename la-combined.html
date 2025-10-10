@@ -16,6 +16,9 @@
   <title>Local anaesthetic combined dose calculator</title>
 
   <style>
+    body {
+  background-color: #f8f9fa; /* mid-light grey */
+}
     header.banner {
    background: linear-gradient(130deg, #2e8b57 0%, #1b5e20 100%);
    margin-bottom: 5px;   
@@ -51,7 +54,7 @@
 }
 
 .la-column {
-  background-color: #fafafa;  /* or white if you prefer */
+  background-color: #ffffff;  /* or white if you prefer */
   border: 1px solid #ddd;
   border-radius: 6px;
   padding: 10px;
@@ -61,7 +64,7 @@
 }
     /* Combined box */
     .combined-box {
-     background-color: #fafafa;  /* or white if you prefer */
+     background-color: #ffffff;  /* or white if you prefer */
   border: 1px solid #ddd;
   border-radius: 6px;
       padding: 10px;
@@ -270,15 +273,15 @@
 <body>
 
   <header class="banner">LA combined doses</header>
-  <div class="la-sections">
-        <div class="la-column" id="la1">
+  
   <div class="input-group">
     <label for="weight">Weight (kg):</label>
     <input type="number" id="weight" min="0" placeholder="0" />
   </div>
   <p class="input-note">Use IBW (BNF) / LBW (SOBA/AoA) if BMI ≥ 30 kg/m².</p>
 
-
+<div class="la-sections">
+        <div class="la-column" id="la1">
      <div class="la-buttons">
   <button type="button" class="la-cycle-btn">
     <span class="drug-label">Lidocaine</span>
@@ -562,7 +565,7 @@ function renderBubbles() {
 });
 
   resetBtn.addEventListener('click', ()=>{
-    weightInput.value='';
+   // weightInput.value='';
     currentDrug='Lidocaine';
     currentWithAd=false;
     adToggle.checked=false;
