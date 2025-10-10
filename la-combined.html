@@ -532,12 +532,17 @@ function renderBubbles() {
   // --- EVENTS ---
   laBtn.addEventListener('click', ()=>{
     const arr=['Lidocaine','Levobupivacaine','Bupivacaine','Ropivacaine'];
-    let i=arr.indexOf(currentDrug);
-    currentDrug = arr[(i+1)%arr.length];
+    let i = arr.indexOf(currentDrug);
+    currentDrug = arr[(i+1) % arr.length];
     laNameSpan.textContent = currentDrug;
+
+    // 🔹 Reset adrenaline toggle when cycling drugs
+    currentWithAd = false;
+    adToggle.checked = false;
+
     renderBubbles();
     updateSelectorInfo();
-  });
+});
 
   adToggle.addEventListener('change', ()=>{
     currentWithAd = adToggle.checked;
