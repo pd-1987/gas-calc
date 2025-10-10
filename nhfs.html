@@ -193,19 +193,19 @@
    let agePoints = 0;
 
 function setAge(category) {
-  document.querySelectorAll('.age-btn').forEach(btn => btn.classList.remove('active'));
-  if (category === '≤65') {
-    agePoints = 0;
-    document.getElementById('age1').classList.add('active');
-  } else if (category === '66–85') {
-    agePoints = 3;
-    document.getElementById('age2').classList.add('active');
-  } else if (category === '≥86') {
-    agePoints = 4;
-    document.getElementById('age3').classList.add('active');
-  }
+  agePoints = 0; // default
+
+  // toggle buttons like other setters
+  document.getElementById('age1').classList.toggle('active', category==='≤65');
+  document.getElementById('age2').classList.toggle('active', category==='66–85');
+  document.getElementById('age3').classList.toggle('active', category==='≥86');
+
+  // assign points
+  if (category==='66–85') agePoints = 3;
+  if (category==='≥86')   agePoints = 4;
+
   calculateNHFS();
-} 
+}
     
     //–– SETTER FUNCTIONS ––//
     function setGender(g) {
