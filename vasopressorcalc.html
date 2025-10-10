@@ -15,6 +15,10 @@
 />
   <title>Vasopressor calculator</title>
   <style>
+     body {
+  background-color: #f8f9fa; /* mid-light grey */
+       font-size: 14px;
+}
     header.banner {
   background: linear-gradient(130deg, #5E35B1 0%, #3a0f81 100%);
 }
@@ -118,9 +122,18 @@ button,
   -webkit-tap-highlight-color: transparent; /* Safari / iOS */
   outline: none; /* removes focus outline on click/tap */
 }
+    .vasopressor-box {
+  background-color: #ffffff;  /* or white if you prefer */
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 0.5rem;
+   box-sizing: border-box;
+  text-align: center;
+}
     </style>
 </head>
-<body onload="updateInfusionRate()">
+
   <!-- Header with Title -->
   <header class="banner">
     Vasopressor Infusions
@@ -133,6 +146,7 @@ button,
     <input type="number" id="weight" placeholder="0" min="0" oninput="updateInfusionRate()">
   </div>
   <p class="input-note"> Consider using ideal or adjusted body weight if BMI ≥30 kg/m².</p>
+  <div class="vasopressor-box" id="vasopressor1">
   <h3>Noradrenaline / Adrenaline</h3>
   <!-- Noradrenaline/Adrenaline selection buttons -->
   <div class="la-buttons">
@@ -172,8 +186,31 @@ button,
   <u>Infusion rate</u>:
   <span id="infusionRateDisplay">-</span>
 </p>
-
-
+  </div>
+<div class="vasopressor-box" id="vasopressor2">
+  <h3>Vasopressin</h3>
+  <div class="dose-bubble selected" data-label="20 units in 50 mL" data-conc="0.4">
+    20 units in 50 mL
+    <small>0.4 units/mL</small>
+  </div>
+  <!-- Infusion Input Group -->
+  <div class="infusion-input-group">
+    <input type="number" id="infusionInput2" placeholder="0" step="any" oninput="updateInfusionRate2()">
+    <!-- Toggle button styled using .unit-toggle -->
+    <button type="button" id="unitToggle2" class="unit-toggle" onclick="toggleUnit2()">ml/hr</button>
+  </div>
+  <p class="infusion-label result">
+  <u>Infusion rate</u>:
+  <span id="infusionRateDisplay2">-</span>
+</p>
+  <small>Dose range 0.5–3 units/hr (1.25–7.5 mL/hr).</small>
+  </div>
+  <div class="vasopressor-box" id="vasopressor3">
+    <h3>Hydrocortisone</h3>
+    <p>For adults with septic shock and an ongoing requirement for vasopressor therapy.</p>
+    <p>200 mg/24 hours: 50 mg IV every 6 hours or a continuous infusion. 
+      <p>Commenced at a dose of noradrenaline or adrenaline ≥ 0.25 mcg/kg/min at least 4 hours after initiation.</p>
+  </div>
 
   <!-- Home and Reset Buttons -->
   <div class="button-container">
@@ -184,8 +221,7 @@ button,
   <!-- Footer -->
   <footer>
     <small>
-      <p><strong>Noradrenaline / Adrenaline</strong>: can be diluted with 0.9% sodium chloride or 5% glucose.</p> 
-      <p><strong>Vasopressin</strong>: 20 units in 50 mL 0.9% sodium chloride or 5% glucose – 0.4 units/mL. Dose range 0.5–3 units/hr (1.25–7.5 mL/hr).</p>
+      <p><strong>Noradrenaline / Adrenaline / Vasopressin</strong>: can be diluted with 0.9% sodium chloride or 5% glucose.</p> 
       <p><a href="guidelines/ics-peripheral-vasopressors.pdf">Intensive Care Society - Peripheral Vasopressors</a></p>
       <p>&copy; 2025 #OneTeam Anaesthesia. All rights reserved.</p></small>
   </footer>
@@ -193,6 +229,10 @@ button,
   <!-- Scripts -->
   <script>
  let selectedDrug = null;
+let selectedDoseVasopressin = {
+  label: "20 units in 50 mL",
+  concentration: 0.4
+};
 let selectedDose = null;
 
 function goHome() {
@@ -256,7 +296,7 @@ function selectDose(element) {
   }
 
   // Remove selection from all, then select the clicked one
-  document.querySelectorAll('.dose-bubble').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('#centralDoses .dose-bubble, #peripheralDose .dose-bubble').forEach(b => b.classList.remove('selected'));
   element.classList.add('selected');
   selectedDose = { label, concentration: conc };
 
@@ -317,9 +357,61 @@ function updateInfusionRate() {
   infusionDisplay.innerHTML =
     resultValue.toFixed(2) + '<span class="unit"> ' + displayUnit + '</span>';
 }
+    
+    function toggleUnit2() {
+  const infusionInput = document.getElementById("infusionInput2");
+  const unitToggle = document.getElementById("unitToggle2");
+  const infusionDisplay = document.getElementById("infusionRateDisplay2");
+  const concentration = 0.4; // Vasopressin: 20 units in 50 mL = 0.4 units/mL
+
+  const currentUnit = unitToggle.textContent;
+  let newValue;
+
+  if (currentUnit === "ml/hr") {
+    // ml/hr → units/hr
+    newValue = parseFloat(infusionInput.value || 0) * concentration;
+    unitToggle.textContent = "units/hr";
+  } else {
+    // units/hr → ml/hr
+    newValue = parseFloat(infusionInput.value || 0) / concentration;
+    unitToggle.textContent = "ml/hr";
+  }
+
+  infusionInput.value = newValue.toFixed(2);
+  updateInfusionRate2();
+}
+
+function updateInfusionRate2() {
+  const infusionInput = document.getElementById("infusionInput2");
+  const unitToggle = document.getElementById("unitToggle2");
+  const infusionDisplay = document.getElementById("infusionRateDisplay2");
+  const concentration = 0.4; // Vasopressin
+
+  const infusionVal = parseFloat(infusionInput.value);
+  const currentUnit = unitToggle.textContent;
+
+  if (isNaN(infusionVal)) {
+    infusionDisplay.innerHTML = `0 <span class="unit">${currentUnit === "ml/hr" ? "units/hr" : "ml/hr"}</span>`;
+    return;
+  }
+
+  let resultValue, displayUnit;
+  if (currentUnit === "ml/hr") {
+    resultValue = infusionVal * concentration; // ml/hr → units/hr
+    displayUnit = "units/hr";
+  } else {
+    resultValue = infusionVal / concentration; // units/hr → ml/hr
+    displayUnit = "ml/hr";
+  }
+
+  infusionDisplay.innerHTML = resultValue.toFixed(2) + `<span class="unit"> ${displayUnit}</span>`;
+}
+
+  updateInfusionRate2();
+
 
 function resetForm() {
-  document.getElementById('weight').value = '';
+  // Reset Noradrenaline
   document.getElementById('weight').placeholder = '0';
   document.getElementById('infusionInput').value = '';
   document.getElementById('unitToggle').textContent = 'ml/hr';
@@ -327,18 +419,42 @@ function resetForm() {
   selectedDrug = null;
   selectedDose = null;
 
-  document.querySelectorAll('.dose-bubble').forEach(b => b.classList.remove('selected'));
+  // Only reset Noradrenaline/Adrenaline selections
+  document.querySelectorAll('#centralDoses .dose-bubble, #peripheralDose .dose-bubble')
+    .forEach(b => b.classList.remove('selected'));
 
   // Reset to Central default
   selectDrug('Central');
   updateInfusionRate();
+
+  // ✅ Reset Vasopressin input
+  const infusionInput2 = document.getElementById('infusionInput2');
+  const unitToggle2    = document.getElementById('unitToggle2');
+
+  infusionInput2.value = '';
+  unitToggle2.textContent = 'ml/hr';
+
+  // Ensure Vasopressin bubble is still selected
+  const vasopressinBubble = document.querySelector('#vasopressor2 .dose-bubble');
+  vasopressinBubble.classList.add('selected');
+
+  // Update Vasopressin display
+  updateInfusionRate2();
 }
 
-// ✅ Automatically select Central on page load
-window.onload = function() {
-  selectDrug('Central');
+window.addEventListener('DOMContentLoaded', () => {
+  // Initialize Central Noradrenaline
+  selectDrug('Central'); // auto-selects 4 mg bubble
+
+  // Initialize Vasopressin as always selected
+  const vasopressinBubble = document.querySelector('#vasopressor2 .dose-bubble');
+  vasopressinBubble.classList.add('selected');
+
+  // Update infusion displays
   updateInfusionRate();
-};
+  updateInfusionRate2();
+});
+
 </script>
 </body>
 </html>
