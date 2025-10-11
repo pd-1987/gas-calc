@@ -19,6 +19,11 @@
    :root {
   --section-gap: 0.5rem;  /* or 20px, whichever you prefer */
 }
+body {
+  background-color: #f8f9fa;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+}
     header.banner {
       background: linear-gradient(130deg, #2e8b57 0%, #1b5e20 100%);
     }
@@ -30,62 +35,44 @@
     }
     .input-group label {
       font-weight: 700;
-      font-size: 14px;
       margin-right: 10px;
     }
     .input-group input {
       width: 60px;
       padding: 5px;
-      font-size: 14px;
     }
-    .input-note {
-      font-size: 0.9em;
+  .input-note {
+      font-size: 0.6em;
+      margin-bottom: 10px;
       color: #555;
     }
-
-    /* LA sections – single column */
-    /* LA sections – single column */
 .la-sections {
   display: block;
 }
 
 .la-column {
-  background-color: #fafafa;  /* or white if you prefer */
+  background-color: #ffffff;  /* or white if you prefer */
   border: 1px solid #ddd;
   border-radius: 6px;
   padding: 10px;
   box-sizing: border-box;
-
-  /* LEFT-ALIGN EVERYTHING inside */
   text-align: left;
 }
     .la-column h2 {
       font-family: 'Poppins', sans-serif;
-      font-size: 14px;
       font-weight: 400;
       margin-bottom: 8px;
       text-align: center;
     }
-    .la-label {
-      text-align: center;
-      font-size: 14px;
-      margin: 8px 0;
-      color: #333;
-    }
     .result {
       text-align: center;
-      font-size: 14px;
       margin-top: 8px;
     }
-
-    /* Dose-option buttons under LA2 */
-    /* Under LA2, left-align the mg/kg buttons */
 .dose-options {
   display: flex;
   justify-content: flex-start;  /* instead of center */
   margin: 8px 0 12px;            /* same vertical spacing */
   width: auto;                   /* shrink-wrap */
-  font-size: 14px;
 }
     .dose-options .concentration-btn {
       background-color: #e7f3fe;
@@ -95,7 +82,6 @@
       cursor: pointer;
       margin: 0 6px;
       padding: 4px 8px;
-      font-size: 14px;
     }
     .dose-options .concentration-btn.active {
       background-color: #0078d7;
@@ -104,7 +90,7 @@
 
     /* Combined box */
     .combined-box {
-     background-color: #fafafa;  /* or white if you prefer */
+     background-color: #ffffff;  /* or white if you prefer */
   border: 1px solid #ddd;
   border-radius: 6px;
       padding: 10px;
@@ -115,14 +101,12 @@
       text-align: center;
       margin-bottom: 10px;
       font-family: 'Poppins', sans-serif;
-      font-size: 14px;
       font-weight: 400;
     }
     /* Override combined-results to be block, not flex */
 .combined-results {
   display: block;       /* stack them vertically */
-  margin-bottom: 10px;
-  font-size: 14px;
+  margin-bottom: 0px;
   text-align: left;     /* left-align content */
   font-weight: 400;
 }
@@ -141,13 +125,11 @@
 .combined-percent {
   display: inline;     /* instead of block */
   margin: 0;           /* cancel any top/bottom margins */
-  font-size: 14px;
   color: #555;
 }
     .instruction.header {
       font-weight: 700;
         text-align: left;
-      font-size: 14px;
     }
 /* Increase the gap under the "Max 50:50 volume" heading */
 .combined-box .instruction.header {
@@ -155,14 +137,12 @@
 }
     .maxresult {
       text-align: center;
-      font-size: 14px;
     }
     .given-volume-box {
- background-color: #fafafa;  /* or white if you prefer */
+ background-color: #ffffff;  /* or white if you prefer */
   border: 1px solid #ddd;
   border-radius: 6px;
   padding: 10px;
-      font-size: 14px;
   text-align: left;
   display: flex;
   align-items: center;
@@ -171,8 +151,7 @@
 
 .given-volume-box label {
   font-weight: 700;
-}
-
+    }
 .given-volume-box input {
   width: 60px;
   padding: 5px;
@@ -184,16 +163,6 @@
   margin-left: auto;
   font-weight: 700;
 }
-     .dose-note {
-  display: block;
-  text-align: left;
-  font-size: 0.5em;
-  margin-top: 5px;
-}
-        .dose-label {
-  font-size: 0.8em;
-  color: #555;
-}
     .overlimit { 
     color: darkred; 
     }
@@ -203,30 +172,6 @@
   color: #555;
   margin-bottom: 0px;
 }
-    .mode-box {
-  background-color: #fafafa;
-  border: 0px solid #ddd;
-  border-radius: 6px;
-  padding: 10px;
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  box-sizing: border-box;
-}
-.mode-btn {
-  background-color: #e7f3fe;
-  border: 1px solid #bcdffc;
-  border-radius: 15px;
-  color: #0078d7;
-  cursor: pointer;
-  padding: 6px 12px;
-  font-size: 14px;
-}
-.mode-btn.active {
-  background-color: #0078d7;
-  color: #fff;
-}
-    .mode-box,
 .la-column,
 .combined-box,
 .given-volume-box,
@@ -236,23 +181,47 @@
     .la-buttons button {
       font-size: 14px;
     }
+        .mode-buttons {
+  display: flex;
+    justify-content: center;
+    gap: 5px;
+          margin: 10px;
+}
+.mode-btn {
+  font-size: 14px;
+  padding: 10px; 
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #f0f0f0;
+  cursor: pointer;
+  white-space: nowrap; 
+  flex: 1;
+  transition: background-color 0.2s ease;
+  min-width: 80px;
+}
+.mode-btn.active {
+  background-color: #ffffff;
+  border: 2px solid #575757;
+  color: #212529;
+  font-weight: 600;
+}
   </style>
 </head>
 <body>
 
   <header class="banner">LA 50:50 combined maximum</header>
   <div class="la-sections">
-    <div class="la-column">
+    
   <div class="input-group">
     <label for="weight">Weight (kg):</label>
     <input type="number" id="weight" min="0" placeholder="0" />
   </div>
   <p class="input-note">Use IBW (BNF) / LBW (SOBA/AoA) if BMI ≥ 30 kg/m².</p>
 
-  <div class="mode-box">
-    <button type="button" id="mode-volume" class="mode-btn active">50:50 Volume</button>
-    <button type="button" id="mode-dose"   class="mode-btn">50:50 Dose</button>
-</div>
+  <div class="mode-buttons">
+    <button type="mode-button" id="mode-volume" class="mode-btn active">50:50 Volume</button>
+    <button type="mode-button" id="mode-dose"   class="mode-btn">50:50 Dose</button>
+
     </div>
   <div class="la-column" id="la1">
           <!-- LA 1 -->
