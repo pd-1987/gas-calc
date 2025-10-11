@@ -577,6 +577,8 @@ function renderBubbles() {
     resultsContainer.innerHTML='';
     combinedPctSpan.textContent='0';
     combinedPctSpan.classList.remove('overlimit');
+    laNameSpan.textContent = currentDrug;
+  laDoseSpan.textContent = `Max: ${drugParams[currentDrug].withoutAd.perKg} mg/kg; ${drugParams[currentDrug].withoutAd.maxTotal} mg`;
     renderBubbles();
     updateSelectorInfo();
   });
