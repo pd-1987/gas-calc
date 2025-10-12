@@ -47,10 +47,6 @@ body {
       margin-bottom: 10px;
       color: #555;
     }
-.la-sections {
-  display: block;
-}
-
 .la-column {
   background-color: #ffffff;  /* or white if you prefer */
   border: 1px solid #ddd;
@@ -59,12 +55,6 @@ body {
   box-sizing: border-box;
   text-align: left;
 }
-    .la-column h2 {
-      font-family: 'Poppins', sans-serif;
-      font-weight: 400;
-      margin-bottom: 8px;
-      text-align: center;
-    }
     .result {
       text-align: center;
       margin-top: 8px;
@@ -98,35 +88,14 @@ body {
       box-sizing: border-box;
       text-align: center;
     }
-    .combined-box h2 {
-      text-align: center;
-      margin-bottom: 10px;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 400;
-    }
-    /* Override combined-results to be block, not flex */
 .combined-results {
   display: block;       /* stack them vertically */
   margin-bottom: 0px;
   text-align: left;     /* left-align content */
   font-weight: 400;
 }
-
-/* Give each inner result its own line and spacing */
 .combined-results > div {
   margin-bottom: 8px;
-}
-
-/* Also left-align that “Max 50:50 volume” header */
-.combined-box .result {
-  text-align: left;
-  font-weight: 400;     /* optional: make it stand out */
-}
-    /* Make sure inline percents flow on the same line */
-.combined-percent {
-  display: inline;     /* instead of block */
-  margin: 0;           /* cancel any top/bottom margins */
-  color: #555;
 }
     .instruction.header {
       font-weight: 700;
@@ -149,7 +118,6 @@ body {
   align-items: center;
   gap: 0.5rem;
 }
-
 .given-volume-box label {
   font-weight: 700;
     }
@@ -158,11 +126,6 @@ body {
   padding: 5px;
   font-size: 14px;
   box-sizing: border-box;
-}
-
-.given-volume-box .given-percent {
-  margin-left: auto;
-  font-weight: 700;
 }
     .overlimit { 
     color: darkred; 
@@ -179,9 +142,6 @@ body {
 .input-note, .la-sections {
   margin-bottom: var(--section-gap);
 }
-    .la-buttons button {
-      font-size: 14px;
-    }
         .mode-buttons {
   display: flex;
     justify-content: center;
@@ -220,8 +180,8 @@ body {
   <p class="input-note">Use IBW (BNF) / LBW (SOBA/AoA) if BMI ≥ 30 kg/m².</p>
 
   <div class="mode-buttons">
-    <button type="mode-button" id="mode-volume" class="mode-btn active">50:50 Volume</button>
-    <button type="mode-button" id="mode-dose"   class="mode-btn">50:50 Dose</button>
+    <button type="button" id="mode-volume" class="mode-btn active">50:50 Volume</button>
+    <button type="button" id="mode-dose"   class="mode-btn">50:50 Dose</button>
 
     </div>
   <div class="la-column" id="la1">
@@ -274,16 +234,6 @@ body {
 </div>
 </div>
   </div>
-  
-  <div class="given-volume-box">
-  <label for="given-vol">Volume given:</label>
-  <input type="number" id="given-vol" min="0" placeholder="0" />
-  <span class="unit">mL</span>
-
-  <div class="given-percent">
-    <span id="given-perc">0</span><span class="unit">%</span>
-  </div>
-</div>
 
   <div class="button-container">
     <button class="reset-btn">Reset</button>
@@ -327,8 +277,6 @@ body {
   const comb1Label    = document.getElementById('comb1-label');
   const comb2Label    = document.getElementById('comb2-label');
   const totalVolSpan  = document.getElementById('total-vol');
-  const givenVolInput = document.getElementById('given-vol');
-  const givenPercSpan = document.getElementById('given-perc');
 
   const modeVolumeBtn = document.getElementById('mode-volume');
 const modeDoseBtn   = document.getElementById('mode-dose');
@@ -468,24 +416,7 @@ function getMainLabel(btn) {
     comb1Perc.textContent = fmt2(s1 ? (d1/s1)*100 : 0);  // always 50%
     comb2Perc.textContent = fmt2(s2 ? (d2/s2)*100 : 0);
   }
-
-  updateGivenPerc();
 }
-
-  // Update “given volume” percentage
-  function updateGivenPerc() {
-    const givenVol = parseFloat(givenVolInput.value) || 0;
-    const maxVol   = parseFloat(totalVolSpan.textContent) || 0;
-    const pct      = maxVol ? (givenVol / maxVol) * 100 : 0;
-    givenPercSpan.textContent = fmt2(pct);
-
-  if (pct > 100) {
-    givenPercSpan.classList.add('overlimit');
- } else {
-    givenPercSpan.classList.remove('overlimit');
-        }
-    
-  }
 
   // Handle mg/kg button clicks
   doseButtons.forEach(btn => {
@@ -510,12 +441,8 @@ function getMainLabel(btn) {
   // Recalc when weight changes
   weightInput.addEventListener('input', updateDoses);
 
-  // Recalc given-% when user enters a volume
-  givenVolInput.addEventListener('input', updateGivenPerc);
-
   // Reset everything
   resetBtn.addEventListener('click', () => {
-  weightInput.value = '';
   isLevo           = true;
   la2NameBtn.textContent = 'Levobupivacaine 0.5%';
 
@@ -541,8 +468,6 @@ toggleExtraDoseButtons();
   comb2Dose.textContent = '0';
   comb2Perc.textContent = '0';
   totalVolSpan.textContent  = '0';
-  givenVolInput.value       = '';
-  givenPercSpan.textContent = '0';
 
   updateDoses();
 });
