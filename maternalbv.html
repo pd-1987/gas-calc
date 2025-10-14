@@ -13,12 +13,11 @@
   href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
   rel="stylesheet"
 />
-  <title>Adult blood volume calculator</title>
+  <title>Maternal blood volume calculator</title>
   <style>
     header.banner {
-      background: linear-gradient(130deg, #5E35B1 0%, #3a0f81 100%);
+      background: linear-gradient(130deg, #894070 0%, #5a1f4e 100%);
     }
-
     .input-group {
       margin: 10px 0;
       display: flex;
@@ -36,27 +35,16 @@
       padding: 5px;
       font-size: 14px;
     }
-   
     .result {
       text-align: center;
       font-size: 14px;
       margin: 20px 0;
     }
-            ol {
-  text-align: left;
-margin-left: 0;
-  padding-left: 1.5em; /* or 0 if you want no indent at all */
-}
-      ul {
-  text-align: left;
-        margin-left: 0;
-  padding-left: 1.5em; /* or 0 if you want no indent at all */
-}
   </style>
 </head>
 <body>
   <!-- Header with Title -->
-  <header class="banner">Adult Blood Volume</header>
+  <header class="banner">Maternal Blood Volume</header>
   
   <!-- Grouped Inputs and Calculation Output -->
   <div class="calc-section">
@@ -66,8 +54,7 @@ margin-left: 0;
       <input type="number" id="weight" placeholder="0" min="0" oninput="updateCalculations()">
     </div>
   
-    <!-- BMI Entry Group -->
-   <!-- Secondary entry: BMI or Height -->
+    <!-- Secondary entry: BMI or Height -->
   <div class="input-group">
     <label for="secondaryInput" id="secondaryLabel">Height (cm):</label>
     <input
@@ -83,11 +70,11 @@ margin-left: 0;
   
     <!-- Circulating Blood Volume Output -->
     <div class="result">
-      <strong><u>Circulating Blood Volume</u>:</strong>
+      <u>Circulating Blood Volume</u>:
       <span id="bloodVolumeOutput">-</span>
     </div>
   </div>
-
+  
   <div class="classification-section">
     <p><u>Classification of Haemorrhagic Shock</u></p>
     <table id="shockClassificationTable">
@@ -147,7 +134,8 @@ margin-left: 0;
   </tr>
 </table>
   </div>
-   
+
+ 
   <!-- Home and Reset Buttons -->
   <div class="button-container" style="text-align: center; margin-bottom: 20px;">
     <button type="button" class="reset-btn" onclick="resetForm()">Reset</button>
@@ -155,20 +143,21 @@ margin-left: 0;
   </div>
   
   <!-- Footer -->
-  <footer style="text-align: center;">
+  <footer>
     <details>
     <summary>Notes and references</summary>
-      <p>Circulating Blood Volume — Lemmens–Bernstein–Brodsky equation: 70÷[√(BMI÷22)]</p>
-     <p><a href="https://pubmed.ncbi.nlm.nih.gov/16756741/" target="_blank" rel="noopener noreferrer">Lemmens HJ, Bernstein DP, Brodsky JB. Estimating blood volume in obese and morbidly obese patients. Obes Surg. 2006;16(6):773-776. doi:10.1381/096089206777346673</a></p>
+      <p>Circulating blood volume (maternal) — Lemmens-Bernstein-Brodsky equation (modified): 95÷[√(BMI÷22)]</p>
+     <p><a href="https://pubmed.ncbi.nlm.nih.gov/36167682/" target="_blank" rel="noopener noreferrer">Kennedy H, Haynes SL, Shelton CL. Maternal body weight and estimated circulating blood volume: a review and practical nonlinear approach. Br J Anaesth. 2022;129(5):716-725. doi:10.1016/j.bja.2022.08.011</a></p>
     </details>
-  
-       <p><a href="disclaimer.html">Disclaimer</a></p>
+    <small>
+     <p><a href="disclaimer.html">Disclaimer</a></p>
       <p>&copy; 2025 #OneTeam Anaesthesia. All rights reserved.</p></small>
   </footer>
   
   <script>
-let circulatingVolume = null;
-let useBMI = false; // false = interpret secondaryInput as Height
+    // Global variable to store circulating blood volume
+    let circulatingVolume = null;
+    let useBMI = false; // false = interpret secondaryInput as Height
 
 function toggleMode() {
   // grab elements & readings
@@ -217,15 +206,15 @@ function toggleMode() {
   // re-run your volume calculation with the newly‐set input
   updateCalculations();
 }
-
+    
     // Helper to format numbers with zero decimals
     function formatNumber(num) {
       return num.toFixed(0);
     }
     
     // Calculate circulating blood volume using modified Lemmen's formula:
-    // Circulating blood volume = (70 / sqrt(BMI / 22)) * Weight
-   function updateBloodVolume() {
+    // Circulating blood volume = (95 / sqrt(BMI / 22)) * Weight
+    function updateBloodVolume() {
   const weight   = parseFloat(document.getElementById('weight').value) || 0;
   const rawValue = parseFloat(document.getElementById('secondaryInput').value) || 0;
   const output   = document.getElementById('bloodVolumeOutput');
@@ -241,7 +230,7 @@ function toggleMode() {
   }
 
   if (weight > 0 && bmi > 0) {
-    const volume = (70 / Math.sqrt(bmi / 22)) * weight;
+    const volume = (95 / Math.sqrt(bmi / 22)) * weight;
     circulatingVolume = volume;
     output.textContent = formatNumber(volume) + ' ml';
     updateShockClassification(volume);
@@ -252,7 +241,6 @@ function toggleMode() {
   }
 }
     
-    // Update the shock classification table based on circulating blood volume.
     function updateShockClassification(volume) {
   document
     .querySelectorAll('#shockClassificationTable td[data-percent]')
@@ -279,12 +267,12 @@ function clearShockClassification() {
       updateBloodVolume();
     }
 
-document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('toggleBtn')
           .addEventListener('click', toggleMode);
 });
     
-   function resetForm() {
+    function resetForm() {
   // clear weight
   document.getElementById('weight').value = "";
   // clear the shared secondary input (BMI or Height)
@@ -300,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleMode();
   }
 }
-
+    
     function goHome() {
       window.location.href = "index.html";
     }
