@@ -42,6 +42,16 @@
       font-size: 14px;
       margin: 20px 0;
     }
+            ol {
+  text-align: left;
+margin-left: 0;
+  padding-left: 1.5em; /* or 0 if you want no indent at all */
+}
+      ul {
+  text-align: left;
+        margin-left: 0;
+  padding-left: 1.5em; /* or 0 if you want no indent at all */
+}
   </style>
 </head>
 <body>
@@ -146,8 +156,13 @@
   
   <!-- Footer -->
   <footer style="text-align: center;">
-    <small><p>Circulating Blood Volume — Lemmens–Bernstein–Brodsky equation: 70÷[√(BMI÷22)]</p>
-       <p><a href="references.html">References</a> - <a href="disclaimer.html">Disclaimer</a></p>
+    <details>
+    <summary>Notes and references</summary>
+      <p>Circulating Blood Volume — Lemmens–Bernstein–Brodsky equation: 70÷[√(BMI÷22)]</p>
+     <p><a href="https://pubmed.ncbi.nlm.nih.gov/16756741/" target="_blank" rel="noopener noreferrer">Lemmens HJ, Bernstein DP, Brodsky JB. Estimating blood volume in obese and morbidly obese patients. Obes Surg. 2006;16(6):773-776. doi:10.1381/096089206777346673</a></p>
+    </details>
+  
+       <p><a href="disclaimer.html">Disclaimer</a></p>
       <p>&copy; 2025 #OneTeam Anaesthesia. All rights reserved.</p></small>
   </footer>
   
