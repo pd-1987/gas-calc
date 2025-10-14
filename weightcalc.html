@@ -114,8 +114,8 @@ margin-left: 0;
       <li>Ideal Body Weight (IBW) – Devine formula. For males: 50 kg + 2.3 kg for each inch over 5 ft; For females: 45.5 kg + 2.3 kg for each inch over 5 feet. 
         Not validated for heights below 152.4 cm/5 ft.</li>
       <li>Adjusted Body Weight: IBW + 0.4 × (Actual weight in kg – IBW).</li>
-      <li>Lean Body Weight – Boer formula. For males: LBW = (0.407 × weight in kg) + (0.267 × height in cm) - 19.2; 
-        For females: LBW = (0.252 × weight in kg) + (0.473 × height in cm) - 48.3.</li>
+      <li>Lean Body Weight – Janmahasatian formula. For males: LBM = (9270 × W) / (6680 + 216 × BMI); 
+        For females: LBM = (9270 × W) / (8780 + 244 × BMI).</li>
     </ul>
     <ol>
       <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7808064/" target="_blank" rel="noopener noreferrer">Hebbes CP, Thompson JP. Pharmacokinetics of anaesthetic drugs at extremes of body weight. BJA Educ. 2018;18(12):364-370. doi:10.1016/j.bjae.2018.09.001</a>
@@ -236,18 +236,20 @@ margin-left: 0;
         document.getElementById('abwResult').textContent = '';
       }
 
-     // 4) Compute & display LBW (only if gender is selected)
+// 4) Compute & display LBW using Janmahasatian formula (only if gender, height, and weight are valid)
 if (heightCm !== null && hasW && gender) {
+  const bmi = weightKg / Math.pow(heightM, 2);
   let lbw;
+
   if (gender === 'male') {
-    lbw = 0.407 * weightKg + 0.267 * heightCm - 19.2;
+    lbw = (9270 * weightKg) / (6680 + 216 * bmi);
   } else { // female
-    lbw = 0.252 * weightKg + 0.473 * heightCm - 48.3;
+    lbw = (9270 * weightKg) / (8780 + 244 * bmi);
   }
+
   lbw = Math.max(lbw, 0);
   document.getElementById('lbwResult').textContent = lbw.toFixed(1) + ' kg';
 } else {
-  // no gender (or no height/weight) → clear the display
   document.getElementById('lbwResult').textContent = '';
 }
     }
