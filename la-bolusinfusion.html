@@ -192,11 +192,20 @@ margin-left: 0;
   
   <!-- Maximum Bolus Display -->
   <div class="result max-safe-dose">
-    <strong>Max Bolus:</strong>
+    <strong>Max bolus:</strong>
     <span id="maxSafeDose">0</span>
     <span class="unit">mg</span>
   </div>
-      <small class="dose-note">Not to be exceeded in any four-hour period.</small>
+      <small class="dose-note">Not to be exceeded in any 4-hour period.</small>
+        <div class="result max-24h-dose">
+    <strong>Max over 24h:</strong>
+    <span id="max24hDose">0</span>
+    <span class="unit">mg</span>
+  </div>
+      <small class="dose-note">Not to be exceeded in any 24-hour period.</small>
+    </div>
+
+      
     </div>
   
   <div class="boxed-section bolus-section">
@@ -212,14 +221,14 @@ margin-left: 0;
   
   <!-- Bolus Volume Entry Group -->
   <div class="input-group bolus-group">
-    <label for="bolusVolume">Bolus Volume:</label>
+    <label for="bolusVolume">Bolus volume:</label>
     <input type="number" id="bolusVolume" placeholder="0" min="0">
     <span class="unit">mL</span>
   </div>
   
   <!-- Bolus Dose Display -->
   <div class="result bolus-dose">
-    <strong><u>Bolus Dose</u>:</strong>
+    <strong><u>Bolus dose</u>:</strong>
     <span id="bolusDose">0</span>
     <span class="unit">mg</span>
   </div>
@@ -238,21 +247,21 @@ margin-left: 0;
 
 <!-- Infusion Rate Entry Group -->
 <div class="input-group bolus-group">
-  <label for="infusionRate">Infusion Rate:</label>
+  <label for="infusionRate">Infusion rate:</label>
   <input type="number" id="infusionRate" placeholder="0" min="0">
   <span class="unit">mL/h</span>
 </div>
   
   <!-- Infusion Dose Display -->
 <div class="result first4hours">
-  <strong><u>Dose over first 4 hours</u>:</strong>
+  <strong><u>Dose over first 4h</u>:</strong>
   <span id="4HoursDose">0</span>
   <span class="unit">mg</span>
   <span id="4HoursPct"></span>
 </div>
   
  <div class="result first24hours">
-  <strong><u>Dose over first 24 hours</u>:</strong>
+  <strong><u>Dose over first 24h</u>:</strong>
   <span id="24HoursDose">0</span>
   <span class="unit">mg</span>
   <span id="24HoursPct"></span>
@@ -302,6 +311,7 @@ margin-left: 0;
     // Global variable to store the maximum bolus (in mg)
     let maxBolusValue = 0;
     let weightUnit = "kg";
+    let max24hValue = 0; // NEW: stores max 24h dose
       
     // --- Local Anaesthetic Selection (toggleable) ---
     function selectLA(selectedLA) {
@@ -432,10 +442,12 @@ const infusionConcMap = {
   let weight = Math.max(parseFloat(weightStr), 0);
   // If weight is not provided or below 45kg, display "0" as the maximum bolus.
   if (!weightStr || isNaN(weight) || weight < 45) {
-    document.getElementById("maxSafeDose").textContent = "0";
-    maxBolusValue = 0;
-    return;
-  }
+  document.getElementById("maxSafeDose").textContent = "0";
+  document.getElementById("max24hDose").textContent = "0"; // NEW
+  maxBolusValue = 0;
+  max24hValue = 0; // NEW
+  return;
+}
   const weightKg = (weightUnit === "kg") ? weight : (weight / 2.20462);
   let dose = 0;
   let cap = Infinity;
@@ -446,21 +458,27 @@ const infusionConcMap = {
   if (bupBtn.classList.contains("active")) {
     dose = 2 * weightKg;
     cap = 175;
+    max24hValue = 400;
   } else if (levoBtn.classList.contains("active")) {
     dose = 2 * weightKg;
     cap = 200;
+    max24hValue = 400;
   } else if (ropiBtn.classList.contains("active")) {
     dose = 3 * weightKg;
     cap = 200;
+    max24hValue = 675;
   } else {
     document.getElementById("maxSafeDose").textContent = "0";
+    document.getElementById("max24hDose").textContent = "0";
     maxBolusValue = 0;
+    max24hValue = 0;
     return;
   }
 
  const finalDose = Math.min(dose, cap);
 maxBolusValue = finalDose;
 document.getElementById("maxSafeDose").textContent = Number(finalDose.toFixed(1));
+     document.getElementById("max24hDose").textContent = Number(max24hValue.toFixed(1));
    }
   
  function updateInfusionRates() {
@@ -510,6 +528,12 @@ document.getElementById("maxSafeDose").textContent = Number(finalDose.toFixed(1)
     pctSpan4.textContent = ` (${pct.toFixed(0)}%)`;
     pctSpan4.classList.toggle("over-limit", pct > 100);
   }
+   
+   if (max24hValue > 0) {
+  const pct24 = (doseOver24h / max24hValue) * 100;
+  pctSpan24.textContent = ` (${pct24.toFixed(0)}%)`;
+  pctSpan24.classList.toggle("over-limit", pct24 > 100);
+}
 
   // Show % of max for 24 hours
 if (maxBolusValue > 0) {
@@ -611,6 +635,9 @@ document.getElementById("infusionRate")
   // Reset max bolus display
   document.getElementById("maxSafeDose").textContent = "0";
   maxBolusValue = 0;
+    max24hValue = 0;
+document.getElementById("max24hDose").textContent = "0";
+
 
   // Restore all bolus and infusion options
   updateInfusionOptions();
