@@ -89,6 +89,19 @@
   color: #212529;
   font-weight: 600;
 }
+    .amts-btn {
+  font-size: 14px;
+  padding: 10px 0; 
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #f0f0f0;
+  cursor: pointer;
+  white-space: nowrap; 
+  flex: 1;
+  font-size: 14px;
+  padding: 10px;
+  transition: background-color 0.2s ease;
+  min-width: 80px;
     ol {
   text-align: left;
 margin-left: 0;
@@ -146,10 +159,10 @@ margin-left: 0;
     </div>
   
     <div class="input-group">
-      <label>AMTS score ≤6 / AMT4 ≤3<sup>*</sup>:</label>
+      <label>AMTS ≤6 / AMT4 ≤3<sup>*</sup>:</label>
   <div class="age-buttons">
-    <button id="amtsLow" class="age-btn" onclick="setAmts('low')">Yes</button>
-    <button id="amtsHigh" class="age-btn" onclick="setAmts('high')">No</button>
+    <button id="amtsLow" class="amts-btn" onclick="setAmts('low')">Yes</button>
+    <button id="amtsHigh" class="amts-btn" onclick="setAmts('high')">No</button>
   </div>
 </div>
  
