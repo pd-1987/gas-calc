@@ -1727,8 +1727,8 @@
            <tr>
         <th style="border:1px solid #ccc; padding:8px; text-align:center;">ETT size</th>
         <td style="border:1px solid #ccc; padding:8px; text-align:center;">
-          <p>Uncuffed ETT size = (Age/4) + 4</p>
-          <p>Decrease by 0.5 for Cuffed ETT</p>
+          <p>Uncuffed ETT size = (Age/4) + 4 [Cole formula]</p>
+          <p>Cuffed ETT size = (Age/4) + 3.5 [Modified Cole]</p>
         </td>
       </tr>
       <tr>
@@ -2545,83 +2545,110 @@ function updateReversal(w) {
   weightIn.dispatchEvent(new Event('input'));
 }
 
-  function estimateWeight() {
+function estimateWeight() {
   clearWeight();
   const a = parseFloat(ageInput.value);
-    
-    const ageY = (ageUnit === 'months') ? (a / 12) : a;
+
+  const ageY = (ageUnit === 'months') ? (a / 12) : a;
+
+  // ── Stop auto-estimating above 16 years ──
   if (ageY > 14) {
     estToggle.checked    = false;
     autoEstimate         = false;
     weightIn.disabled    = false;
-    weightIn.value       = '';             // clear any auto-filled weight
+    weightIn.value       = '';
     weightIn.placeholder = '0';
     clearWeight();
     return;
   }
-    
-    
+
   if (isNaN(a) || a < 0) {
     alert('Please enter a valid age.');
     return;
   }
 
-  // ── SPECIAL CASE for exactly 0 months/years ──
+  // ────────────────────────────────────────────────
+  // 0) NEWBORN
+  // ────────────────────────────────────────────────
   if (a === 0) {
-  const w = 3.5;
-  weightIn.value = w;
-  calcDiv.innerHTML = `<p>Estimated weight for a neonate = ${w} <span class="unit">kg</span></p>`;
+    const w = 3.5;
+    weightIn.value = w;
+    calcDiv.innerHTML =
+      `<p>Estimated weight for a neonate = ${w} <span class="unit">kg</span></p>`;
 
-  if (autoEstimate) {                          // ← ADD this block
-    const y = ageUnit === 'months' ? 0/12 : 0;
-    const normals = getNormalValues(a, ageUnit);
-    if (normals) updateNormalCentiles(normals);
-    if (!isNaN(y)) updateAirwayCalculations(y);
-    expandOpenAccordion();
+    if (autoEstimate) {
+      const normals = getNormalValues(a, ageUnit);
+      if (normals) updateNormalCentiles(normals);
+      updateAirwayCalculations(0);
+      expandOpenAccordion();
+    }
+    return;
   }
-  return;
-}
 
+  // Convert to months if needed
   const m = ageUnit === 'months' ? a : a * 12;
-  
-    if (m < 12) {
-  const w     = 0.5 * m + 4;
-  const wDisp = stripZeros(w.toFixed(2));
-  weightIn.value  = wDisp;
-  calcDiv.innerHTML =
-    `<p>(0.5 × Age in months) + 4 = ${wDisp} <span class="unit">kg</span></p>`;
 
-  if (autoEstimate) {                          // ← ADD this block
-    const y = ageUnit === 'months' ? (a/12) : a;
+  // ────────────────────────────────────────────────
+  // 1) INFANTS <12 MONTHS
+  // ────────────────────────────────────────────────
+  if (m < 12) {
+    const w = 0.5 * m + 4;
+    const wDisp = stripZeros(w.toFixed(2));
+
+    weightIn.value = wDisp;
+    calcDiv.innerHTML =
+      `<p>(0.5 × Age in months) + 4 = ${wDisp} <span class="unit">kg</span></p>`;
+
+    if (autoEstimate) {
+      const y = m / 12;
+      const normals = getNormalValues(a, ageUnit);
+      if (normals) updateNormalCentiles(normals);
+      updateAirwayCalculations(y);
+      expandOpenAccordion();
+    }
+    return;
+  }
+
+  // ────────────────────────────────────────────────
+  // ≥1 year
+  // ────────────────────────────────────────────────
+  const y = m / 12;
+
+  const w2 = Math.round((2 * y + 8) * 10) / 10; // 2A+8
+  const w3 = Math.round((3 * y + 7) * 10) / 10; // 3A+7
+
+  let mainW, mainFormula, noteFormula, noteW;
+
+  if (y >= 1 && y <= 5) {
+    // Primary: 2A+8
+    mainW = w2;
+    mainFormula = `(2 × Age) + 8 = ${w2} kg`;
+    noteFormula = `(3 × Age) + 7 = ${w3} kg`;
+    noteW = w3;
+  } else if (y > 5 && y <= 14) {
+    // Primary: 3A+7
+    mainW = w3;
+    mainFormula = `(3 × Age) + 7 = ${w3} kg`;
+    noteFormula = `(2 × Age) + 8 = ${w2} kg`;
+    noteW = w2;
+  }
+
+  weightIn.value = mainW;
+
+  // Output main + small note
+  calcDiv.innerHTML = `
+    <p><small>${mainFormula}</small></p>
+    <p><small>${noteFormula}</small></p>
+  `;
+
+  // Auto-update linked systems
+  if (autoEstimate) {
     const normals = getNormalValues(a, ageUnit);
     if (normals) updateNormalCentiles(normals);
-    if (!isNaN(y)) updateAirwayCalculations(y);
+    updateAirwayCalculations(y);
     expandOpenAccordion();
   }
-  return;
 }
-    
-const y = m / 12;
-if (y <= 14) {
-  const w1 = Math.round((2 * y + 8) * 10) / 10;
-  let html = `<p>(2 × Age) + 8 = ${w1} <span class="unit">kg</span></p>`;
-  // show the 3A+7 line for any age above 1 year
-  if (y > 1) {
-    const w2 = Math.round((3 * y + 7) * 10) / 10;
-    html += `<p>(3 × Age) + 7 = ${w2} <span class="unit">kg</span></p>`;
-  }
-  weightIn.value    = w1;
-  calcDiv.innerHTML = html;
-
-  if (autoEstimate) {                          // ← ADD this block
-    const normals = getNormalValues(a, ageUnit);
-    if (normals) updateNormalCentiles(normals);
-    if (!isNaN(y)) updateAirwayCalculations(y);
-    expandOpenAccordion();
-  }
-  return;
-}
-  }
 
   // paediatric normals table
   const paediatricNormals = {
@@ -2673,7 +2700,7 @@ if (y <= 14) {
       .forEach(el => el.style.display='inline');
   }
 
-  function updateAirwayCalculations(ageYears) {
+function updateAirwayCalculations(ageYears) {
   // 1) clear old notes
   document.querySelectorAll('.airway-note, .depth-note-row').forEach(el => el.remove());
 
@@ -2696,8 +2723,8 @@ if (y <= 14) {
     return;
   }
 
-      if (w > 0 && w < 1) {
-    // always give uncuffed size 2.5
+  // Special neonatal case: <1 kg
+  if (w > 0 && w < 1) {
     const uncEl  = document.getElementById('ett-uncuffed');
     const cuffEl = document.getElementById('ett-cuffed');
     uncEl.textContent   = '2.5';
@@ -2705,104 +2732,120 @@ if (y <= 14) {
     cuffEl.textContent   = '';
     cuffEl.style.display = 'none';
         
-         const depth         = stripZeros((1.17 * w + 5.58).toFixed(2));
-  const depthEl       = document.getElementById('ett-depth-lips');
-  const depthUnit     = depthEl.nextElementSibling;
-  depthEl.textContent   = depth;
-  depthEl.style.display = 'inline';
-  depthUnit.style.display = 'inline';
-  }
-  else {
-    
-  // your age→ETT size table
-  const table = [
-    { maxAge: 0.0833, unc: '3.0',     cuff: '2.5'    },  // <1 mo
-    { maxAge: 1/12,   unc: '3.5',  cuff: '3.0'    }, // =1 mo
-    { maxAge: 2/12,   unc: '3.5',  cuff: '3.0'    }, // =2 mo
-    { maxAge: 4/12,   unc: '3.5',      cuff: '3.0'    }, // 3-4 mo
-    { maxAge: 5/12,   unc: '4.0',      cuff: '3.5'    }, // 5 mo
-    { maxAge: 6/12,   unc: '4.0',      cuff: '3.5'    }, // 6 mo
-    { maxAge: 1,      unc: '4.0–4.5',      cuff: '3.5–4.0'    }, // 1 yr
-    { maxAge: 2,      unc: '4.5',      cuff: '4.0'    },
-    { maxAge: 3,      unc: '4.5–5.0',  cuff: '4.0–4.5'},
-    { maxAge: 4,      unc: '5.0',      cuff: '4.5'    },
-    { maxAge: 5,      unc: '5.0–5.5',  cuff: '4.5–5.0'},
-    { maxAge: 6,      unc: '5.5–6.0',      cuff: '5.0–5.5'    },
-    { maxAge: 7,      unc: '5.5–6.0',  cuff: '5.0–5.5'},
-    { maxAge: 8,      unc: '6.5',      cuff: '6.0'},
-    { maxAge: 9,      unc: '6.5',      cuff: '6.0'},
-    { maxAge: 10,     unc: null,       cuff: '6.0–6.5'    },
-    { maxAge: 12,     unc: null,       cuff: '7.0-7.5'    },
-    { maxAge: 14,     unc: null,       cuff: '7.0–8.0'},
-    { maxAge: 17,     unc: null,       cuff: '7.0–8.0'},
-    { maxAge: Infinity,unc: null,      cuff: '7.0–8.0'}
-  ];
-
-  const row = table.find(r => y <= r.maxAge);
-
-  // 3) inject uncuffed
-  const uncEl = document.getElementById('ett-uncuffed');
-  if (row.unc) {
-    uncEl.textContent   = row.unc;
-    uncEl.style.display = 'inline';
-  } else {
-    uncEl.textContent   = '';
-    uncEl.style.display = 'none';
-  }
-
-  // 4) inject cuffed (only if ≥ 3 kg)
-  const cuffEl = document.getElementById('ett-cuffed');
-  if (row.cuff && w >= 3.0) {
-    cuffEl.textContent   = row.cuff;
-    cuffEl.style.display = 'inline';
-  } else {
-    cuffEl.textContent   = '';
-    cuffEl.style.display = 'none';
-  }
-
-// 5) calculate depth
-let depth = '';
-
-if (y >= 1) {
-  // ≥1 year
-  depth = y/2 + 12;
-  depth = Math.min(depth, 21);
-  depth = stripZeros(depth.toFixed(2));
-
-} else if (y === 0) {
-  // 0 months
-  depth = 1.17 * w + 5.58;
-  depth = Math.min(depth, 9);
-  depth = stripZeros(depth.toFixed(2));
-
-} else if (y > 0 && y <= 3/12) {
-  // 1–3 months
-  depth = '9–10';
-
-} else if (y > 3/12 && y <= 6/12) {
-  // 4–6 months
-  depth = '10–11';
-
-} else if (y > 6/12 && y < 1) {
-  // 7–11 months
-  depth = '12';
-}
-
-  // inject depth
-  const depthEl = document.getElementById('ett-depth-lips');
-  const depthUnit = depthEl.nextElementSibling;
-  if (depth) {
+    const depth = stripZeros((1.17 * w + 5.58).toFixed(2));
+    const depthEl       = document.getElementById('ett-depth-lips');
+    const depthUnit     = depthEl.nextElementSibling;
     depthEl.textContent   = depth;
     depthEl.style.display = 'inline';
     depthUnit.style.display = 'inline';
-  } else {
-    depthEl.textContent   = '';
-    depthEl.style.display = 'none';
-    depthUnit.style.display = 'none';
   }
+
+  else {
+
+    // ================================
+    // NEW ETT SELECTION LOGIC
+    // ================================
+
+    let uncuffed = '';
+    let cuffed   = '';
+
+    // --- AGE 0–12 MONTHS → Use your existing lookup table ---
+    if (y < 1) {
+      const table = [
+        { maxAge: 0.0833, unc: '3.0',  cuff: '2.5' },
+        { maxAge: 1/12,   unc: '3.5',  cuff: '3.0' },
+        { maxAge: 2/12,   unc: '3.5',  cuff: '3.0' },
+        { maxAge: 4/12,   unc: '3.5',  cuff: '3.0' },
+        { maxAge: 5/12,   unc: '4.0',  cuff: '3.5' },
+        { maxAge: 6/12,   unc: '4.0',  cuff: '3.5' },
+        { maxAge: 1,      unc: '4.0–4.5', cuff: '3.5–4.0' }
+      ];
+      const row = table.find(r => y <= r.maxAge);
+      uncuffed = row.unc;
+      cuffed   = row.cuff;
+    }
+
+    // --- AGE ≥1 YEAR ---
+    else {
+
+      // Uncuffed: 1–8 years → age/4 + 4
+      if (y >= 1 && y <= 8) {
+        const size = (y/4 + 4).toFixed(2);
+        uncuffed = stripZeros(size);
+      }
+
+      // Cuffed: 1–14 years → age/4 + 3.5
+      if (y >= 1 && y <= 14) {
+        const size = (y/4 + 3.5).toFixed(2);
+        cuffed = stripZeros(size);
+      }
+
+      // Cuffed: >14 years → "7.0–8.0"
+      if (y > 14) {
+        cuffed = '7.0–8.0';
+      }
+    }
+
+    // Inject into DOM
+    const uncEl = document.getElementById('ett-uncuffed');
+    if (uncuffed) {
+      uncEl.textContent = uncuffed;
+      uncEl.style.display = 'inline';
+    } else {
+      uncEl.textContent = '';
+      uncEl.style.display = 'none';
+    }
+
+    const cuffEl = document.getElementById('ett-cuffed');
+    if (cuffed && w >= 3.0) {
+      cuffEl.textContent = cuffed;
+      cuffEl.style.display = 'inline';
+    } else {
+      cuffEl.textContent = '';
+      cuffEl.style.display = 'none';
+    }
+
+    // ============================
+    // DEPTH RULES
+    // ============================
+    let depth = '';
+
+    if (y >= 1) {
+      depth = y/2 + 12;
+      depth = Math.min(depth, 21);
+      depth = stripZeros(depth.toFixed(2));
+
+    } else if (y === 0) {
+      depth = 1.17 * w + 5.58;
+      depth = Math.min(depth, 9);
+      depth = stripZeros(depth.toFixed(2));
+
+    } else if (y > 0 && y <= 3/12) {
+      depth = '9–10';
+
+    } else if (y > 3/12 && y <= 6/12) {
+      depth = '10–11';
+
+    } else if (y > 6/12 && y < 1) {
+      depth = '12';
+    }
+
+    const depthEl = document.getElementById('ett-depth-lips');
+    const depthUnit = depthEl.nextElementSibling;
+    if (depth) {
+      depthEl.textContent   = depth;
+      depthEl.style.display = 'inline';
+      depthUnit.style.display = 'inline';
+    } else {
+      depthEl.textContent   = '';
+      depthEl.style.display = 'none';
+      depthUnit.style.display = 'none';
+    }
   }
-  // 8) now your i-Gel, LMA, tidal-volume & blade sizing exactly as before:
-  // — i-Gel —
+
+  // ==========================
+  // I-GEL (unchanged)
+  // ==========================
   const igelEl = document.getElementById('igel');
   let igelSize = '';
   if (w >= 2) {
@@ -2817,7 +2860,9 @@ if (y >= 1) {
   igelEl.innerHTML          = igelSize;
   igelEl.style.display      = igelSize ? 'inline' : 'none';
 
-  // — LMA —
+  // ==========================
+  // LMA (unchanged)
+  // ==========================
   const lmaEl = document.getElementById('lma');
   let lmaSize = '';
   if (w > 0) {
@@ -2829,12 +2874,12 @@ if (y >= 1) {
     else if (w <= 70)  lmaSize = '4.0 <small>(50–70 kg)</small>';
     else if (w <= 100) lmaSize = '5.0 <small>(70–100 kg)</small>';
   }
-    
-lmaEl.innerHTML = lmaSize;
-lmaEl.style.display = lmaSize ? 'inline-block' : 'none';
+  lmaEl.innerHTML = lmaSize;
+  lmaEl.style.display = lmaSize ? 'inline-block' : 'none';
 
-
-  // — Tidal volume —
+  // ==========================
+  // TIDAL VOLUME (unchanged)
+  // ==========================
   const tvEl = document.getElementById('tidalvolume');
   if (w > 0) {
     const tvMin = Math.round(6 * w),
@@ -2844,78 +2889,60 @@ lmaEl.style.display = lmaSize ? 'inline-block' : 'none';
   } else {
     tvEl.style.display = 'none';
   }
-    
-    // — Neonates/ARDS tidal volume (4-6 mL/kg) —
-const tvArdsEl = document.getElementById('tv-neonates-ards');
-if (tvArdsEl) {
+
+  // ARDS TV (unchanged)
+  const tvArdsEl = document.getElementById('tv-neonates-ards');
+  if (tvArdsEl) {
+    if (w > 0) {
+      const tvArdsMin = Math.round(4 * w),
+            tvArdsMax = Math.round(6 * w);
+      tvArdsEl.textContent   = `${tvArdsMin}–${tvArdsMax} mL`;
+      tvArdsEl.style.display = 'inline';
+    } else {
+      tvArdsEl.textContent   = '';
+      tvArdsEl.style.display = 'none';
+    }
+  }
+
+  // ==========================
+  // LARYNGOSCOPE BLADE (YOUR MISSING BLOCK)
+  // ==========================
+  const laryEl = document.getElementById('laryngoscope');
+  laryEl.innerHTML = '';
+
   if (w > 0) {
-    const tvArdsMin = Math.round(4 * w),
-          tvArdsMax = Math.round(6 * w);
-    tvArdsEl.textContent   = `${tvArdsMin}–${tvArdsMax} mL`;
-    tvArdsEl.style.display = 'inline';
+    let mainText = '';
+    let noteText = '';
+
+    if      (w < 1.5) { mainText = 'Miller 00 or 0';       noteText = '(Extremely preterm)'; }
+    else if (w < 2.5) { mainText = 'Mac 0 / Miller 0';     noteText = '(Preterm)'; }
+    else if (w < 4)   { mainText = 'Mac 0–1 / Miller 0–1'; }
+    else if (w < 6)   { mainText = 'Mac 1 / Miller 1';     noteText = '(1–6 m)'; }
+    else if (w < 12)  { mainText = 'Mac 1–2 / Miller 1–2'; noteText = '(6 m–2 y)'; }
+    else if (w < 30)  { mainText = 'Mac 2';    noteText = '(2–10 y)'; }
+    else if (w <= 60) { mainText = 'Mac 3';    noteText = '(>10 y)'; }
+    else              { mainText = 'Mac 3–4';  noteText = '(adult)'; }
+
+    laryEl.style.display = 'inline-block';
+    laryEl.appendChild(document.createTextNode(mainText));
+
+    if (noteText) {
+      laryEl.appendChild(document.createElement('br'));
+      const small = document.createElement('small');
+      small.textContent = noteText;
+      small.style.display   = 'block';
+      small.style.marginTop = '2px';
+      small.style.fontSize  = '0.8em';
+      small.style.color     = '#000000';
+      laryEl.appendChild(small);
+    }
   } else {
-    tvArdsEl.textContent   = '';
-    tvArdsEl.style.display = 'none';
+    laryEl.style.display = 'none';
   }
-}
 
-  // — Laryngoscope blade (replace your existing blade logic) —
-const laryEl = document.getElementById('laryngoscope');
-// 1) clear any previous content
-laryEl.innerHTML = '';
-
-if (w > 0) {
-  // 2) decide main vs. note text
-  let mainText = '';
-  let noteText = '';
-
-  if      (w < 1.5) { 
-    mainText = 'Miller 00 or 0'; 
-    noteText = '(Extremely preterm)';
-  }
-  else if (w < 2.5) { 
-    mainText = 'Mac 0 / Miller 0'; 
-    noteText = '(Preterm)';
-  }
-  else if (w < 4)   { 
-    mainText = 'Mac 0–1 / Miller 0–1'; 
-  }
-  else if (w < 6)   { 
-    mainText = 'Mac 1 / Miller 1'; 
-    noteText = '(1–6 m)';
-  }
-  else if (w < 12)  { 
-    mainText = 'Mac 1–2 / Miller 1–2'; 
-    noteText = '(6 m–2 y)';
-  }
-  else if (w < 30)  { mainText = 'Mac 2';    noteText = '(2–10 y)'; }
-  else if (w <= 60) { mainText = 'Mac 3';    noteText = '(>10 y)'; }
-  else              { mainText = 'Mac 3–4';  noteText = '(adult)'; }
-
-  // 3) show container as inline-block so it can stack children
-  laryEl.style.display = 'inline-block';
-
-  // 4) append the main line
-  laryEl.appendChild(document.createTextNode(mainText));
-
-  // 5) if there’s a note, force a break and a styled <small>
-  if (noteText) {
-    laryEl.appendChild(document.createElement('br'));
-    const small = document.createElement('small');
-    small.textContent = noteText;
-    // inline styles (or move to CSS if you prefer)
-    small.style.display   = 'block';    
-    small.style.marginTop = '2px';
-    small.style.fontSize  = '0.8em';
-    small.style.color     = '#000000';
-    laryEl.appendChild(small);
-  }
-} else {
-  // hide if no weight
-  laryEl.style.display = 'none';
-}
-
-  // 9) finally, update the drug tables
+  // ==========================
+  // DRUG TABLE UPDATES (unchanged)
+  // ==========================
   updateEmergencyDrugs(w);
   updateSedation(w);
   updateGADrugs(w);
