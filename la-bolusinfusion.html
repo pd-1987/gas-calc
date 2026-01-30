@@ -185,10 +185,10 @@ margin-left: 0;
     <button id="levobupivacaineBtn" onclick="selectLA('Levobupivacaine')">
       Levobupivacaine<small>2 mg/kg<br>Max. 200mg</small>
     </button>
-    <button id="ropivacaineBtn" onclick="selectLA('Ropivacaine')">
+ <!--   <button id="ropivacaineBtn" onclick="selectLA('Ropivacaine')">
       Ropivacaine<small>3 mg/kg<br>Max. 200mg</small>
     </button>
-  </div>
+  </div> -->
   
   <!-- Maximum Bolus Display -->
   <div class="result max-safe-dose">
@@ -213,7 +213,7 @@ margin-left: 0;
   <!-- Bolus Concentration -->
   <div class="input-group"><label><strong>Bolus Concentration:</strong></label></div>
   <div class="concentration-buttons">
-    <button class="concentration-btn" onclick="selectConcentration('0.2%')">0.2%</button>
+    <!-- <button class="concentration-btn" onclick="selectConcentration('0.2%')">0.2%</button> -->
     <button class="concentration-btn" onclick="selectConcentration('0.25%')">0.25%</button>
     <button class="concentration-btn" onclick="selectConcentration('0.375%')">0.375%</button>
     <button class="concentration-btn" onclick="selectConcentration('0.5%')">0.5%</button>
@@ -227,11 +227,12 @@ margin-left: 0;
   </div>
   
   <!-- Bolus Dose Display -->
-  <div class="result bolus-dose">
-    <strong><u>Bolus dose</u>:</strong>
-    <span id="bolusDose">0</span>
-    <span class="unit">mg</span>
-  </div>
+ <div class="result bolus-dose">
+  <strong><u>Bolus dose</u>:</strong>
+  <span id="bolusDose">0</span>
+  <span class="unit">mg</span>
+  <span id="bolusPct"></span>
+</div>
 
 </div>
 
@@ -242,7 +243,7 @@ margin-left: 0;
   <div class="infusion-concentration-buttons">
     <button class="infusion-concentration-btn" onclick="selectInfusionConcentration('0.1%')">0.1%</button>
     <button class="infusion-concentration-btn" onclick="selectInfusionConcentration('0.125%')">0.125%</button>
-    <button class="infusion-concentration-btn" onclick="selectInfusionConcentration('0.2%')">0.2%</button>
+   <!-- <button class="infusion-concentration-btn" onclick="selectInfusionConcentration('0.2%')">0.2%</button> -->
   </div>
 
 <!-- Infusion Rate Entry Group -->
@@ -331,7 +332,7 @@ margin-left: 0;
       
       const bupBtn = document.getElementById("bupivacaineBtn");
       const levoBtn = document.getElementById("levobupivacaineBtn");
-      const ropiBtn = document.getElementById("ropivacaineBtn");
+      // const ropiBtn = document.getElementById("ropivacaineBtn");
       
       if (selectedLA === "Bupivacaine") {
         if (bupBtn.classList.contains("active")) {
@@ -339,7 +340,7 @@ margin-left: 0;
         } else {
           bupBtn.classList.add("active");
           levoBtn.classList.remove("active");
-          ropiBtn.classList.remove("active");
+         // ropiBtn.classList.remove("active");
         }
       } else if (selectedLA === "Levobupivacaine") {
         if (levoBtn.classList.contains("active")) {
@@ -347,16 +348,16 @@ margin-left: 0;
         } else {
           levoBtn.classList.add("active");
           bupBtn.classList.remove("active");
-          ropiBtn.classList.remove("active");
+         // ropiBtn.classList.remove("active");
         }
-      } else if (selectedLA === "Ropivacaine") {
+     /* } else if (selectedLA === "Ropivacaine") {
         if (ropiBtn.classList.contains("active")) {
           ropiBtn.classList.remove("active");
         } else {
           ropiBtn.classList.add("active");
           bupBtn.classList.remove("active");
           levoBtn.classList.remove("active");
-        }
+        } */
       }
       updateMaxSafeDose();
 updateBolusDose();      // Ensure bolus dose is recalculated.
@@ -412,26 +413,40 @@ const infusionConcMap = {
   "0.2%": 2.0
 };    
     
-    function updateBolusDose() {
-      const volume = Math.max(parseFloat(document.getElementById("bolusVolume").value), 0);
-      const doseDisplay = document.getElementById("bolusDose");
-      const activeConcBtn = document.querySelector(".concentration-btn.active");
-      if (activeConcBtn && !isNaN(volume) && volume > 0) {
-        const concValue = concMap[activeConcBtn.textContent.trim()];
-        if (concValue) {
-          const bolusDose = Math.max(volume * concValue, 0);
-          doseDisplay.textContent = Number(bolusDose.toFixed(1));
-          doseDisplay.style.color = (maxBolusValue > 0 && bolusDose > maxBolusValue)
-            ? "darkred" : "inherit";
-          updateInfusionRates();
-          return;
-        }
-      }
-      doseDisplay.textContent = "0";
-      doseDisplay.style.color = "inherit";
-      updateInfusionRates();
+function updateBolusDose() {
+  const volume = Math.max(parseFloat(document.getElementById("bolusVolume").value), 0);
+  const doseDisplay = document.getElementById("bolusDose");
+  const pctSpan = document.getElementById("bolusPct");
+  const activeConcBtn = document.querySelector(".concentration-btn.active");
+
+  // Reset
+  doseDisplay.textContent = "0";
+  pctSpan.textContent = "";
+  pctSpan.classList.remove("over-limit");
+  doseDisplay.style.color = "inherit";
+
+  if (activeConcBtn && !isNaN(volume) && volume > 0) {
+    const concValue = concMap[activeConcBtn.textContent.trim()];
+    if (!concValue) return;
+
+    const bolusDose = volume * concValue;
+    doseDisplay.textContent = bolusDose.toFixed(1);
+
+    if (maxBolusValue > 0) {
+      const pct = (bolusDose / maxBolusValue) * 100;
+      pctSpan.textContent = ` (${pct.toFixed(0)}%)`;
+      pctSpan.classList.toggle("over-limit", pct > 100);
     }
-    
+
+    doseDisplay.style.color =
+      maxBolusValue > 0 && bolusDose > maxBolusValue
+        ? "darkred"
+        : "inherit";
+  }
+
+  updateInfusionRates();
+}
+ 
     // --- Maximum Bolus Calculation ---
     // Bupivacaine: max bolus = min(2 mg/kg * weight, 175 mg)
     // Levobupivacaine: max bolus = min(2 mg/kg * weight, 200 mg)
@@ -453,7 +468,7 @@ const infusionConcMap = {
   let cap = Infinity;
   const bupBtn = document.getElementById("bupivacaineBtn");
   const levoBtn = document.getElementById("levobupivacaineBtn");
-  const ropiBtn = document.getElementById("ropivacaineBtn");
+ // const ropiBtn = document.getElementById("ropivacaineBtn");
 
   if (bupBtn.classList.contains("active")) {
     dose = 2 * weightKg;
@@ -463,10 +478,10 @@ const infusionConcMap = {
     dose = 2 * weightKg;
     cap = 200;
     max24hValue = 400;
-  } else if (ropiBtn.classList.contains("active")) {
+  /* } else if (ropiBtn.classList.contains("active")) {
     dose = 3 * weightKg;
     cap = 200;
-    max24hValue = 675;
+    max24hValue = 675; */
   } else {
     document.getElementById("maxSafeDose").textContent = "0";
     document.getElementById("max24hDose").textContent = "0";
@@ -501,22 +516,23 @@ document.getElementById("maxSafeDose").textContent = Number(finalDose.toFixed(1)
   }
 
   const activeInfBtn = document.querySelector(".infusion-concentration-btn.active");
-  if (!activeInfBtn) {
-    document.getElementById("4HoursDose").textContent = "0";
-    document.getElementById("24HoursDose").textContent = "0";
-    return;
-  }
+const bolusDose = parseFloat(document.getElementById("bolusDose").textContent) || 0;
 
+// Default: bolus only
+let doseOver4h  = bolusDose;
+let doseOver24h = bolusDose;
+
+// Only add infusion if BOTH concentration AND rate exist
+if (activeInfBtn) {
   const concText = activeInfBtn.textContent.trim();
   const conc = infusionConcMap[concText] || 0;
-  if (conc === 0) return;
+  const rate = parseFloat(document.getElementById("infusionRate").value) || 0;
 
-  const bolusDose = parseFloat(document.getElementById("bolusDose").textContent) || 0;
-  const rate = parseFloat(document.getElementById("infusionRate").value) || 0; // mL/h
-
-  // Calculate doses
-  const doseOver4h  = bolusDose + (rate * conc * 4);
-  const doseOver24h = bolusDose + (rate * conc * 24);
+  if (conc > 0 && rate > 0) {
+    doseOver4h  += rate * conc * 4;
+    doseOver24h += rate * conc * 24;
+  }
+}
 
   // Update UI
   document.getElementById("4HoursDose").textContent  = Number(doseOver4h.toFixed(1));
@@ -535,18 +551,6 @@ document.getElementById("maxSafeDose").textContent = Number(finalDose.toFixed(1)
   pctSpan24.classList.toggle("over-limit", pct24 > 100);
 }
 
-  // Show % of max for 24 hours
-if (maxBolusValue > 0) {
-  let max24h = 400; // default for Bupi/Levo
-  const ropiBtn = document.getElementById("ropivacaineBtn");
-  if (ropiBtn && ropiBtn.classList.contains("active")) {
-    max24h = 675;
-  }
-  
-  const pct24 = (doseOver24h / max24h) * 100;
-  pctSpan24.textContent = ` (${pct24.toFixed(0)}%)`;
-  pctSpan24.classList.toggle("over-limit", pct24 > 100);
-}
  }
     // Attach event listeners.
 // Attach event listeners.
@@ -567,16 +571,16 @@ document.getElementById("infusionRate")
    function updateBolusOptions() {
     const isBupi = document.getElementById('bupivacaineBtn').classList.contains('active');
     const isLevo = document.getElementById('levobupivacaineBtn').classList.contains('active');
-    const isRopi = document.getElementById('ropivacaineBtn').classList.contains('active');
-    const anyLA = isBupi || isLevo || isRopi;
+   // const isRopi = document.getElementById('ropivacaineBtn').classList.contains('active');
+    const anyLA = isBupi || isLevo // || isRopi;
 
     document.querySelectorAll('.concentration-btn').forEach(btn => {
       const txt = btn.textContent.trim();  // "0.2%", "0.25%", "0.375%", "0.5%"
       // If no LA selected, show all; otherwise apply drug‑specific rules
       const show =
         !anyLA ||
-        ((isBupi || isLevo) && ['0.25%','0.375%','0.5%'].includes(txt)) ||
-        (isRopi && ['0.2%','0.375%','0.5%'].includes(txt));
+        ((isBupi || isLevo) && ['0.25%','0.375%','0.5%'].includes(txt)) /*||
+        (isRopi && ['0.2%','0.375%','0.5%'].includes(txt)); */
 
       btn.style.display = show ? '' : 'none';
       if (!show) btn.classList.remove('active');
@@ -585,16 +589,16 @@ document.getElementById("infusionRate")
     function updateInfusionOptions() {
     const isBupi = document.getElementById('bupivacaineBtn').classList.contains('active');
     const isLevo = document.getElementById('levobupivacaineBtn').classList.contains('active');
-    const isRopi = document.getElementById('ropivacaineBtn').classList.contains('active');
-    const anyLA = isBupi || isLevo || isRopi;
+    // const isRopi = document.getElementById('ropivacaineBtn').classList.contains('active');
+    const anyLA = isBupi || isLevo // || isRopi;
 
     document.querySelectorAll('.infusion-concentration-btn').forEach(btn => {
       const txt = btn.textContent.trim();  // "0.1%", "0.125%", "0.2%"
       // If no LA selected, show all; otherwise apply drug‑specific rules
       const show =
         !anyLA ||
-        ((isBupi || isLevo) && (txt === '0.1%' || txt === '0.125%')) ||
-        (isRopi && txt === '0.2%');
+        ((isBupi || isLevo) && (txt === '0.1%' || txt === '0.125%')) /* ||
+        (isRopi && txt === '0.2%'); */
 
       btn.style.display = show ? '' : 'none';
       if (!show) btn.classList.remove('active');
@@ -607,6 +611,10 @@ document.getElementById("infusionRate")
   // Reset bolus volume and dose
   document.getElementById("bolusVolume").value = "";
   document.getElementById("bolusDose").textContent = "0";
+    
+    const bolusPct = document.getElementById("bolusPct");
+bolusPct.textContent = "";
+bolusPct.classList.remove("over-limit");
 
   // Reset infusion rate and doses
   document.getElementById("infusionRate").value = "";
@@ -624,7 +632,7 @@ document.getElementById("infusionRate")
   // Reset LA selection buttons
   document.getElementById("bupivacaineBtn").classList.remove("active");
   document.getElementById("levobupivacaineBtn").classList.remove("active");
-  document.getElementById("ropivacaineBtn").classList.remove("active");
+ // document.getElementById("ropivacaineBtn").classList.remove("active");
 
   // Reset bolus concentration selection
   document.querySelectorAll(".concentration-btn").forEach(btn => btn.classList.remove("active"));
