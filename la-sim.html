@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Local Anaesthetic Plasma Concentration</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.1.1/dist/chartjs-plugin-annotation.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 30px auto;
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    label {
+      font-weight: bold;
+    }
+    input, select {
+      width: 100%;
+      padding: 6px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Plasma Concentration After Peripheral Nerve Block</h2>
+
+<div class="controls">
+  <div>
+  <label for="weight">Weight (kg)</label>
+  <input type="number" id="weight" value="70">
+</div>
+  <div>
+  <label for="drug">Drug</label>
+  <select id="drug">
+    <option value="bupi">Bupivacaine</option>
+    <option value="levo" selected>Levobupivacaine</option>
+  </select>
+</div>
+
+  <div>
+    <label for="dose">Dose (mg)</label>
+    <input type="number" id="dose" value="150">
+  </div>
+
+  <div>
+    <label for="absorption">Absorption</label>
+    <select id="absorption">
+      <option value="fast">Fast (intercostal / scalp)</option>
+      <option value="moderate" selected>Moderate (TAP / femoral)</option>
+      <option value="slow">Slow (sciatic / deep blocks)</option>
+    </select>
+  </div>
+
+  <div>
+    <label>&nbsp;</label>
+    <button onclick="updateChart()">Update</button>
+  </div>
+</div>
+
+<canvas id="pkChart"></canvas>
+
+<script>
+  // Fixed PK parameters
+ const DrugParams = {
+  bupi: {
+    Ke: 0.257,   // h^-1 (t1/2 ≈ 2.7 h)
+    Vd: 120     // L
+  },
+  levo: {
+    Ke: 0.239,   // h^-1 (t1/2 ≈ 2.9 h)
+    Vd: 110     // L
+  }
+};
+  
+  const ToxicLevels = {
+  bupi: 2.0,
+  levo: 2.4
+};
+
+  const KaPresets = {
+    fast: 3.5,
+    moderate: 2.0,
+    slow: 0.8
+  };
+
+  const TwoCompParams = {
+  levo: { alpha: 1.5, beta: 0.25, Vc: 30 },
+  bupi: { alpha: 1.5, beta: 0.27, Vc: 35 }
+};
+  
+  let chart;
+
+function concentration2(t, dose, Ka, alpha, beta, Vc) {
+  if (t < 0) return 0;
+  const f = 0.7;
+  return (dose / Vc) * (1 - Math.exp(-Ka * t)) * (f * Math.exp(-alpha * t) + (1 - f) * Math.exp(-beta * t));
+}
+
+ function updateChart() {
+  // Inputs
+  const weight = parseFloat(document.getElementById("weight").value);
+  const doseMg = parseFloat(document.getElementById("dose").value); // always mg
+  const absorption = document.getElementById("absorption").value;
+  const drug = document.getElementById("drug").value;
+
+  // Absorption Ka
+  const Ka = KaPresets[absorption];
+
+  // PK parameters by drug
+  const DrugParams = {
+    bupi: { Ke: 0.257, Vd: 120 },
+    levo: { Ke: 0.239, Vd: 110 }
+  };
+  const { Ke, Vd } = DrugParams[drug];
+
+  // Scale Vd by weight
+  const actualVd = Vd * (weight / 70); // standard 70 kg
+
+  // Time points
+  const times = [];
+  const concentrations = [];
+
+  for (let t = 0; t <= 6; t += 0.05) {
+    times.push(t);
+
+    const { alpha, beta, Vc } = TwoCompParams[drug];
+
+    // Scale central compartment by patient weight (70kg = reference)
+    const scaledVc = Vc * (weight / 70);
+
+    concentrations.push(concentration2(t, doseMg, Ka, alpha, beta, scaledVc));
+}
+
+  if (chart) chart.destroy();
+
+  chart = new Chart(document.getElementById("pkChart"), {
+    type: "line",
+    data: {
+      labels: times,
+      datasets: [{
+        label: "Plasma concentration (mg/L)",
+        data: concentrations,
+        borderWidth: 2,
+        fill: false
+      }]
+    },
+    options: {
+      plugins: {
+        annotation: {
+          annotations: {
+            toxicLine: {
+              type: 'line',
+              yMin: ToxicLevels[drug],
+              yMax: ToxicLevels[drug],
+              borderColor: 'red',
+              borderWidth: 2,
+              label: {
+                content: 'Toxic level',
+                enabled: true,
+                position: 'end',
+                backgroundColor: 'rgba(255,0,0,0.2)',
+                color: 'red'
+              }
+            }
+          }
+        }
+      },
+      scales: {
+        x: { title: { display: true, text: "Time (hours)" } },
+        y: { title: { display: true, text: "Concentration (mg/L)" }, beginAtZero: true }
+      }
+    }
+  });
+}
+  updateChart();
+</script>
+
+</body>
+</html>
