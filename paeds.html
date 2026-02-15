@@ -1378,38 +1378,40 @@
           </tr>
   <tr style="background-color: #fff;">
             <td style="padding: 8px; border: 1px solid #ccc;">
-              <strong>Flucloxacillin</strong>
+              <strong>Flucloxacillin (Soft tissue)</strong>
             </td>
             <td style="padding: 8px; border: 1px solid #ccc;">
-              12.5–25 mg/kg (Max 1 g)
+              25 mg/kg (Max 1 g)
             </td>
             <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
               <span id="flucloxacillin"></span>
               <span class="static unit">mg</span>
             </td>
           </tr>
-          <tr style="background-color: #f5f5f5;">
+   <tr style="background-color: #f5f5f5;">
             <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
               <small></small>
             </td>
-          </tr>
-    <tr style="background-color: #fff;">
+  
+  <tr style="background-color: #fff;">
             <td style="padding: 8px; border: 1px solid #ccc;">
-              <strong>Gentamicin</strong>
+              <strong>Flucloxacillin (Open orthopaedic surgery)</strong>
             </td>
             <td style="padding: 8px; border: 1px solid #ccc;">
-              2.5 mg/kg (Max 480 mg)
+              50 mg/kg (Max 2 g)
             </td>
             <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
-              <span id="gentamicin"></span>
+              <span id="flucloxacillin-bone"></span>
               <span class="static unit">mg</span>
             </td>
           </tr>
+  
           <tr style="background-color: #f5f5f5;">
             <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
               <small></small>
             </td>
           </tr>
+    
    <tr style="background-color: #fff;">
             <td style="padding: 8px; border: 1px solid #ccc;">
               <strong>Metronidazole</strong>
@@ -1440,6 +1442,42 @@
           <tr style="background-color: #f5f5f5;">
             <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
               <small id="teicoplanin-note"></small>
+            </td>
+          </tr>
+  
+  <tr style="background-color: #fff;">
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              <strong>Gentamicin</strong>
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              2.5 mg/kg (Max 160 mg)
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+              <span id="gentamicin"></span>
+              <span class="static unit">mg</span>
+            </td>
+          </tr>
+          <tr style="background-color: #f5f5f5;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+              <small>In obesity, doses should be calculated based on adjusted body weight.</small>
+            </td>
+          </tr>
+  
+  <tr style="background-color: #fff;">
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              <strong>Gentamicin (high-dose)</strong>
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              5 mg/kg (Max 480 mg)
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+              <span id="gentamicin-high"></span>
+              <span class="static unit">mg</span>
+            </td>
+          </tr>
+          <tr style="background-color: #f5f5f5;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+              <small>In obesity, doses should be calculated based on adjusted body weight.</small>
             </td>
           </tr>
   
@@ -3463,8 +3501,10 @@ function updateAntibiotics(w) {
     { id: 'amoxicillin',    dosePerKg: 30, max: 1000 },
     { id: 'cefuroxime',     dosePerKg: 50, max: 1500 },
     { id: 'co-amoxiclav',   dosePerKg: 30, max: 1200 },
-    { id: 'flucloxacillin', dosePerKgMin: 12.5, dosePerKgMax: 25, max: 1000 },
-    { id: 'gentamicin',     dosePerKg: 2.5,  max: 480 },
+    { id: 'flucloxacillin', dosePerKg: 25, max: 1000 },
+    { id: 'flucloxacillin-bone', dosePerKg: 50, max: 2000 },
+    { id: 'gentamicin',     dosePerKg: 2.5,  max: 160 },
+    { id: 'gentamicin-high',     dosePerKg: 5,  max: 480 },
     { id: 'metronidazole',  dosePerKg: 30,   max: 500 }
   ];
 
