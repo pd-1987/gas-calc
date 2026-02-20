@@ -76,3 +76,15 @@ function getBMILMS(ageYears, gender) {
 
   return interpolateLMS(dataset, ageYears);
 }
+
+function formatCentile(c) {
+  const rounded = Math.round(c);
+
+  const suffix =
+    rounded % 10 === 1 && rounded % 100 !== 11 ? "st" :
+    rounded % 10 === 2 && rounded % 100 !== 12 ? "nd" :
+    rounded % 10 === 3 && rounded % 100 !== 13 ? "rd" :
+    "th";
+
+  return `${rounded}${suffix}`;
+}
