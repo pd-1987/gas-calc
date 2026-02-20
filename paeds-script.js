@@ -2011,16 +2011,23 @@ function calculateBMI() {
 
   }
 
-  // =========================
-  // IDEAL BODY WEIGHT
-  // =========================
+// =========================
+// IDEAL BODY WEIGHT
+// =========================
 
-  const bmi50 = getBMI50(ageYears, gender);
+const lms = getBMILMS(ageYears, gender);
 
-  const ibw = bmi50 * heightM * heightM;
+let ibw = null;
+
+if (lms) {
+  const bmi50 = lms.M;   // 50th centile BMI from LMS
+  ibw = bmi50 * heightM * heightM;
+
   const ibwRounded = ibw.toFixed(1);
-
   ibwOutput.textContent = `${ibwRounded} kg`;
+} else {
+  ibwOutput.textContent = "";
+}
 
   // =========================
   // ADJUSTED BODY WEIGHT
@@ -2037,81 +2044,6 @@ function calculateBMI() {
 // Age in years 2–18
 // 2-decimal precision
 // ===============================
-
-const bmi50Data = {
-
-  male: [
-    { age: 2, bmi: 16.60 },
-    { age: 3, bmi: 16.05 },
-    { age: 4, bmi: 15.73 },
-    { age: 5, bmi: 15.55 },
-    { age: 6, bmi: 15.53 },
-    { age: 7, bmi: 15.73 },
-    { age: 8, bmi: 16.10 },
-    { age: 9, bmi: 16.64 },
-    { age: 10, bmi: 17.30 },
-    { age: 11, bmi: 18.07 },
-    { age: 12, bmi: 18.89 },
-    { age: 13, bmi: 19.66 },
-    { age: 14, bmi: 20.37 },
-    { age: 15, bmi: 21.00 },
-    { age: 16, bmi: 21.54 },
-    { age: 17, bmi: 21.95 },
-    { age: 18, bmi: 22.27 }
-  ],
-
-  female: [
-    { age: 2, bmi: 16.52 },
-    { age: 3, bmi: 15.96 },
-    { age: 4, bmi: 15.63 },
-    { age: 5, bmi: 15.45 },
-    { age: 6, bmi: 15.47 },
-    { age: 7, bmi: 15.80 },
-    { age: 8, bmi: 16.28 },
-    { age: 9, bmi: 16.88 },
-    { age: 10, bmi: 17.58 },
-    { age: 11, bmi: 18.34 },
-    { age: 12, bmi: 19.07 },
-    { age: 13, bmi: 19.73 },
-    { age: 14, bmi: 20.29 },
-    { age: 15, bmi: 20.75 },
-    { age: 16, bmi: 21.10 },
-    { age: 17, bmi: 21.37 },
-    { age: 18, bmi: 21.57 }
-  ]
-
-};
-
-// ===============================
-// Interpolation Function
-// ===============================
-
-function getBMI50(ageYears, gender) {
-
-  const data = bmi50Data[gender];
-
-  if (!data) return null;
-
-  // Clamp age
-  if (ageYears <= data[0].age) return data[0].bmi;
-  if (ageYears >= data[data.length - 1].age) return data[data.length - 1].bmi;
-
-  // Find surrounding points
-  for (let i = 0; i < data.length - 1; i++) {
-
-    const a1 = data[i];
-    const a2 = data[i + 1];
-
-    if (ageYears >= a1.age && ageYears <= a2.age) {
-
-      const fraction = (ageYears - a1.age) / (a2.age - a1.age);
-
-      return a1.bmi + fraction * (a2.bmi - a1.bmi);
-    }
-  }
-
-  return null;
-}
 
 function getBMICentile(bmi, ageYears, gender) {
 
