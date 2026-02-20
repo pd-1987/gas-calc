@@ -1,3 +1,5 @@
+console.log("swapped json data loaded");
+
 const paedsBMIData =
 {
   "girls": [
