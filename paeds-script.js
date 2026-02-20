@@ -2000,10 +2000,10 @@ function calculateBMI() {
 
   if (result) {
 
-    const centileRounded = result.centile.toFixed(1);
+   const centileText = formatCentile(result.centile);
 
-    bmiOutput.textContent =
-      `${bmiRounded} kg/m² (${centileRounded}th centile – ${result.category})`;
+   bmiOutput.textContent =
+  `${bmiRounded} kg/m² (${centileText} centile – ${result.category})`;
 
   } else {
 
