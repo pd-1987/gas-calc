@@ -249,6 +249,11 @@
   background-color: #fff;      /* text on solid white so it’s readable */
   padding: 0px 6px;
 }
+    .accordion-title sup {
+  font-size: 0.6em;
+  vertical-align: super;
+  margin-left: 1px;
+}
   </style>
 </head>
 <body>
@@ -276,7 +281,7 @@
       <small>In Obesity, use <a href="https://www.paedspro.com/">Paeds Prescribing Pro.</a></small>
       </p>
   </div>
-    
+ 
   <div class="accordion">
 
   <div class="accordion-item">
@@ -285,7 +290,65 @@
 
       <span class="accordion-title">
 
-        <i class="fa-solid fa-heart-pulse"></i> Normal Physiological Values
+        <i class="fa-solid fa-heart-pulse"></i>Weight and Body Mass Index
+
+      </span>
+
+      <span>
+
+        <i class="fas fa-plus"></i>
+
+        <i class="fas fa-minus"></i>
+
+      </span>
+
+    </div>
+
+    <div class="accordion-content">
+
+      <div class="accordion-content-inner">
+    <!-- Height input -->
+  <div class="input-group">
+    <label for="height">Height (cm):</label>
+    <input type="number" id="height" min="0" placeholder="0" />
+  </div>      
+        
+  <!-- Gender toggle -->
+  <div class="input-group">
+    <label for="GenderBtn">Gender:</label>
+    <button class="unit-toggle" id="GenderBtn" data-gender="male">Male</button>
+  </div>
+
+  <!-- BMI display -->
+<div class="input-group">
+  <label>BMI:</label>
+  <span id="bmi-value"></span>
+</div>
+
+<div class="input-group">
+  <label>Ideal body weight:</label>
+  <span id="ibw-value"></span>
+</div>
+
+<div class="input-group">
+  <label>Adjusted body weight:</label>
+  <span id="adjbw-value"></span>
+</div>        
+
+</div>
+      </div>
+      </div>
+    </div>
+  
+  <div class="accordion">
+
+  <div class="accordion-item">
+
+    <div class="accordion-header">
+
+      <span class="accordion-title">
+
+        <i class="fa-solid fa-heart-pulse"></i><span>Normal Physiological Values</span>
 
       </span>
 
@@ -329,7 +392,6 @@
 </table>
 
         <small><sup>*</sup>50th centile (5th – 95th)<br><sup>†</sup>5th – 95th centile</small>
-        <p style="text-align: center; margin-bottom: 0.01em;"><small><a href="/guidelines/paediatrics/apls-table-1.1.png">APLS 6e Paediatric Normal Values</a></small></p>
       </div>
       </div>
     </div>
@@ -340,7 +402,7 @@
 
       <span class="accordion-title">
 
-        <i class="fa-solid fa-mask-ventilator"></i> Airway and Ventilation
+        <i class="fa-solid fa-mask-ventilator"></i>Airway and Ventilation
 
       </span>
 
@@ -433,11 +495,17 @@
            <tr>
         <th style="border:1px solid #ccc; padding:8px; text-align:center;">T-piece</th>
         <td style="border:1px solid #ccc; padding:8px; text-align:center;">
-          0–10 kg (Up to 20 kg)
+          0–20 kg
+        </td>
+      </tr>
+       <tr>
+        <th style="border:1px solid #ccc; padding:8px; text-align:center;">Infant (Micro) circle</th>
+        <td style="border:1px solid #ccc; padding:8px; text-align:center;">
+          0–10 kg
         </td>
       </tr>
       <tr>
-        <th style="border:1px solid #ccc; padding:8px; text-align:center;">Paediatric circle</th>
+        <th style="border:1px solid #ccc; padding:8px; text-align:center;">Paediatric (Mini) circle</th>
         <td style="border:1px solid #ccc; padding:8px; text-align:center;">
           10–30 kg
         </td>
@@ -484,7 +552,7 @@
 
       <span class="accordion-title">
 
-        <i class="fas fa-syringe"></i> Emergency Intubation
+        <i class="fas fa-syringe"></i>Emergency Intubation
 
       </span>
 
@@ -857,7 +925,7 @@
 
       <span class="accordion-title">
 
-        <i class="fa-solid fa-bed"></i> Routine General Anaesthetic
+        <i class="fa-solid fa-bed"></i> Routine General Anaesthesia
 
       </span>
 
@@ -1490,7 +1558,7 @@
      <div class="accordion-item">
     <div class="accordion-header">
       <span class="accordion-title">
-        <i class="fa-solid fa-grip-lines"></i> Lines
+        <i class="fa-solid fa-grip-lines"></i> Lines and Suction catheters
       </span>
       <span>
         <i class="fas fa-plus"></i>
@@ -1773,7 +1841,7 @@
         <th style="border:1px solid #ccc; padding:8px; text-align:center;">ETT depth (oral)</th>
         <td style="border:1px solid #ccc; padding:8px; text-align:center;">
           <p>Above 1 year: Depth ≈ Age/2+12</p> 
-          <p>Neonates: Depth ≈ 1.17 × Birth weight (kg) + 5.58 (“7-8-9” rule)</p>
+          <p>Neonates: Depth ≈ 1.17 × Birth weight (kg) + 5.58 (Tochen / “7-8-9” rule)</p>
         </td>
       </tr>
             <tr>
@@ -1829,22 +1897,42 @@
   
   <footer>
     <small> 
-    <p>SBP: Systolic blood pressure; HR: Heart rate; RR: Respiratory rate; LMA: Laryngeal mask airway; ARDS: Acute respiratory distress syndrome; PO: By mouth; NAS: Intranasal; TOF: Train-of-four; PTC: Post-tetanic count</p>
       <p>These tools and calculators do not have approval by the MHRA as medical devices and clinicians need to be aware that they use them at their own risk. Results should be verified and used in conjunction with the appropriate training and professional judgement, and according to your local hospital policies and procedures.</p>
     </small>
       <details>
-    <summary>Notes and references</summary>
+    <summary>Notes</summary>
   <small>
-        <p><a href="https://onlinelibrary.wiley.com/doi/book/10.1002/9781118369784" target="_blank" rel="noopener noreferrer">M Samuels, S Wieteska, eds. Advanced Paediatric Life Support: The Practical Approach, 5th edn. Chichester: Wiley-Blackwell, 2011.</a></p>
+        <p>SBP: Systolic blood pressure; HR: Heart rate; RR: Respiratory rate; LMA: Laryngeal mask airway; ARDS: Acute respiratory distress syndrome; PO: By mouth; NAS: Intranasal; TOF: Train-of-four; PTC: Post-tetanic count</p>
+        </small>  
+    </details>
+        <p>
+<details>
+<summary>References</summary>
+<small>
+<ol>
+<li>Samuels M, Wieteska S, editors.
+  <em>Advanced Paediatric Life Support: a practical approach to emergencies</em>.
+  6th ed. Chichester (UK): Wiley-Blackwell; 2016. doi:10.1002/9781119241225.</li>
+  <li>Weiner GM, editor.
+  <em>Textbook of Neonatal Resuscitation (NRP)</em>.
+  9th ed. Itasca (IL): American Academy of Pediatrics; 2025.
+</li>
+ <li>Paediatric Formulary Committee.
+  <em>BNF for Children (BNFC)</em>.
+  London: BMJ Group, Pharmaceutical Press, and RCPCH Publications.
+  Available from: <a href="https://bnfc.nice.org.uk/" target="_blank" rel="noopener noreferrer">https://bnfc.nice.org.uk/</a>
+  (accessed 20 Feb 2026).
+</li>
+      </ol>
     </small>
-      </details>
+      </details></p>
+<small>        
       <p><a href="disclaimer.html">Disclaimer</a></p>
       <p>&copy; 2025 #OneTeam Anaesthesia. All rights reserved.</p>
     </small>
   </footer>
-
 <script>
-    function stripZeros(str) {
+      function stripZeros(str) {
     return str
       .replace(/(\.\d*?[1-9])0+$/ , '$1')   // drop extra zeroes after a significant decimal
       .replace(/\.0+$/            , ''   );// drop ".0", ".00", etc.
@@ -2690,24 +2778,24 @@ function estimateWeight() {
 
   // paediatric normals table
   const paediatricNormals = {
-    0:   { respRate:[25,50], heartRate:[120,170], bp:{p5:65, p50:85, p95:105} },
-    1:   { respRate:[25,50], heartRate:[120,170], bp:{p5:65, p50:85, p95:105} },
-    3:   { respRate:[25,45], heartRate:[115,160], bp:{p5:65, p50:85, p95:105} },
-    6:   { respRate:[20,40], heartRate:[110,160], bp:{p5:65, p50:85, p95:105} },
-    12:  { respRate:[20,40], heartRate:[110,160], bp:{p5:70, p50:90, p95:105} },
-    18:  { respRate:[20,35], heartRate:[100,155], bp:{p5:70, p50:90, p95:105} },
-    24:  { respRate:[20,30], heartRate:[100,150], bp:{p5:70, p50:90, p95:110} },
-    36:  { respRate:[20,30], heartRate:[90,140],  bp:{p5:70, p50:90, p95:110} },
-    48:  { respRate:[20,30], heartRate:[80,135],  bp:{p5:70, p50:90, p95:110} },
-    60:  { respRate:[20,30], heartRate:[80,135],  bp:{p5:80, p50:95, p95:120} },
-    72:  { respRate:[20,30], heartRate:[80,130],  bp:{p5:80, p50:95, p95:120} },
-    84:  { respRate:[20,30], heartRate:[80,130],  bp:{p5:80, p50:95, p95:120} },
-    96:  { respRate:[15,25], heartRate:[70,120],  bp:{p5:80, p50:95, p95:120} },
-    108: { respRate:[15,25], heartRate:[70,120],  bp:{p5:80, p50:95, p95:120} },
-    120: { respRate:[15,25], heartRate:[70,120],  bp:{p5:80, p50:95, p95:120} },
-    132: { respRate:[15,25], heartRate:[70,120],  bp:{p5:80, p50:95, p95:120} },
-    144: { respRate:[12,24], heartRate:[65,115],  bp:{p5:90, p50:110,p95:140} },
-    168: { respRate:[12,24], heartRate:[60,110],  bp:{p5:90, p50:110,p95:140} }
+    0:   { respRate:[25,50], heartRate:[120,170], bp:{p5:65, p50:[80,90], p95:105} },
+    1:   { respRate:[25,50], heartRate:[120,170], bp:{p5:65, p50:[80,90], p95:105} },
+    3:   { respRate:[25,45], heartRate:[115,160], bp:{p5:65, p50:[80,90], p95:105} },
+    6:   { respRate:[20,40], heartRate:[110,160], bp:{p5:65, p50:[80,90], p95:105} },
+    12:  { respRate:[20,40], heartRate:[110,160], bp:{p5:70, p50:[85,95], p95:105} },
+    18:  { respRate:[20,35], heartRate:[100,155], bp:{p5:70, p50:[85,95], p95:105} },
+    24:  { respRate:[20,30], heartRate:[100,150], bp:{p5:70, p50:[85,100], p95:110} },
+    36:  { respRate:[20,30], heartRate:[90,140],  bp:{p5:70, p50:[85,100], p95:110} },
+    48:  { respRate:[20,30], heartRate:[80,135],  bp:{p5:70, p50:[85,100], p95:110} },
+    60:  { respRate:[20,30], heartRate:[80,135],  bp:{p5:80, p50:[90,110], p95:120} },
+    72:  { respRate:[20,30], heartRate:[80,130],  bp:{p5:80, p50:[90,110], p95:120} },
+    84:  { respRate:[20,30], heartRate:[80,130],  bp:{p5:80, p50:[90,110], p95:120} },
+    96:  { respRate:[15,25], heartRate:[70,120],  bp:{p5:80, p50:[90,110], p95:120} },
+    108: { respRate:[15,25], heartRate:[70,120],  bp:{p5:80, p50:[90,110], p95:120} },
+    120: { respRate:[15,25], heartRate:[70,120],  bp:{p5:80, p50:[90,110], p95:120} },
+    132: { respRate:[15,25], heartRate:[70,120],  bp:{p5:80, p50:[90,110], p95:120} },
+    144: { respRate:[12,24], heartRate:[65,115],  bp:{p5:90, p50:[100,120],p95:140} },
+    168: { respRate:[12,24], heartRate:[60,110],  bp:{p5:90, p50:[100,120],p95:140} }
   };
 
   // pick the nearest key
@@ -2728,7 +2816,8 @@ function estimateWeight() {
   // show centiles
   function updateNormalCentiles(n) {
     document.getElementById('sbp-5').textContent   = n.bp.p5;
-    document.getElementById('sbp-50').textContent  = n.bp.p50;
+    document.getElementById('sbp-50').textContent =
+  Array.isArray(n.bp.p50) ? `${n.bp.p50[0]}–${n.bp.p50[1]}` : n.bp.p50;
     document.getElementById('sbp-95').textContent  = n.bp.p95;
     document.getElementById('hr-5').textContent    = n.heartRate[0];
     document.getElementById('hr-95').textContent   = n.heartRate[1];
@@ -2761,25 +2850,61 @@ function updateAirwayCalculations(ageYears) {
     return;
   }
 
-  // Special neonatal case: <1 kg
-  if (w > 0 && w < 1) {
-    const uncEl  = document.getElementById('ett-uncuffed');
-    const cuffEl = document.getElementById('ett-cuffed');
-    uncEl.textContent   = '2.5';
-    uncEl.style.display = 'inline';
-    cuffEl.textContent   = '';
-    cuffEl.style.display = 'none';
-        
-    const depth = stripZeros((1.17 * w + 5.58).toFixed(2));
-    const depthEl       = document.getElementById('ett-depth-lips');
-    const depthUnit     = depthEl.nextElementSibling;
-    depthEl.textContent   = depth;
-    depthEl.style.display = 'inline';
-    depthUnit.style.display = 'inline';
-  }
+  // ==========================
+// NRP 2025 Neonatal ETT tables
+// ==========================
 
+const neonatalETTSizeTable = [
+  { max: 0.799,  size: '2.0–2.5' },
+  { max: 1.2,  size: '2.5' },
+  { max: 2.2,  size: '3.0' },
+  { max: Infinity, size: '3.5' }
+];
+
+const neonatalDepthTable = [
+  { max: 0.499,  depth: '5–5.5' },
+  { max: 0.6,  depth: '5.5' },
+  { max: 0.8,  depth: '6' },
+  { max: 1.0,  depth: '6.5' },
+  { max: 1.4,  depth: '7' },
+  { max: 1.8,  depth: '7.5' },
+  { max: 2.4,  depth: '8' },
+  { max: 3.1,  depth: '8.5' },
+  { max: Infinity,  depth: '9' }
+];
+
+function lookupByWeight(weight, table) {
+  const row = table.find(r => weight <= r.max);
+  return row ? (row.size || row.depth) : '';
+}
+  
+ // ==========================
+// NEONATAL (NRP 2025) — Age 0
+// ==========================
+if (y === 0 && w > 0) {
+
+  const uncEl  = document.getElementById('ett-uncuffed');
+  const cuffEl = document.getElementById('ett-cuffed');
+
+  const size = lookupByWeight(w, neonatalETTSizeTable);
+  const depth = lookupByWeight(w, neonatalDepthTable);
+
+  // Neonates: uncuffed only
+  uncEl.textContent = size;
+  uncEl.style.display = 'inline';
+
+  cuffEl.textContent = '';
+  cuffEl.style.display = 'none';
+
+  const depthEl   = document.getElementById('ett-depth-lips');
+  const depthUnit = depthEl.nextElementSibling;
+
+  depthEl.textContent = depth;
+  depthEl.style.display = 'inline';
+  depthUnit.style.display = 'inline';
+
+}
   else {
-
     // ================================
     // NEW ETT SELECTION LOGIC
     // ================================
@@ -2790,7 +2915,7 @@ function updateAirwayCalculations(ageYears) {
     // --- AGE 0–12 MONTHS → Use your existing lookup table ---
     if (y < 1) {
       const table = [
-        { maxAge: 0.0833, unc: '3.0',  cuff: '2.5' },
+        { maxAge: 0.0833, unc: '3.0–3.5',  cuff: '2.5–3.0' },
         { maxAge: 1/12,   unc: '3.5',  cuff: '3.0' },
         { maxAge: 2/12,   unc: '3.5',  cuff: '3.0' },
         { maxAge: 4/12,   unc: '3.5',  cuff: '3.0' },
@@ -2854,11 +2979,6 @@ if (y >= 14) {
 } else if (y >= 1) {
   // 1–13 years
   depth = y / 2 + 12;
-  depth = stripZeros(depth.toFixed(2));
-} else if (y === 0) {
-  // Newborn
-  depth = 1.17 * w + 5.58;
-  depth = Math.min(depth, 9);
   depth = stripZeros(depth.toFixed(2));
 } else if (y > 0 && y <= 3/12) {
   // 1–3 months
@@ -3745,8 +3865,175 @@ function expandOpenAccordion() {
     content.style.maxHeight = content.scrollHeight + 'px';
   });
 }
-  
-</script>
+
+// =========================
+// Gender Toggle Button
+// =========================
+
+const genderBtn = document.getElementById("GenderBtn");
+
+let gender = "male"; // default
+
+genderBtn.addEventListener("click", () => {
+
+  if (gender === "male") {
+    gender = "female";
+    genderBtn.textContent = "Female";
+    genderBtn.dataset.gender = "female";
+  } else {
+    gender = "male";
+    genderBtn.textContent = "Male";
+    genderBtn.dataset.gender = "male";
+  }
+
+  calculateBMI(); // recalc if needed later for centiles
+});
+
+
+// =========================
+// BMI Calculation
+// =========================
+
+const weightInput = document.getElementById("weight");
+const heightInput = document.getElementById("height");
+const bmiOutput = document.getElementById("bmi-value");
+const ibwOutput = document.getElementById("ibw-value");
+const adjbwOutput = document.getElementById("adjbw-value");
+
+function calculateBMI() {
+
+  const weight = parseFloat(weightInput.value);
+  const heightCm = parseFloat(heightInput.value);
+
+  if (!weight || !heightCm) {
+    bmiOutput.textContent = "";
+    ibwOutput.textContent = "";
+    adjbwOutput.textContent = "";
+    return;
+  }
+
+  const heightM = heightCm / 100;
+
+  // BMI
+  const bmi = weight / (heightM * heightM);
+  const bmiRounded = bmi.toFixed(1);
+
+  bmiOutput.textContent = `${bmiRounded} kg/m²`;
+
+  // =========================
+  // IDEAL BODY WEIGHT
+  // =========================
+  // Placeholder until centiles added
+  // Replace with BMI50 lookup later
+
+const age = parseFloat(ageInput.value);   // your age input
+const bmi50 = getBMI50(age, gender);
+
+  const ibw = bmi50 * heightM * heightM;
+
+  const ibwRounded = ibw.toFixed(1);
+
+  ibwOutput.textContent = `${ibwRounded} kg`;
+
+  // =========================
+  // ADJUSTED BODY WEIGHT
+  // =========================
+
+  const adjbw = ibw + 0.35 * (weight - ibw);
+
+  const adjbwRounded = adjbw.toFixed(1);
+
+  adjbwOutput.textContent = `${adjbwRounded} kg`;
+}
+
+// ===============================
+// UK-WHO BMI 50th centile (median)
+// Age in years 2–18
+// 2-decimal precision
+// ===============================
+
+const bmi50Data = {
+
+  male: [
+    { age: 2, bmi: 16.60 },
+    { age: 3, bmi: 16.05 },
+    { age: 4, bmi: 15.73 },
+    { age: 5, bmi: 15.55 },
+    { age: 6, bmi: 15.53 },
+    { age: 7, bmi: 15.73 },
+    { age: 8, bmi: 16.10 },
+    { age: 9, bmi: 16.64 },
+    { age: 10, bmi: 17.30 },
+    { age: 11, bmi: 18.07 },
+    { age: 12, bmi: 18.89 },
+    { age: 13, bmi: 19.66 },
+    { age: 14, bmi: 20.37 },
+    { age: 15, bmi: 21.00 },
+    { age: 16, bmi: 21.54 },
+    { age: 17, bmi: 21.95 },
+    { age: 18, bmi: 22.27 }
+  ],
+
+  female: [
+    { age: 2, bmi: 16.52 },
+    { age: 3, bmi: 15.96 },
+    { age: 4, bmi: 15.63 },
+    { age: 5, bmi: 15.45 },
+    { age: 6, bmi: 15.47 },
+    { age: 7, bmi: 15.80 },
+    { age: 8, bmi: 16.28 },
+    { age: 9, bmi: 16.88 },
+    { age: 10, bmi: 17.58 },
+    { age: 11, bmi: 18.34 },
+    { age: 12, bmi: 19.07 },
+    { age: 13, bmi: 19.73 },
+    { age: 14, bmi: 20.29 },
+    { age: 15, bmi: 20.75 },
+    { age: 16, bmi: 21.10 },
+    { age: 17, bmi: 21.37 },
+    { age: 18, bmi: 21.57 }
+  ]
+
+};
+
+// ===============================
+// Interpolation Function
+// ===============================
+
+function getBMI50(ageYears, gender) {
+
+  const data = bmi50Data[gender];
+
+  if (!data) return null;
+
+  // Clamp age
+  if (ageYears <= data[0].age) return data[0].bmi;
+  if (ageYears >= data[data.length - 1].age) return data[data.length - 1].bmi;
+
+  // Find surrounding points
+  for (let i = 0; i < data.length - 1; i++) {
+
+    const a1 = data[i];
+    const a2 = data[i + 1];
+
+    if (ageYears >= a1.age && ageYears <= a2.age) {
+
+      const fraction = (ageYears - a1.age) / (a2.age - a1.age);
+
+      return a1.bmi + fraction * (a2.bmi - a1.bmi);
+    }
+  }
+
+  return null;
+}
+
+// =========================
+// Event Listeners
+// =========================
+
+weightInput.addEventListener("input", calculateBMI);
+heightInput.addEventListener("input", calculateBMI);
+  </script>
 
 </body>
 </html>
