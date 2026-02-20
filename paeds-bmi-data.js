@@ -1,6 +1,6 @@
 const paedsBMIData =
 {
-  "boys": [
+  "girls": [
     {
       "age": 2.0,
       "L": -0.5684,
@@ -1160,7 +1160,7 @@ const paedsBMIData =
       "S": 0.12631
     }
   ],
-  "girls": [
+  "boys": [
     {
       "age": 2.0,
       "L": -0.6187,
