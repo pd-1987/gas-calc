@@ -1,3 +1,5 @@
+console.log("BMI functions loaded");
+
 function interpolateLMS(data, age) {
   if (!data || data.length === 0) return null;
 
