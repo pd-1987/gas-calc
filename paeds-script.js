@@ -1,4 +1,4 @@
-    function stripZeros(str) {
+function stripZeros(str) {
     return str
       .replace(/(\.\d*?[1-9])0+$/ , '$1')   // drop extra zeroes after a significant decimal
       .replace(/\.0+$/            , ''   );// drop ".0", ".00", etc.
@@ -1734,17 +1734,18 @@ function updateAntibiotics(w) {
  estToggle.addEventListener('change', () => {
    autoEstimate = estToggle.checked;
 
-   if (autoEstimate) {
-     weightIn.disabled = true;
-     // Immediately estimate (if age is valid)
-     const n = parseFloat(ageInput.value);
-     if (!isNaN(n) && n >= 0) {
-       estimateWeight();
-     }
-   } else {
-     weightIn.disabled = false;
-     // Do not clear existing outputs; user can manually type weight
-   }
+  if (autoEstimate) {
+  weightIn.disabled = true;
+
+  const n = parseFloat(ageInput.value);
+  if (!isNaN(n) && n >= 0) {
+    estimateWeight();
+  }
+
+  calculateBMI();   // ← ADD THIS LINE
+} else {
+  weightIn.disabled = false;
+}
  });
 
  ageInput.addEventListener('input', () => {
@@ -1971,6 +1972,17 @@ function calculateBMI() {
   const weight = parseFloat(weightInput.value);
   const heightCm = parseFloat(heightInput.value);
 
+  const rawAge = parseFloat(ageInput.value) || 0;
+  const ageYears = ageUnit === 'months' ? rawAge / 12 : rawAge;
+
+  // ── Do not show BMI / IBW under 2 years ──
+  if (ageYears < 2) {
+    bmiOutput.textContent = "—";
+    ibwOutput.textContent = "Not applicable <2y";
+    adjbwOutput.textContent = "";
+    return;
+  }
+
   if (!weight || !heightCm) {
     bmiOutput.textContent = "";
     ibwOutput.textContent = "";
@@ -1984,19 +1996,28 @@ function calculateBMI() {
   const bmi = weight / (heightM * heightM);
   const bmiRounded = bmi.toFixed(1);
 
-  bmiOutput.textContent = `${bmiRounded} kg/m²`;
+   const result = getBMICentile(bmi, ageYears, gender);
+
+  if (result) {
+
+    const centileRounded = result.centile.toFixed(1);
+
+    bmiOutput.textContent =
+      `${bmiRounded} kg/m² (${centileRounded}th centile – ${result.category})`;
+
+  } else {
+
+    bmiOutput.textContent = `${bmiRounded} kg/m²`;
+
+  }
 
   // =========================
   // IDEAL BODY WEIGHT
   // =========================
-  // Placeholder until centiles added
-  // Replace with BMI50 lookup later
 
-const age = parseFloat(ageInput.value);   // your age input
-const bmi50 = getBMI50(age, gender);
+  const bmi50 = getBMI50(ageYears, gender);
 
   const ibw = bmi50 * heightM * heightM;
-
   const ibwRounded = ibw.toFixed(1);
 
   ibwOutput.textContent = `${ibwRounded} kg`;
@@ -2006,7 +2027,6 @@ const bmi50 = getBMI50(age, gender);
   // =========================
 
   const adjbw = ibw + 0.35 * (weight - ibw);
-
   const adjbwRounded = adjbw.toFixed(1);
 
   adjbwOutput.textContent = `${adjbwRounded} kg`;
@@ -2093,9 +2113,25 @@ function getBMI50(ageYears, gender) {
   return null;
 }
 
+function getBMICentile(bmi, ageYears, gender) {
+
+  const lms = getBMILMS(ageYears, gender);
+  if (!lms) return null;
+
+  const z = lmsZ(bmi, lms.L, lms.M, lms.S);
+  const centile = zToCentile(z);
+
+  return {
+    centile,
+    category: classifyBMI(centile),
+    z
+  };
+}
+
 // =========================
 // Event Listeners
 // =========================
 
 weightInput.addEventListener("input", calculateBMI);
 heightInput.addEventListener("input", calculateBMI);
+ageInput.addEventListener("input", calculateBMI);
