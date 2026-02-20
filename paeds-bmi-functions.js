@@ -1,4 +1,4 @@
-console.log("BMI functions loaded");
+console.log("BMI centile functions loaded");
 
 function interpolateLMS(data, age) {
   if (!data || data.length === 0) return null;
