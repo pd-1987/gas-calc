@@ -53,8 +53,24 @@ function zToCentile(z) {
 }
 
 function classifyBMI(centile) {
-  if (centile >= 98) return "Obese";
-  if (centile >= 91) return "Overweight";
-  return "Healthy weight";
+
+  if (centile < 0.4) return "Severely underweight";
+  if (centile < 2) return "Underweight";
+  if (centile < 91) return "Healthy weight";
+  if (centile < 98) return "Overweight";
+  if (centile < 99.6) return "Obese";
+
+  return "Severely obese";
 }
 
+function getBMILMS(ageYears, gender) {
+
+  if (!ageYears || ageYears < 2) return null;
+
+  const dataset =
+    gender === "female"
+      ? paedsBMIData.girls
+      : paedsBMIData.boys;
+
+  return interpolateLMS(dataset, ageYears);
+}
