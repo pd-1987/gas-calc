@@ -14,38 +14,18 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="Gas-calc.xyz" />
 <link rel="manifest" href="/favicon/site.webmanifest" />
-  <link
-  href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
-  rel="stylesheet"
-/>
-<link
-  href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
-  rel="stylesheet"
-/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <title>Gas-Calc.xyz</title>
   <style>
- body {
-  background-color: #f8f9fa; /* mid-light grey */
+  .button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
-    .button-container {
-      margin: 0px;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
     .button-container h1 {
       margin: 0px;
       font-size: 18px;
     }
-    .calc-button {
-  font-weight: 700;   /* make the main link text bold */
-      margin: 0px;
-      padding: 10px;
-}
-.calc-button small {
-  font-weight: 400;
-  line-height: 1.2;
-}
     .banner2 {
       margin: 0;
       padding: 0;
@@ -54,18 +34,51 @@
   margin: 0;
       padding-top: 2px;
 }
-    header.banner2 {
-    margin-bottom: 5px;
-    font-size: 24px;
-    }
-    h1 {
-    color: #212529;
-      border-bottom: 2px solid #212529;
-    }
+header.banner2 {
+  background: none;
+  border: none;
+  box-shadow: none;
+
+  text-align: center;
+  padding: 10px 0;
+  margin-bottom: 10px;
+
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+header.banner2 small {
+  color: var(--text-secondary);
+}
+h1 {
+  font-size: 18px;
+  margin-top: 18px;
+  margin-bottom: 6px;
+  text-align: left;
+  border-bottom: 3px solid var(--border-light);
+  padding-bottom: 4px;
+  color: var(--text-main);
+}
     .grey-btn {
 margin: 0px;
 box-shadow: none; 
 }
+h1.section-general { border-bottom-color: var(--clr-general); }
+
+h1.section-airway { border-bottom-color: var(--clr-airway); }
+
+h1.section-regional { border-bottom-color: var(--clr-regional); }
+
+h1.section-risk { border-bottom-color: var(--clr-risk); }
+
+h1.section-critical { border-bottom-color: var(--clr-critical); }
+
+h1.section-obstetrics { border-bottom-color: var(--clr-obstetrics); }
+
+h1.section-paeds { border-bottom-color: var(--clr-paeds); }
+
+h1.section-other { border-bottom-color: var(--clr-other); }
   </style>
 </head>
 <body>
@@ -77,81 +90,81 @@ box-shadow: none;
 
   <!-- Main content -->
   <div class="button-container">
-    <h1>General</h1>
-    <a href="weightcalc.html" class="calc-button general-btn">
+    <h1 class="section-general">General</h1>
+    <a href="weightcalc.html" class="menu-card general-btn">
       Weight and BMI
       <small>BMI, Ideal Body Weight, Adjusted Body Weight, Lean Body Weight</small>
     </a>
 
-    <h1>Airway</h1>
-    <a href="dasaticalc.html" class="calc-button airway-btn">
+<h1 class="section-airway">Airway</h1>
+    <a href="dasaticalc.html" class="menu-card airway-btn">
       DAS Awake Tracheal Intubation (ATI) topicalisation
       <small>Calculate local anaesthetic dosing based on the Difficult Airway Society (UK) guidelines for awake tracheal intubation in adults</small>
     </a>
-    <a href="freeaticalc.html" class="calc-button airway-btn">
+    <a href="freeaticalc.html" class="menu-card airway-btn">
       ATI topicalisation
       <small>Calculate using your own technique</small>
     </a>
 
-    <h1>Regional</h1>  
-    <a href="la-combined.html" class="calc-button regional-btn">
+<h1 class="section-regional">Regional</h1> 
+    <a href="la-combined.html" class="menu-card regional-btn">
       Local anaesthetic (LA) combined doses
       <small>Calculate the combined dose % for multiple local anaesthetics at varying concentrations and volumes</small>
     </a>
-       <a href="la-bolusinfusion.html" class="calc-button regional-btn">
+       <a href="la-bolusinfusion.html" class="menu-card regional-btn">
       LA bolus and infusion rates
       <small>Calculate maximum safe bolus and infusion rates for adults ≥45 kg</small>
     </a> 
-        <a href="la-5050mix.html" class="calc-button regional-btn">
+        <a href="la-5050mix.html" class="menu-card regional-btn">
       LA 50:50 mixtures
       <small>Calculate the combined maximum dose and volume of a 50:50 mixture of a short- and long-acting local anaesthetic</small>
         </a>
     
-    <h1>Risk</h1>
-         <a href="nhfs.html" class="calc-button risk-btn">
+<h1 class="section-risk">Risk</h1>
+         <a href="nhfs.html" class="menu-card risk-btn">
       Nottingham Hip Fracture Score
       <small>A scoring system validated for the prediction of 30-day mortality after hip fracture surgery</small>
     </a>
     
-      <h1>Critical care</h1>
-    <a href="vasopressorcalc.html" class="calc-button critical-btn">
+<h1 class="section-critical">Critical care</h1>
+    <a href="vasopressorcalc.html" class="menu-card critical-btn">
       Vasopressor infusions
       <small>Calculate infusion rates for noradrenaline and adrenaline (central & peripheral) and vasopressin</small>
     </a>
-     <a href="adultbv.html" class="calc-button critical-btn">
+     <a href="adultbv.html" class="menu-card critical-btn">
      Adult blood volume
       <small>Predict adult blood volume and estimated blood loss at different classes of haemorrhagic shock</small>
     </a>
-     <a href="la-toxicity.html" class="calc-button critical-btn">
+     <a href="la-toxicity.html" class="menu-card critical-btn">
      Local anaesthetic toxicity - 20% Intralipid
       <small>Calculate bolus dose and infusion rates of 20% intralipid to treat local anaesthetic toxicity</small>
     </a>
   
-    <h1>Obstetrics</h1>
-    <a href="maternalbv.html" class="calc-button obstetrics-btn">
+<h1 class="section-obstetrics">Obstetrics</h1>
+    <a href="maternalbv.html" class="menu-card obstetrics-btn">
       Maternal blood volume
       <small>Predict maternal blood volume and estimated blood loss at different classes of haemorrhagic shock</small>
     </a>
 
-    <h1>Paediatrics</h1>
-    <a href="paeds.html" class="calc-button paeds-btn">
+<h1 class="section-paeds">Paediatrics</h1>
+    <a href="paeds.html" class="menu-card paeds-btn">
      Paediatric anaesthesia
       <small>Calculate drugs and equipment sizes for routine and emergency anaesthesia</small>
     </a>
 
-    <h1>Other</h1>
-     <a href="guidelines.html" class="calc-button other-btn">
+<h1 class="section-other">Other</h1>
+     <a href="guidelines.html" class="menu-card other-btn">
       Useful guidelines
       <small>A collection of useful guidelines relating to anaesthesia and perioperative care</small>
     </a>
-   <a href="/guidelines/QRH_complete_June_2023.pdf" class="calc-button other-btn" target="_blank" rel="noopener noreferrer">
+   <a href="/guidelines/QRH_complete_June_2023.pdf" class="menu-card other-btn" target="_blank" rel="noopener noreferrer">
        Quick Reference Handbook (June 2023)
       <small>The Association of Anaesthetists</small>
     </a>
     <br>
      
-    <a href="feedback.html" class="calc-button grey-btn">Feedback</a>   
-    <a href="disclaimer.html" class="calc-button grey-btn">Disclaimer</a>
+    <a href="feedback.html" class="menu-card grey-btn">Feedback</a>   
+    <a href="disclaimer.html" class="menu-card grey-btn">Disclaimer</a>
   </div>
 
   <footer>
