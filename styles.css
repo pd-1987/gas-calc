@@ -12,6 +12,7 @@
 /* Backgrounds */
   --bg-main: #f3f4f6;
   --bg-card: #ffffff;
+  --btn-bg: #f0f0f0;
 
   /* Text */
   --text-main: #212529;
@@ -38,7 +39,7 @@
   :root {
     --bg-main: #0f1115;
     --bg-card: #1f232a;
-
+    --btn-bg: #2a2f36;
     --text-main: #f1f3f5;
     --text-secondary: #a8adb3;
 
@@ -450,11 +451,10 @@ button:active {
   padding: 10px;
   margin: 5px;
   cursor: pointer;
-
-  border: 1px solid var(--border-light);
   border-radius: var(--radius);
 
-  background-color: var(--clr-light-grey);
+  background-color: var(--btn-bg);
+  border: 1px solid var(--border-light);
   color: var(--text-main);
 
   transition: background-color 0.2s ease;
@@ -474,9 +474,9 @@ button:active {
   cursor: pointer;
 
   border-radius: var(--radius);
-  border: 1px solid var(--border-light);
 
-  background-color: var(--clr-light-grey);
+  background-color: var(--btn-bg);
+  border: 1px solid var(--border-light);
   color: var(--text-main);
 }
 
