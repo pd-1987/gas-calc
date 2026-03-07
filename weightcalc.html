@@ -5,32 +5,24 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="styles.css">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
-    rel="stylesheet"
-  />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
-    rel="stylesheet"
-  />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <title>Weight Calculator</title>
     <style>
-:root {
-  --bg-main: #f3f4f6;
-  --bg-card: #ffffff;
-
-  --text-main: #212529;
-  --text-secondary: #555;
-
-  --border-light: #e0e0e0;
+header.banner2 {
+  background: none;
+  border: none;
+  box-shadow: none;
+  text-align: center;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: 0.2px;
+  padding-bottom: 6px;
+  border-bottom-width: 3px;
+  border-bottom-style: solid;
+  border-radius: 0;
 }
-     body {
-  background-color: #f8f9fa; /* mid-light grey */
-}
-    header.banner {
-      background: linear-gradient(130deg, #1565C0 0%, #003c8f 100%);
-  );
-    }
     .input-group {
       display: flex;
       align-items: center;
@@ -53,15 +45,13 @@
     }
     .results {
       font-size: 14px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
       padding: 8px 16px;
       max-width: 600px;
       box-sizing: border-box;
       width: 100%;
       margin: 20px auto;
+      margin-top: 15px;
       text-align: left;
-      background-color: #ffffff;
     }
     .results div {
       margin: 6px 0;
@@ -69,9 +59,6 @@
     .active {
       background-color: #007BFF;
       color: white;
-    }
-    .gender-buttons button {
-  font-size: 14px;
     }
         ol {
   text-align: left;
@@ -86,7 +73,8 @@ margin-left: 0;
   </style>
 </head>
 <body>
-  <header class="banner">Weight and BMI</header>
+<header class="calc-header general">Weight and BMI</header>
+  <div class="calc-section">
   <div class="gender-buttons">
     <button id="maleButton" onclick="selectGender('male')">Male</button>
     <button id="femaleButton" onclick="selectGender('female')">Female</button>
@@ -109,6 +97,7 @@ margin-left: 0;
     <div><strong>Ideal Body Weight:</strong> <span id="ibwResult"></span></div>
     <div><strong>Adjusted Body Weight:</strong> <span id="abwResult"></span></div>
     <div><strong>Lean Body Weight:</strong> <span id="lbwResult"></span></div>
+  </div>
   </div>
 
   <div class="button-container">
