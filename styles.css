@@ -2,7 +2,7 @@
 =            1. CSS Variables                  =
 =============================================*/
 :root {
-  --clr-light-grey: #f0f0f0;
+  --clr-light-grey: #f5f6f7;
   --clr-med-grey:   #ccc;
   --clr-dark-grey:  #555;
   --clr-primary:    #007BFF;
@@ -46,6 +46,9 @@
   }
     h1 {
     color: #ffffff;
+  }
+  button:hover {
+    background-color: rgba(255,255,255,0.06);
   }
 }
 /*=============================================
@@ -113,7 +116,8 @@ input[type="number"]::-webkit-outer-spin-button {
   display: flex;
   width: 100%;
   gap: 10px;
-  margin-top: 20px;
+  margin-top: 24px;
+  align-items: stretch;
 }
 
 .button-container.calc {
@@ -209,6 +213,41 @@ header.banner2 div {
 }
 
 /*=============================================
+=            Calculator Header                =
+=============================================*/
+
+.calc-header {
+  background: none;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+
+  text-align: center;
+  margin: 0 0 10px 0;
+
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: 0.2px;
+
+  padding-bottom: 2px;
+
+  border-bottom-width: 3px;
+  border-bottom-style: solid;
+}
+
+/* Category underline colours */
+
+.calc-header.general { border-bottom-color: var(--clr-general); }
+.calc-header.airway { border-bottom-color: var(--clr-airway); }
+.calc-header.regional { border-bottom-color: var(--clr-regional); }
+.calc-header.risk { border-bottom-color: var(--clr-risk); }
+.calc-header.critical { border-bottom-color: var(--clr-critical); }
+.calc-header.obstetrics { border-bottom-color: var(--clr-obstetrics); }
+.calc-header.paeds { border-bottom-color: var(--clr-paeds); }
+.calc-header.other { border-bottom-color: var(--clr-other); }
+
+/*=============================================
 =            5. Headings                       =
 =============================================*/
 h1 {
@@ -243,6 +282,31 @@ h3 {
 /*=============================================
 =          6. Form Elements & Inputs           =
 =============================================*/
+/* Inputs */
+/* Standard input styling */
+
+input,
+select {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+
+  padding: 5px;
+  font-size: 14px;
+
+  box-sizing: border-box;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--clr-primary);
+  box-shadow: 0 0 0 2px rgba(0,123,255,0.15);
+}
+input::placeholder {
+  color: var(--text-secondary);
+}
 .instruction-header {
   margin-top: 20px;
   font-size: 14px;
@@ -350,16 +414,26 @@ h3 {
 =============================================*/
 button {
   -webkit-appearance: none;
-  appearance: none;      /* iOS Safari fix + standard reset */
+  appearance: none;
+
   font-size: 14px;
   padding: 10px;
+
   cursor: pointer;
-  border: none;
-  border-radius: 5px;
-  background-color: #f0f0f0;
-  transition: background-color 0.2s ease;
-  width: 100%;
-  color: inherit;
+
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
+
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  transition: background-color 0.2s ease, transform 0.05s ease;
+}
+button:hover {
+  background-color: rgba(0,0,0,0.04);
+}
+
+button:active {
+  transform: scale(0.97);
 }
 
 .gender-buttons {
@@ -374,28 +448,36 @@ button {
   flex: 1;
   font-size: 14px;
   padding: 10px;
- margin: 5px;
+  margin: 5px;
   cursor: pointer;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: #f0f0f0;
+
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+
+  background-color: var(--clr-light-grey);
+  color: var(--text-main);
+
   transition: background-color 0.2s ease;
 }
 
 .gender-buttons button.active {
-  background-color: #575757;
+  background-color: var(--clr-primary);
   color: white;
 }
 
 .unit-toggle {
-    width: 100%;
+  width: 100%;
   font-size: 14px;
-     margin: 5px 0;
+  margin: 5px 0;
   padding: 5px;
+
   cursor: pointer;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  background-color: #f0f0f0;
+
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
+
+  background-color: var(--clr-light-grey);
+  color: var(--text-main);
 }
 
 .button-group {
@@ -464,26 +546,20 @@ button.active small {
   display: block;
   text-decoration: none;
   text-align: left;
+
   padding: 12px 14px 12px 16px;
+
   background-color: var(--bg-card);
   color: var(--text-main);
+
   border-radius: var(--radius);
   border: 1px solid var(--border-light);
+
   border-left: 6px solid transparent;
+
   font-weight: 600;
+
   box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-}
-.menu-card {
-  transition: transform 0.08s ease, box-shadow 0.08s ease;
-}
-
-.menu-card:hover {
-  transform: translateY(-1px);
-}
-
-.menu-card:active {
-  transform: scale(0.98);
-  box-shadow: 0 0 1px rgba(0,0,0,0.05);
 }
 
 .menu-card small {
@@ -494,6 +570,15 @@ button.active small {
   line-height: 1.35;
   font-weight: 400;
 }
+
+.menu-card:hover {
+  transform: translateY(-1px);
+}
+
+.menu-card:active {
+  transform: translateY(0);
+}
+
     .la-buttons {
       display: flex;
       flex-wrap: wrap;
@@ -596,20 +681,31 @@ button.active small {
   cursor: pointer;
   border: none;
   transition: background-color 0.2s ease;
+  font-weight: 600;
 }
 
 .reset-btn {
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  color: var(--text-secondary);
 }
 
 .home-btn {
   text-decoration: none;
   text-align: center;
-  background-color: #444444;
-  color: white;
-}
 
+  background-color: var(--clr-primary);
+  color: white;
+
+  border: 1px solid var(--clr-primary);
+}
+.home-btn:hover {
+  background-color: #0069d9;
+  border-color: #0069d9;
+}
+button:active {
+  transform: translateY(1px);
+}
 /*=============================================
 =           10. Concentration & Doses           =
 =============================================*/
@@ -740,10 +836,10 @@ footer a:hover {
       max-width: 400px;
       margin: 0 auto 20px auto;
       padding: 10px 15px; /* 10px top & bottom, 15px left & right */
-      border: 1px solid #ccc;
       border-radius: 10px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      background-color: #fff;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-light);
     }
 
     /* Box for shock classification */
