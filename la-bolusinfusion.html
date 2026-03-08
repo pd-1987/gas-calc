@@ -24,6 +24,43 @@
 
   --border-light: #e0e0e0;
 }
+    button {
+  -webkit-appearance: none;
+  appearance: none;      /* iOS Safari fix + standard reset */
+  font-size: 14px;
+  padding: 10px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: #f0f0f0;
+  transition: background-color 0.2s ease;
+  width: 100%;
+  color: inherit;
+}
+    .gender-buttons {
+  display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0 10px;
+}
+
+.gender-buttons button {
+  flex: 1;
+  font-size: 14px;
+  padding: 10px;
+ margin: 5px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.gender-buttons button.active {
+  background-color: #575757;
+  color: white;
+}
     header.banner {
  background: linear-gradient(130deg, #2e8b57 0%, #1b5e20 100%   /* dark green */
   );
