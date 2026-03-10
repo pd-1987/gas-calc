@@ -295,7 +295,7 @@ h3 {
  width: 90%;
   max-width: 400px;
   margin: 0 auto 20px auto;
-  padding: 16px 18px;
+  padding: 16px 14px;
   border-radius: 10px;
   border: 1px solid var(--border-light);
   background-color: var(--bg-card);
