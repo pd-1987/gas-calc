@@ -18,67 +18,11 @@
 .calc-section #height {
   width: 60px;
 }
-      /* Button Groups */
-  .button-group {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.5rem;              /* space between the button, input & bubble */
-    flex-direction: row;
-    margin: 0.3rem 0;     /* 0.25rem top _and_ bottom, instead of 20px top */
-  }
-  .button-group button {
-    border: 1px solid #ccc;   /* light grey */
-    box-sizing: border-box;    /* so padding stays consistent */
-    width: 100%;
-    font-size: 14px;
-  }
-  button small {
-    display: block;
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin-bottom: 5px;
-  }
-.instruction-header {
-  margin-top: 18px;
-  margin-bottom: 6px;
-
-  font-size: 13px;
-  font-weight: 600;
-
-  color: var(--text-secondary);
-}
-.spray-row {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-  /* optional: remove any stray margins */
-  .spray-row input,
-  .spray-row .spray-units {
-    margin: 3px 0;
-  }
-      .result.max-dose {
-    /* adjust this value to taste */
-    padding-bottom: 0rem;
-  }
-      .spray-units {
-        font-size: 14px;
-      }
-      .ml-units {
-        font-size: 14px;
-      }
- @media (max-width: 480px) {
-  .button-group button {
-    padding: 12px 10px;
-  }
-
-}
     </style>
   </head>
   <body>
     <header class="calc-header airway">DAS ATI Topicalisation</header>
-  
+  <div class="calc-wrapper">
     <div class="calc-section">
 
 <div class="gender-buttons">
@@ -157,8 +101,6 @@
       <button id="lidocaine2BelowButton">Lidocaine 2% 2ml<br><small>Spray as you go: Below vocal cords</small></button>
       <span class="bubble"><span id="lidocaine2BelowBubble">40</span> <span class="unit">mg</span></span>
     </div>
-  </div>  
-    </div>
    
    <div class="calc-section">
   <div class="results">
@@ -177,6 +119,7 @@
     </div>
   </div>
 </div>
+  </div>
   
      <div class="button-container">
       <button type="button" class="reset-btn" onclick="resetForm()">Reset</button>
