@@ -4,97 +4,20 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DAS ATI Topicalisation Calculator</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
-    rel="stylesheet"
-  />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
-    rel="stylesheet"
-  />
+  
+  <title>DAS ATI Topicalisation Calculator</title>
+  
     <style>
-:root {
-  --bg-main: #f3f4f6;
-  --bg-card: #ffffff;
-
-  --text-main: #212529;
-  --text-secondary: #555;
-
-  --border-light: #e0e0e0;
+      .calc-section #weight,
+.calc-section #height {
+  width: 60px;
 }
-              body {
-  background-color: #f8f9fa; /* mid-light grey */
-}
-      header.banner {
-        background: linear-gradient(130deg, #b71c1c 0%, #8e0000 100%);
-      }
-      .flex-container {
-        display: flex;
-        flex-wrap: wrap;
-        margin: 0 auto 0rem;
-        padding: 10px 15px 10px;
-   border: 1px solid #ccc;
-      border-radius: 10px;
-        background-color: #fff;
-        row-gap: 0.25rem;      /* vertical space */
-    column-gap: 0rem; /* horizontal space */
-      }
-           /* make full-row items span 100% of the container */
-  .flex-item.full-row {
-    flex: 0 0 100%;
-    max-width: 100%;
-    margin: 0px auto 0px;
-  }
-      .flex-item {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        flex: 0 0 50%;
-        box-sizing: border-box;
-        border: none;
-        border-radius: 6px;
-        padding: 0 0.5rem;     /* 0 on top/bottom, 0.5rem left/right */
-        text-align: center;
-        margin: 0px auto 3px;
-      }
-      .flex-item button {
-        flex: 1;
-    font-size: 14px;
-    padding: 10px;
-   margin: 5px;
-    cursor: pointer;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f0f0f0;
-    transition: background-color 0.2s ease;
-      }
-      .flex-item button.active {
-    background-color: #575757;
-    color: white;
-  }
-      .input-group {
-        display: flex;
-        align-items: center;
-        margin: 0px 0;
-         gap: 0.25rem;
-      }
-      .input-group label {
-        font-size: 14px;
-        margin: 0;
-        font-weight: 400;
-        width: auto;
-        flex-shrink: 0;
-      }
-      .input-group input {
-        width: 50px;
-        padding: 5px;
-        font-size: 14px;
-        box-sizing: border-box;
-        margin: 0px;
-      }
       /* Button Groups */
   .button-group {
     display: flex;
@@ -113,42 +36,23 @@
   button small {
     display: block;
     font-size: 12px;
-    color: #555;
-    margin-bottom: 0px;
+    color: var(--text-secondary);
+    margin-bottom: 5px;
   }
-      .results-section {
-        display: flex;
-        flex-direction: column;
-        row-gap: 0.25rem;
-        border: 1px solid #ccc;
-      border-radius: 8px;
-        box-sizing: border-box;
-        width: 100%;
-        max-width: 600px;
-        margin: 15px auto 20px;
-        padding: 8px 10px;
-        background-color: #fff;
-      }
-      .result {
-    font-size: 14px;
-    font-weight: 700;
-    color: #000;
-    margin-top: 0px;
-    margin-bottom: 0rem;
-    text-align: center;
-  }
-      .instruction-header {
-    margin-top: 15px;
-        margin-bottom: 5px;
-        font-size: 14px;
-  }
-      .spray-row {
-    display: flex;
-    justify-content: center;  /* center horizontally */
-    align-items: center;      /* center vertically */
-    gap: 0.25rem;             /* space between input & text (tweak to taste) */
-  }
-  
+.instruction-header {
+  margin-top: 18px;
+  margin-bottom: 6px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  color: var(--text-secondary);
+}
+.spray-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
   /* optional: remove any stray margins */
   .spray-row input,
   .spray-row .spray-units {
@@ -158,59 +62,59 @@
     /* adjust this value to taste */
     padding-bottom: 0rem;
   }
-      .bubble {
-        font-size: 14px;
-      }
       .spray-units {
         font-size: 14px;
       }
       .ml-units {
         font-size: 14px;
       }
+ @media (max-width: 480px) {
+  .button-group button {
+    padding: 12px 10px;
+  }
+
+}
     </style>
   </head>
   <body>
-    <header class="banner">DAS ATI Topicalisation</header>
+    <header class="calc-header airway">DAS ATI Topicalisation</header>
   
-    <div class="flex-container">
-      <div class="flex-item">
-        <button id="maleButton">Male</button>
-      </div>
-      <div class="flex-item">
-        <button id="femaleButton">Female</button>
-      </div>
-      <div class="flex-item">
-        <div class="input-group">
-          <label for="weight">Weight (kg):</label>
-          <input type="number" id="weight" min="0">
-        </div>
-      </div>
-      <div class="flex-item">
-        <div class="input-group">
-          <label for="height">Height (cm):</label>
-          <input type="number" id="height" min="0">
-        </div>
-      </div>
-     <!-- two full-width rows -->
-    <div class="flex-item full-row">
-      <!-- put whatever you need here -->
-      <div class="result">
-      Lean Body Weight: <span id="leanBodyWeight">0</span>
-        <span class="unit">kg</span>
+    <div class="calc-section">
+
+<div class="gender-buttons">
+  <button id="maleButton">Male</button>
+  <button id="femaleButton">Female</button>
+</div>
+
+  <div class="row-2">
+    <div class="input-group">
+      <label for="weight">Weight:</label>
+      <input type="number" id="weight" min="0">
+      <span class="unit">kg</span>
     </div>
-      </div>
-    <div class="flex-item full-row">
-      <!-- another full-width input or content -->
-      <div class="result max-dose">
-   Max Lidocaine (9 mg/kg): 
-        <span id="maxLidoDose">0</span>
-        <span class="unit">mg</span>
-      </div>
+
+    <div class="input-group">
+      <label for="height">Height:</label>
+      <input type="number" id="height" min="0">
+      <span class="unit">cm</span>
     </div>
   </div>
+
+ <div class="results">
+  <div>
+    <span>Lean Body Weight:</span>
+    <span><span id="leanBodyWeight">0</span> <span class="unit">kg</span></span>
+  </div>
+
+  <div>
+    <span>Max Lidocaine (9 mg/kg):</span>
+    <span><span id="maxLidoDose">0</span> <span class="unit">mg</span></span>
+  </div>
+</div>
+    </div>
      
    <div class="instruction-header">
-      <u>Topicalise</u>:
+      Topicalise:
     </div>
       <div class="button-group">
       <button id="coPhenylcaineButton">Co-phenylcaine Spray<br><small>If nasal route</small></button>
@@ -218,13 +122,23 @@
     </div>
     
      <div class="button-group">
-      <button id="lidocaineSprayButton">Lidocaine 10%<br><small>20–30 sprays to the oropharynx, tonsillar pillars and tongue base</small></button>
-           <input type="number" id="lidocaineInput" value="20" min="0">
-      <span class="spray-units" id="sprayUnits">sprays</span>
-       <span class="bubble"><span id="lidocaineOutput">200</span> <span class="unit">mg</span></span>
-    </div>
+  <button id="lidocaineSprayButton">
+    Lidocaine 10%<br>
+    <small>20–30 sprays to the oropharynx, tonsillar pillars and tongue base</small>
+  </button>
+
+  <div class="spray-row">
+    <input type="number" id="lidocaineInput" value="20" min="0">
+    <span class="spray-units" id="sprayUnits">sprays</span>
+  </div>
+
+  <span class="bubble">
+    <span id="lidocaineOutput">200</span>
+    <span class="unit">mg</span>
+  </span>
+</div>
       <div class="instruction-header">
-      <u>If inadequate</u>:
+      If inadequate:
     </div> 
       <div class="button-group">
       <button id="additionalLidocaineButton">Lidocaine 10%<br><small>Give a further 5 sprays to tongue base</small></button>
@@ -248,14 +162,23 @@
   </div>  
     </div>
    
-    <div class="results-section">
-      <div class="result">
-      Total Dose Given: <span id="doseGiven">0</span>
-        <span class="unit">mg</span></div>
-        <div class="result">
-          Dose Remaining: <span id="doseRemaining">0</span>
-            <span class="unit">mg</span>
-      </div></div>
+   <div class="calc-section">
+  <div class="results">
+    <div>
+      <span>Total Dose Given:</span>
+      <span>
+        <span id="doseGiven">0</span> <span class="unit">mg</span>
+      </span>
+    </div>
+
+    <div>
+      <span>Dose Remaining:</span>
+      <span>
+        <span id="doseRemaining">0</span> <span class="unit">mg</span>
+      </span>
+    </div>
+  </div>
+</div>
   
      <div class="button-container">
       <button type="button" class="reset-btn" onclick="resetForm()">Reset</button>
