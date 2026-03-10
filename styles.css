@@ -35,20 +35,21 @@
 }
 
 @media (prefers-color-scheme: dark) {
-
   :root {
     --bg-main: #0f1115;
     --bg-card: #1f232a;
     --btn-bg: #2a2f36;
     --text-main: #f1f3f5;
     --text-secondary: #a8adb3;
-
     --border-light: #2e333b;
   }
     h1 {
     color: #ffffff;
   }
   button:hover {
+    background-color: rgba(255,255,255,0.06);
+  }
+    .gender-buttons button:hover:not(.active) {
     background-color: rgba(255,255,255,0.06);
   }
 }
@@ -67,21 +68,17 @@ body {
   background-color: var(--bg-main);
   font-variant-numeric: tabular-nums;
 }
-
 strong { 
   font-weight: 700;
 }
-
 small sup {
   font-size: 0.6em;    /* or whatever fraction you like */
   line-height: 0;      /* to pull it up a little */
   vertical-align: super;
 }
-
 .negative {
   color: darkred;
 }
-
 /* Remove number spinners in inputs */
 input[type="number"] {
   -moz-appearance: textfield;      /* Firefox */
@@ -94,7 +91,14 @@ input[type="number"]::-webkit-outer-spin-button {
   appearance: none;
   margin: 0;
 }
-
+.calc-section ol,
+.calc-section ul,
+footer ol,
+footer ul {
+  text-align: left;
+  margin-left: 0;
+  padding-left: 1.5em;
+}
 /*=============================================
 =          3. Layout & Containers              =
 =============================================*/
@@ -137,16 +141,6 @@ input[type="number"]::-webkit-outer-spin-button {
   max-width: 100%;      /* Ensures the container can expand full width */
   overflow: hidden;     /* Hides overflow from large images */
 }
-
-.banner img {
-  max-width: 100%;      /* Scales the image to be responsive */
-  height: auto;         /* Maintains the image's aspect ratio */
-  display: block;       /* Removes inline-block gaps */
-  margin: 0 auto;       /* Centers the image within the banner */
-  border: none;
-  outline: none;
-}
-
 header.banner {
 background: linear-gradient(
     to right,
@@ -165,7 +159,6 @@ background: linear-gradient(
   text-shadow: 0 1px 2px rgba(0,0,0,0.1);
   line-height: 1.2;
 }
-
 header.banner small {
   font-size: 8px; /* or any size you like */
   display: block;             /* ensure it sits on its own line */
@@ -173,13 +166,11 @@ header.banner small {
   line-height: 1;             /* tight line for the small text */
   /* font-size: 0.75em; Adjust the value as needed */
 }
-
 header.banner div {
   margin-top: 0px;
   padding: 0;
   line-height: 1;
 }
-
 header.banner2 {
 background: linear-gradient(
     to right,
@@ -198,7 +189,6 @@ background: linear-gradient(
   text-shadow: 0 1px 2px rgba(0,0,0,0.1);
   line-height: 1.2;
 }
-
 header.banner2 small {
   font-size: 0.5rem; /* ~8px if base = 16px */
   display: block;             /* ensure it sits on its own line */
@@ -206,13 +196,31 @@ header.banner2 small {
   line-height: 1;             /* tight line for the small text */
   /* font-size: 0.75em; Adjust the value as needed */
 }
-
 header.banner2 div {
   margin-top: 0px;
   padding: 0;
   line-height: 1;
 }
 
+header.calc-header {
+  background: none;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+
+  text-align: center;
+  margin: 0 0 10px 0;
+
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: 0.2px;
+
+  padding-bottom: 2px;
+
+  border-bottom-width: 3px;
+  border-bottom-style: solid;
+}
 /*=============================================
 =            Calculator Header                =
 =============================================*/
@@ -283,9 +291,62 @@ h3 {
 /*=============================================
 =          6. Form Elements & Inputs           =
 =============================================*/
-/* Inputs */
-/* Standard input styling */
-
+.calc-section {
+ width: 90%;
+  max-width: 400px;
+  margin: 0 auto 20px auto;
+  padding: 16px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
+  background-color: var(--bg-card);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  display: flow-root;
+    }
+.calc-section > * + * {
+  margin-top: 12px;
+}
+.calc-section .input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin: 10px 0;
+}
+.calc-section .input-group label {
+  width: 70px;
+  margin: 0;
+}
+.calc-section .input-group input {
+  width: 70px;
+  margin: 0;
+}
+.calc-section .gender-buttons {
+  display: flex;
+  justify-content: flex-start;
+  margin: 4px 0 14px 0;
+  padding: 0;
+  max-width: 180px;
+}
+.calc-section .results {
+  margin-top: 14px;
+}
+.calc-section .results div {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  gap: 12px;
+  align-items: baseline;
+}
+.calc-section .results div + div {
+  margin-top: 4px;
+}
+.calc-section .results span:last-child {
+  font-weight: 600;
+  text-align: right;
+}
+.calc-section .unit-toggle {
+  width: 60px;
+  margin: 0;
+}
 input,
 select {
   background-color: var(--bg-card);
@@ -320,7 +381,7 @@ input::placeholder {
   color: #212529;
   margin-top: 10px;
 }
-
+/* Calculator layout */
 .input-note {
   font-size: 10px;
   color: #555;
@@ -332,7 +393,6 @@ input::placeholder {
   align-items: center;
   margin: 10px 0;
 }
-
 .input-group label {
   font-size: 14px;
   margin: 5px 10px 5px 0;
@@ -427,15 +487,13 @@ button {
 
   background-color: var(--bg-card);
   color: var(--text-main);
-  transition: background-color 0.2s ease, transform 0.05s ease;
+  transition: background-color 0.2s ease, transform 0.08s ease;
 }
 button:hover {
   background-color: rgba(0,0,0,0.04);
 }
 
-button:active {
-  transform: scale(0.97);
-}
+
 
 .gender-buttons {
   display: flex;
@@ -447,39 +505,50 @@ button:active {
 
 .gender-buttons button {
   flex: 1;
-  font-size: 14px;
   padding: 10px;
-  margin: 5px;
+  font-size: 14px;
   cursor: pointer;
-  border-radius: var(--radius);
 
-  background-color: var(--btn-bg);
   border: 1px solid var(--border-light);
-  color: var(--text-main);
+  background-color: var(--btn-bg);
 
-  transition: background-color 0.2s ease;
+  color: var(--text-secondary);   /* change this */
+
+  border-radius: 0;
+  margin: 0;
+}
+      .gender-buttons button:first-child {
+  border-top-left-radius: var(--radius);
+  border-bottom-left-radius: var(--radius);
 }
 
+.gender-buttons button:last-child {
+  border-top-right-radius: var(--radius);
+  border-bottom-right-radius: var(--radius);
+}
+      .gender-buttons button + button {
+  border-left: none;
+}
 .gender-buttons button.active {
   background-color: var(--clr-primary);
+  border-color: var(--clr-primary);
   color: white;
+  font-weight: 600;
 }
-
+.gender-buttons button:hover:not(.active) {
+  background-color: rgba(0,0,0,0.04);
+}
 .unit-toggle {
   width: 100%;
   font-size: 14px;
   margin: 5px 0;
   padding: 5px;
-
   cursor: pointer;
-
   border-radius: var(--radius);
-
   background-color: var(--btn-bg);
   border: 1px solid var(--border-light);
   color: var(--text-main);
 }
-
 .button-group {
   display: flex;
   flex-direction: row;
@@ -671,7 +740,6 @@ button.active small {
   border-radius: var(--radius);
   border: 1px solid var(--border-light);
 }
-
 .reset-btn,
 .home-btn {
   flex: 1;
@@ -689,7 +757,6 @@ button.active small {
   border: 1px solid var(--border-light);
   color: var(--text-secondary);
 }
-
 .home-btn {
   text-decoration: none;
   text-align: center;
@@ -828,19 +895,8 @@ footer a:hover {
   text-decoration: underline;
 }
 
-/*=============================================
-=          Adult and Maternal BV                         =
-=============================================*/
-.calc-section {
-      width: 90%;
-      max-width: 400px;
-      margin: 0 auto 20px auto;
-      padding: 10px 15px; /* 10px top & bottom, 15px left & right */
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      background-color: var(--bg-card);
-      border: 1px solid var(--border-light);
-    }
+
+
 
     /* Box for shock classification */
     .classification-section {
