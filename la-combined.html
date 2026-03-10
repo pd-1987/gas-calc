@@ -4,151 +4,39 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-<link
-  href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
-  rel="stylesheet"
-/>
-<link
-  href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
-  rel="stylesheet"
-/>
   <title>Local anaesthetic combined dose calculator</title>
 
   <style>
-:root {
-  --bg-main: #f3f4f6;
-  --bg-card: #ffffff;
-
-  --text-main: #212529;
-  --text-secondary: #555;
-
-  --border-light: #e0e0e0;
-}
-    body {
-  background-color: #f8f9fa; /* mid-light grey */
-}
-    header.banner {
-   background: linear-gradient(130deg, #2e8b57 0%, #1b5e20 100%);
-   margin-bottom: 5px;   
-    }
-    
-    /* Inputs */
-    .input-group {
-      display: flex;
-      align-items: center;
-      margin-bottom: 2px;
-      margin-top: 0px;
-    }
-    .input-group label {
-      font-size: 14px;
-      font-weight: 700;
-      margin-right: 10px;
-    }
-    .input-group input {
-      width: 60px;
-      padding: 5px;
-      font-size: 14px;
-    }
-    .input-note {
-      font-size: 0.6em;
-      margin-bottom: 10px;
-      color: #555;
-    }
-
-    /* LA sections – single column */
 .la-sections {
   display: block;
   margin-bottom: 20px;
 }
-
 .la-column {
-  background-color: #ffffff;  /* or white if you prefer */
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 10px;
+  padding: 0;
   margin-bottom: 0.5rem;
-   box-sizing: border-box;
-  text-align: left;
+  box-sizing: border-box;
 }
-    /* Combined box */
-    .combined-box {
-     background-color: #ffffff;  /* or white if you prefer */
-  border: 1px solid #ddd;
-  border-radius: 6px;
-      padding: 10px;
-      margin-bottom: 5px;
-       box-sizing: border-box;
-      text-align: center;
-    }
-.combined-results {
-  display: block;       /* stack them vertically */
-  margin-bottom: 0px;
-  font-size: 14px;
-  text-align: center;
-  font-weight: 400;
-}
-/* Give each inner result its own line and spacing */
-.combined-results > div {
-  margin-bottom: 8px;
-}
-    /* Make sure inline percents flow on the same line */
-.combined-percent {
-  display: inline;     /* instead of block */
-  margin: 0;           /* cancel any top/bottom margins */
-  font-size: 14px;
-  color: #555;
-}
-    .instruction.header {
-      font-weight: 700;
-      font-size: 14px;
-        text-align: center;
-      margin-bottom: 8px;
-    }
-    .maxresult {
-      font-size: 14px;
-      text-align: center;
-      margin-bottom: 8px;
-    }
-    /* center the With/Without Adrenaline toggles under each LA box */
 .la-column .toggle-container {
   display: flex;
   justify-content: center;
-  margin: 10px auto; /* vertical spacing + auto‐centers horizontally */
-}
-    /* small text for per-kg and total limits */
-.dose-info {
-  font-size: 14px;
-  text-align: center;
-  margin: 10px 0 0;
-}
-.dose-info small {
-  font-size: 0.8em;
-  color: #555;
-}
-    .bubble {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px 8px;
-  font-size: 14px;
-  font-weight: 700;
-  background-color: #e7f3fe;
-  border: 1px solid #bcdffc;
-  border-radius: 15px;
-  color: #0078d7;
-  cursor: pointer;
+  margin: 6px auto;
 }
     .concentration-bubbles {
- display: flex;
-  flex-wrap: wrap;         /* allow wrapping onto multiple lines */  
-      justify-content: center; /* centre the items in each line */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   align-content: center;
-      gap: 0.5rem;             /* spacing between buttons */
-  margin-top: 8px;
-        margin-bottom: 0px;
-  padding: 0;              /* remove that left/right inset */
-  overflow: visible;       /* no scrollbar */
+  gap: 0.5rem;  
+  margin-top: 6px;
+  margin-bottom: 8px;
+  padding: 0;           
+  overflow: visible;  
     }
  .concentration-bubbles .bubble {
   flex: 0 0 auto; /* no grow, no shrink, size to content */
@@ -156,49 +44,24 @@
   max-width: none;
    min-width: 5rem;
 }
-.bubble.active {
-  background-color: #0078d7;
-  color: white;
-}
-.overlimit { 
-    color: darkred; 
-    }
-    .la-cycle-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;              /* a bit of space between name and dose */
-  white-space: nowrap;   /* keep each button on one line */
-   
-}
-.la-buttons button {
-         font-size: 14px;
-      margin: 2px;
-      padding: 5px;
-    }  
-.dose-label {
-  font-size: 0.8em;
-  color: #555;
-}
 .concentration-row {
-  display: flex;              /* block flex container */
-  flex-wrap: nowrap;
+  display: grid;
+  grid-template-columns: minmax(0,1fr) 50px auto 70px auto;
   align-items: center;
-  justify-content: center;
-  background-color: #f0f0f0;
-  margin: 5px 0;              /* no auto-centering */
-  gap: 8px;
-  padding: 5px 10px;
-  border-radius: 6px;
-  box-sizing: border-box;     /* stay within parent */
-  width: 100%;                /* take full width of la-column */
+  column-gap: 8px;
+  background: var(--btn-bg);
+  border: 1px solid var(--border-light);
+  margin: 5px 0;
+  padding: 6px 8px;
+  border-radius: var(--radius);
+  width: 100%;
+  box-sizing: border-box;
 }
-    
 .concentration-row .concentration-label {
   background: none;       /* no background */
   border: none;           /* no border */
   padding: 0;             /* remove padding */
-  color: #000;            /* text color */
+  color: var(--text-primary);
   font-weight: 400;       /* optional, keep bold */
   font-size: 14px;
   min-width: 60px;
@@ -211,20 +74,16 @@
   background: transparent;
   border: none;
   color: darkred;
-  font-size: 14px;
-  cursor: pointer;
-  padding: 0px;
+  font-size: 16px;
   line-height: 1;
+  padding: 0 4px;
+  cursor: pointer;
   width: 20px;
 }
 
-    .concentration-row input {
-  flex: 0 1 40px;   /* narrow input box */
-  min-width: 30px;  /* prevents collapsing too much */
-  max-width: 50px;  /* optional: cap width */
-  padding: 3px;
-  font-size: 14px;
-  box-sizing: border-box;
+.concentration-row input {
+  width: 50px;
+  text-align: center;
 }
     .concentration-row .bubble {
   flex: 0 0 50px;       /* fixed width */
@@ -232,19 +91,12 @@
   align-items: center;
   justify-content: center;
   padding: 2px 4px;     /* smaller padding */
-  font-size: 12px;      /* smaller text */
+  font-size: 13px;      /* smaller text */
   font-weight: 700;
   background-color: #e7f3fe;
   border: 1px solid #bcdffc;
   border-radius: 8px;   /* smaller radius */
   color: #0078d7;
-}
-    .concentration-row .concentration-label,
-.concentration-row input,
-.concentration-row .unit-label,
-.concentration-row .bubble,
-.concentration-row .remove-conc {
-  flex: 0 0 auto;           /* prevent stretching, size to content */
 }
 .concentration-boxes {
   margin-top: 0;
@@ -277,33 +129,30 @@
   border-color: #1b5e20;
   color: white;
 }
-        ol {
-  text-align: left;
-margin-left: 0;
-  padding-left: 1.5em; /* or 0 if you want no indent at all */
-}
-       ul {
-  text-align: left;
-        margin-left: 0;
-  padding-left: 1.5em; /* or 0 if you want no indent at all */
-}
 </style>
 </head>
 <body>
 
-  <header class="banner">LA combined doses</header>
-  
-  <div class="input-group">
-    <label for="weight">Weight (kg):</label>
-    <input type="number" id="weight" min="0" placeholder="0" />
-  </div>
-  <p class="input-note">Use IBW (BNF) / LBW (SOBA/AoA) if BMI ≥ 30 kg/m².</p>
+  <header class="calc-header regional">LA Combined Doses</header>
+  <div class="calc-wrapper">
+<div class="calc-section">
+
+<div class="input-group">
+<label for="weight">Weight:</label>
+<input type="number" id="weight" min="0">
+<span class="unit">kg</span>
+</div>
+
+<p class="input-note">Use IBW (BNF) / LBW (SOBA/AoA) if BMI ≥ 30 kg/m².</p>
 
 <div class="la-sections">
-        <div class="la-column" id="la1">
+  <div class="la-column" id="la1">
      <div class="la-buttons">
   <button type="button" class="la-cycle-btn">
-    <span class="drug-label">Lidocaine</span>
+   <span class="drug-label">
+  <span class="drug-name">Lidocaine</span>
+  <span class="cycle-icon">⟳</span>
+</span>
     <span class="dose-label">Max: 0 mg/kg; 0 mg</span>
   </button>
 </div>
@@ -317,22 +166,28 @@ margin-left: 0;
         Max single dose: <span id="la1-max">0</span><span class="unit"> mg</span>
       </div>
 <div class="concentration-bubbles" id="la1-conc-bubbles"></div>
-      <div id="la1-conc-dyn" class="concentration-boxes"></div>     
+      <div id="la1-conc-dyn" class="concentration-boxes"></div>   
     </div>
-    
-    <div id="la-results"></div>
- <div class="combined-box">
-  <div class="instruction header">Combined Dose:</div>
-  <div class="combined-results">
-    <span id="combined-dose-percent">0</span><span class="unit">%</span>
+  <div id="la-results"></div>
+</div> <!-- closes la-sections -->
+
+</div> <!-- closes input calc-section -->
+
+<div class="calc-section">
+<div class="results">
+
+<div>
+<span>Combined Dose:</span>
+<span><span id="combined-dose-percent">0</span> <span class="unit">%</span></span>
+</div>
+</div>
+</div>
   </div>
-</div>
-</div>
+  </div>
   
 <div class="preset-container">
   <button class="preset-btn" id="tkr-btn">TKR – ESH (Spinal, Adductor canal + LIA)</button>
 </div>  
-  
   <div class="button-container">
     <button class="reset-btn">Reset</button>
     <button class="home-btn">Home</button>
@@ -389,7 +244,7 @@ margin-left: 0;
   // --- DOM refs ---
   const weightInput      = document.getElementById('weight');
   const laBtn            = document.querySelector('#la1 .la-cycle-btn');
-  const laNameSpan       = laBtn.querySelector('.drug-label');
+  const laNameSpan = laBtn.querySelector('.drug-name');
   const laDoseSpan       = laBtn.querySelector('.dose-label');
   const adToggle         = document.getElementById('la1-ad-toggle');
   const concBubbles      = document.getElementById('la1-conc-bubbles');
