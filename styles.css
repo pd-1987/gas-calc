@@ -52,12 +52,19 @@
     .gender-buttons button:hover:not(.active) {
     background-color: rgba(255,255,255,0.06);
   }
+    .bubble {
+    background-color: rgba(0,123,255,0.15);
+    border-color: rgba(0,123,255,0.35);
+    color: #66b3ff;
+  }
 }
 /*=============================================
 =            2. Base & Resets                  =
 =============================================*/
 body {
   font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   color: var(--text-main);
   font-size: 14px;
   font-weight: 400;
@@ -315,6 +322,7 @@ h3 {
 .calc-section .input-group label {
   width: 70px;
   margin: 0;
+  font-weight: 600;
 }
 .calc-section .input-group input {
   width: 70px;
@@ -346,6 +354,11 @@ h3 {
 .calc-section .unit-toggle {
   width: 60px;
   margin: 0;
+}
+      .calc-section .row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 input,
 select {
@@ -380,6 +393,9 @@ input::placeholder {
   font-weight: 700;
   color: #212529;
   margin-top: 10px;
+}
+.results .unit {
+  margin-left: 2px;
 }
 /* Calculator layout */
 .input-note {
@@ -692,7 +708,7 @@ button.active small {
   margin-left: 5px;
   padding: 4px 8px;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   background-color: #e7f3fe;
   border: 1px solid #bcdffc;
   border-radius: 15px;
@@ -700,17 +716,21 @@ button.active small {
   min-width: 60px;
   min-height: 30px;
   line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 
 .bubble .unit {
   color: inherit;
   font-weight: 400;
+  font-size: 0.9em;
+  opacity: 0.8;
 }
 
 .unit {
   margin-left: 2px;
   font-weight: normal;
-  color: #555;
+  font-size: 0.9em;
+  color: var(--text-secondary);
 }
 
 .spray-units,
