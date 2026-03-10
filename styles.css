@@ -338,8 +338,8 @@ h3 {
 }
 .calc-section .gender-buttons {
   display: flex;
-  justify-content: flex-start;
-  margin: 4px 0 14px 0;
+  justify-content: center;
+  margin: 4px auto 14px auto;
   padding: 0;
   max-width: 300px;
 }
@@ -519,7 +519,7 @@ button:hover {
     margin-bottom: 5px;
   }
 .gender-buttons {
-  display: flex;
+    display: flex;
     justify-content: center;
     flex-wrap: wrap;
     margin: 0;
