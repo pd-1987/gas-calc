@@ -325,7 +325,7 @@ h3 {
   justify-content: flex-start;
   margin: 4px 0 14px 0;
   padding: 0;
-  max-width: 180px;
+  max-width: 240px;
 }
 .calc-section .results {
   margin-top: 14px;
@@ -508,12 +508,10 @@ button:hover {
   padding: 10px;
   font-size: 14px;
   cursor: pointer;
-
+  min-width: 100px;
   border: 1px solid var(--border-light);
   background-color: var(--btn-bg);
-
   color: var(--text-secondary);   /* change this */
-
   border-radius: 0;
   margin: 0;
 }
