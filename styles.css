@@ -28,10 +28,11 @@
   --bubble-border: #bcdffc;
   
   /* Category colours */
-  --clr-general: #1565C0;
+  --clr-general: #6c757d;
+  
   --clr-airway: #b71c1c;
-  --clr-regional: #2e8b57;
-  --clr-risk: #6c757d;
+  --clr-regional: #1565C0;
+  --clr-risk: #2e8b57; 
   --clr-obstetrics: #894070;
   --clr-paeds: #E38BA3;
   --clr-critical: #5E35B1;
