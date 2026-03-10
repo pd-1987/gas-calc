@@ -299,16 +299,18 @@ h3 {
 =          6. Form Elements & Inputs           =
 =============================================*/
 .calc-section {
- width: 90%;
+  width: 90%;
   max-width: 400px;
   margin: 0 auto 20px auto;
   padding: 16px 14px;
+
   border-radius: 10px;
   border: 1px solid var(--border-light);
   background-color: var(--bg-card);
   box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+
   display: flow-root;
-    }
+}
 .calc-section > * + * {
   margin-top: 12px;
 }
@@ -320,7 +322,7 @@ h3 {
   margin: 10px 0;
 }
 .calc-section .input-group label {
-  width: 70px;
+  width: 95px;
   margin: 0;
   font-weight: 600;
 }
@@ -336,7 +338,7 @@ h3 {
   max-width: 300px;
 }
 .calc-section .results {
-  margin-top: 14px;
+  padding: 4px 0;
 }
 .calc-section .results div {
   display: grid;
