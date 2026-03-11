@@ -102,7 +102,7 @@ small sup {
   vertical-align: super;
 }
 .negative {
-  color: darkred;
+  color: #c62828;
 }
 /* Remove number spinners in inputs */
 input[type="number"] {
@@ -386,13 +386,15 @@ input::placeholder {
 .result {
   font-size: 14px;
   font-weight: 700;
-  color: #212529;
+  color: var(--text-main);
   margin-top: 10px;
   padding: 4px 0;
 }
 .la-result {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
   align-items: baseline;
+  column-gap: 6px;
   gap: 6px;
   padding: 6px 8px;
   margin-top: 6px;
@@ -410,6 +412,10 @@ input::placeholder {
   min-width: 48px;
   text-align: right;
   font-variant-numeric: tabular-nums;
+}
+.la-result span[id$="Dose"] {
+  text-align: right;
+  min-width: 48px;
 }
 .results .unit {
   margin-left: 2px;
@@ -950,7 +956,7 @@ button:active {
     margin: 3px 0;
   }
 .overlimit { 
-    color: darkred;
+    color: #c62828 !important;
     font-weight: 600;
     }
 .maxresult {
@@ -1045,6 +1051,11 @@ footer a:hover {
 }
 .result-group {
   margin-top: 6px;
+  text-align: center;
+}
+.result-group small {
+  display: block;
+  margin-top: 0px;
 }
 /*=============================================
 =        LA Combined Dose Calculator       =
@@ -1108,7 +1119,7 @@ footer a:hover {
   margin-left: 0;
   background: transparent;
   border: none;
-  color: darkred;
+  color: #c62828;
   font-size: 16px;
   line-height: 1;
   padding: 0 4px;
@@ -1213,6 +1224,17 @@ footer a:hover {
 }
 .infusion-results .result + .result {
   margin-top: 2px;
+}
+.infusion-row {
+  background: none;
+  border: none;
+  padding: 2px 0;
+  margin: 0;
+}
+.infusion-row span[id$="Dose"] {
+  font-size: 1.1em;
+  font-weight: 700;
+  color: var(--clr-regional);
 }
 /*=============================================
 =        Blood loss Calculators       =
