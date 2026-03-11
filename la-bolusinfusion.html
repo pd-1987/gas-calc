@@ -112,14 +112,14 @@
 
 <div class="result-group infusion-results">
 
-  <div class="result">
+  <div class="la-result infusion-row">
     <strong class="result-label">Dose over first 4 h:</strong>
     <span id="4HoursDose">0</span>
     <span class="unit">mg</span>
     <span id="4HoursPct"></span>
   </div>
 
-  <div class="result">
+  <div class="la-result infusion-row">
     <strong class="result-label">Dose over first 24 h:</strong>
     <span id="24HoursDose">0</span>
     <span class="unit">mg</span>
@@ -127,8 +127,6 @@
   </div>
 
 </div>
-    
-<small class="note">Bupivacaine / Levobupivacaine max rate: 0.1% = 16.6 mL/hr, 0.125% = 13.3 mL/hr (400 mg/24h)<br>Ropivacaine max rate: 0.2% = 14 mL/hr (675 mg/24h).</small>
   </div>
   </div>
   <!-- Home and Reset Buttons -->
@@ -144,7 +142,7 @@
       <p>Bupivacaine: A maximum dose of 2 mg/kg should not be exceeded in any four-hour period<sup>1</sup>; not to exceed 175 mg per dose<sup>2</sup>; In total ≤400 mg/24h.<sup>3</sup> Paediatric textbooks advise an upper limit of 0.3 – 0.375 mg/kg/hour (approximately 400 mg/24h in a 45 kg patient).<sup>4</sup></p> 
         <p>Levobupivacaine: Not to exceed 200 mg per dose.<sup>2</sup> In total ≤400 mg/24h.<sup>3</sup></p>
       <p>Ropivacaine: Not to exceed 200 mg per dose.<sup>2, 5</sup> In total ≤675 mg/24h.<sup>5, 6</sup></p>
-      <p>IBW: ideal body weight; LBW: lean body weight; BNF: British National Formulary; SOBA: The Society for Obesity and Bariatric Anaesthesia; 
+      <p>IBW: ideal body weight; LBW: lean body weight; BNF: British National Formulary; SOBA: The Society for Obesity and Bariatric Anaesthesia;
         AoA: Association of Anaesthetists (UK)</p></small>
     </details>
     
@@ -179,7 +177,6 @@
       // Reset bolus volume and dose
   document.getElementById("bolusVolume").value = "";
   document.getElementById("bolusDose").textContent = "0";
-  document.getElementById("bolusDose").style.color = "inherit";
       
       // Reset bolus concentration selection
   document.querySelectorAll(".concentration-btn").forEach(btn => btn.classList.remove("active"));
@@ -280,10 +277,10 @@ function updateBolusDose() {
   const activeConcBtn = document.querySelector(".concentration-btn.active");
 
   // Reset
-  doseDisplay.textContent = "0";
-  pctSpan.textContent = "";
-  pctSpan.classList.remove("overlimit");
-  doseDisplay.style.color = "inherit";
+doseDisplay.textContent = "0";
+pctSpan.textContent = "";
+pctSpan.classList.remove("overlimit");
+doseDisplay.classList.remove("overlimit");
 
   if (activeConcBtn && !isNaN(volume) && volume > 0) {
     const concValue = concMap[activeConcBtn.textContent.trim()];
@@ -298,10 +295,12 @@ function updateBolusDose() {
       pctSpan.classList.toggle("overlimit", pct > 100);
     }
 
-    doseDisplay.style.color =
-      maxBolusValue > 0 && bolusDose > maxBolusValue
-        ? "darkred"
-        : "inherit";
+doseDisplay.classList.remove("overlimit");
+    
+doseDisplay.classList.toggle(
+  "overlimit",
+  maxBolusValue > 0 && bolusDose > maxBolusValue
+);
   }
 
   updateInfusionRates();
@@ -362,6 +361,8 @@ document.getElementById("maxSafeDose").textContent = Number(finalDose.toFixed(1)
 
   const pctSpan4 = document.getElementById("4HoursPct");
   const pctSpan24 = document.getElementById("24HoursPct");
+   const dose4 = document.getElementById("4HoursDose");
+const dose24 = document.getElementById("24HoursDose");
 
   // Clear % by default
   pctSpan4.textContent = "";
@@ -416,16 +417,22 @@ if (conc > 0 && (rate > 0 || maintenanceRate > 0)) {
   document.getElementById("24HoursDose").textContent = Number(doseOver24h.toFixed(1));
 
   // Show % of max bolus for 4 hours
-  if (maxBolusValue > 0) {
-    const pct = (doseOver4h / maxBolusValue) * 100;
-    pctSpan4.textContent = ` (${pct.toFixed(0)}%)`;
-    pctSpan4.classList.toggle("overlimit", pct > 100);
-  }
+if (maxBolusValue > 0) {
+  const pct = (doseOver4h / maxBolusValue) * 100;
+  pctSpan4.textContent = ` (${pct.toFixed(0)}%)`;
+
+  const over = pct > 100;
+  pctSpan4.classList.toggle("overlimit", over);
+  dose4.classList.toggle("overlimit", over);
+}
    
-   if (max24hValue > 0) {
+if (max24hValue > 0) {
   const pct24 = (doseOver24h / max24hValue) * 100;
   pctSpan24.textContent = ` (${pct24.toFixed(0)}%)`;
-  pctSpan24.classList.toggle("overlimit", pct24 > 100);
+
+  const over = pct24 > 100;
+  pctSpan24.classList.toggle("overlimit", over);
+  dose24.classList.toggle("overlimit", over);
 }
 
  }
@@ -492,8 +499,12 @@ if (maintenanceInput) {
   document.getElementById("weight").value = "";
 
   // Reset bolus volume and dose
-  document.getElementById("bolusVolume").value = "";
-  document.getElementById("bolusDose").textContent = "0";
+  // Reset bolus volume and dose
+document.getElementById("bolusVolume").value = "";
+
+const bolusDose = document.getElementById("bolusDose");
+bolusDose.textContent = "0";
+bolusDose.classList.remove("overlimit");
     
     const bolusPct = document.getElementById("bolusPct");
 bolusPct.textContent = "";
@@ -503,6 +514,8 @@ bolusPct.classList.remove("overlimit");
   document.getElementById("infusionRate").value = "";
   document.getElementById("4HoursDose").textContent = "0";
   document.getElementById("24HoursDose").textContent = "0";
+    document.getElementById("4HoursDose").classList.remove("overlimit");
+document.getElementById("24HoursDose").classList.remove("overlimit");
 
   // Reset percentage spans
   const pct4 = document.getElementById("4HoursPct");
