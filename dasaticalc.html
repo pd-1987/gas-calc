@@ -303,7 +303,8 @@ maxSpan.textContent = maxDose;
       givenSpan.textContent = total;
       const remain = maxSafe - total;
       remSpan.textContent = remain;
-      remSpan.style.color = remain < 0 ? 'darkred' : '';
+      remSpan.classList.toggle("overlimit", remain < 0);
+      givenSpan.classList.toggle("overlimit", remain < 0);
     }
   
    function resetForm() {
@@ -325,6 +326,9 @@ maxSpan.textContent = maxDose;
   l2vDoseSpan.textContent    = '40';
   l2bDoseSpan.textContent    = '40';
 
+givenSpan.classList.remove("overlimit");
+remSpan.classList.remove("overlimit");
+     
   // --- 4) Recalculate totals (uses the existing LBW & max-dose) ---
   updateTotal();
 }
