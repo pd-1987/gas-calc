@@ -63,11 +63,6 @@
     border-color: #355070;
     color: #7fb6ff;
   }
-  .bubble.active {
-    background-color: #3a7bd5;
-    border-color: #3a7bd5;
-    color: white;
-  }
     .toggle-container {
     background: #2a2f36;
   }
@@ -312,19 +307,19 @@ h3 {
 =============================================*/
 .calc-wrapper {
   width: 90%;
-  max-width: 400px;
+  max-width: 480px;
   margin: 0 auto;
 }
 .calc-wrapper > * + * {
   margin-top: 8px;
 }
 .calc-section {
-  padding: 16px 14px;
-  margin-bottom: 20px;
+  padding: 14px 12px;
+  margin-bottom: 12px;
   border-radius: 10px;
   border: 1px solid var(--border-light);
   background-color: var(--bg-card);
-  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
   display: flow-root;
 }
 .calc-section .input-group {
@@ -342,6 +337,9 @@ h3 {
 .calc-section .input-group input {
   width: 70px;
   margin: 0;
+}
+.calc-section .result {
+margin-top: 6px;
 }
 .calc-section .results div {
   display: grid;
@@ -385,7 +383,6 @@ input::placeholder {
   font-weight: 600;
   color: var(--text-secondary);
 }
-
 .result {
   font-size: 14px;
   font-weight: 700;
@@ -393,8 +390,44 @@ input::placeholder {
   margin-top: 10px;
   padding: 4px 0;
 }
+.la-result {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 6px 8px;
+  margin-top: 6px;
+
+  background: var(--btn-bg);
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+}
+.la-result .result-value {
+  min-width: 48px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.la-result span:last-child {
+  min-width: 48px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
 .results .unit {
   margin-left: 2px;
+}
+.result span:first-of-type {
+  font-size: 1.1em;
+  font-weight: 700;
+  color: var(--clr-regional);
+}
+.result-label {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.result-value {
+  font-size: 1.1em;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 /* Calculator layout */
 .input-note {
@@ -410,7 +443,7 @@ input::placeholder {
 .input-group label {
   font-size: 14px;
   margin: 5px 10px 5px 0;
-  font-weight: 700;
+  font-weight: 600;
    width: auto;
     flex-shrink: 0;
 }
@@ -746,10 +779,12 @@ button.active small {
   border-radius: 15px;
   color: var(--bubble-text);
   min-width: 60px;
-  min-height: 30px;
+  min-height: 34px;
   line-height: 1;
   font-variant-numeric: tabular-nums;
   transition: background-color 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 .bubble .unit {
   color: inherit;
@@ -760,6 +795,12 @@ button.active small {
 .bubble:hover {
   background-color: var(--bubble-active-bg);
   border-color: var(--bubble-active-bg);
+  color: white;
+}
+.bubble.active {
+  background: var(--bubble-active-bg);
+  border-color: var(--bubble-active-bg);
+  transform: translateY(1px);
   color: white;
 }
 .unit {
@@ -899,16 +940,6 @@ button:active {
   font-weight: 700;
   color: #212529;
 }
-
-.max-safe-dose {
-  font-size: 14px;
-  font-weight: 700;
-  margin: 20px 0;
-}
-
-.max-safe-dose + .max-safe-dose {
-  margin-top: 10px;
-}
 .spray-row {
   display: flex;
   align-items: center;
@@ -919,7 +950,8 @@ button:active {
     margin: 3px 0;
   }
 .overlimit { 
-    color: darkred; 
+    color: darkred;
+    font-weight: 600;
     }
 .maxresult {
   font-size: 13px;
@@ -941,6 +973,13 @@ button:active {
   font-variant-numeric: tabular-nums;
   min-width: 58px;
   text-align: right;
+}
+.note {
+  display: block;
+  text-align: center;
+  font-size: 0.8em;
+  color: var(--text-secondary);
+  margin-top: 0;
 }
 .la-totals {
   font-size: 12px;
@@ -1004,6 +1043,9 @@ footer a:hover {
   line-height: 1.25;
   text-align: center;
 }
+.result-group {
+  margin-top: 6px;
+}
 /*=============================================
 =        LA Combined Dose Calculator       =
 =============================================*/  
@@ -1027,8 +1069,7 @@ footer a:hover {
   justify-content: center;
   align-content: center;
   gap: 0.5rem;  
-  margin-top: 6px;
-  margin-bottom: 8px;
+  margin: 4px 0 6px;
   padding: 0;           
   overflow: visible;  
     }
@@ -1124,6 +1165,42 @@ footer a:hover {
   border-color: #1b5e20;
   color: white;
 }
+/*=============================================
+=        LA Bolus and Infusion Calculator       =
+=============================================*/
+   .la-select-buttons {
+ display: grid;
+ grid-template-columns: repeat(2, 1fr);
+ row-gap: 4px;         /* only 8px between the two rows */
+ column-gap: 8px;      /* 8px between the two columns */
+ margin: 5px 0;        /* only vertical margins */
+ justify-items: center; /* center buttons horizontally in each cell */
+    }
+.la-select-buttons button {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  background: var(--btn-bg);
+  color: var(--text-main);
+}
+.la-select-buttons button.active {
+  background: var(--clr-regional);
+  border-color: var(--clr-regional);
+  color: white;
+}
+    .la-select-buttons button:hover {
+  border-color: var(--clr-regional);
+}
+    .la-select-buttons button small {
+      display: block;
+      font-size: 0.8em;
+      color: var(--text-secondary);
+      margin-top: 3px;
+    }
+    .la-select-buttons button.active small {
+      color: white;
+    }
 /*=============================================
 =        Blood loss Calculators       =
 =============================================*/
