@@ -979,7 +979,7 @@ button:active {
   text-align: center;
   font-size: 0.8em;
   color: var(--text-secondary);
-  margin-top: 0;
+  margin-top: 6px;
 }
 .la-totals {
   font-size: 12px;
@@ -1201,6 +1201,19 @@ footer a:hover {
     .la-select-buttons button.active small {
       color: white;
     }
+.infusion-results {
+  padding: 4px 8px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  background: var(--btn-bg);
+}
+.infusion-results .result {
+  margin-top: 0;
+  padding: 2px 0;
+}
+.infusion-results .result + .result {
+  margin-top: 2px;
+}
 /*=============================================
 =        Blood loss Calculators       =
 =============================================*/
