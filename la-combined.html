@@ -13,122 +13,10 @@
   <title>Local anaesthetic combined dose calculator</title>
 
   <style>
-.la-sections {
-  display: block;
-  margin-bottom: 20px;
-}
-.la-column {
-  padding: 0;
-  margin-bottom: 0.5rem;
-  box-sizing: border-box;
-}
-.la-column .toggle-container {
-  display: flex;
-  justify-content: center;
-  margin: 6px auto;
-}
-    .concentration-bubbles {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-content: center;
-  gap: 0.5rem;  
-  margin-top: 6px;
-  margin-bottom: 8px;
-  padding: 0;           
-  overflow: visible;  
-    }
- .concentration-bubbles .bubble {
-  flex: 0 0 auto; /* no grow, no shrink, size to content */
-   width: auto;
-  max-width: none;
-   min-width: 5rem;
-}
-.concentration-row {
-  display: grid;
-  grid-template-columns: minmax(0,1fr) 50px auto 70px auto;
-  align-items: center;
-  column-gap: 8px;
-  background: var(--btn-bg);
-  border: 1px solid var(--border-light);
-  margin: 5px 0;
-  padding: 6px 8px;
-  border-radius: var(--radius);
-  width: 100%;
-  box-sizing: border-box;
-}
-.concentration-row .concentration-label {
-  background: none;       /* no background */
-  border: none;           /* no border */
-  padding: 0;             /* remove padding */
-  color: var(--text-primary);
-  font-weight: 400;       /* optional, keep bold */
-  font-size: 14px;
-  min-width: 60px;
-  text-align: left;
-}      
-    
-.concentration-row .remove-conc {
-  flex: 0 0 auto;
-  margin-left: 0;
-  background: transparent;
-  border: none;
-  color: darkred;
-  font-size: 16px;
-  line-height: 1;
-  padding: 0 4px;
-  cursor: pointer;
-  width: 20px;
-}
-
-.concentration-row input {
-  width: 50px;
-  text-align: center;
-}
-    .concentration-row .bubble {
-  flex: 0 0 50px;       /* fixed width */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2px 4px;     /* smaller padding */
-  font-size: 13px;      /* smaller text */
-  font-weight: 700;
-  background-color: #e7f3fe;
-  border: 1px solid #bcdffc;
-  border-radius: 8px;   /* smaller radius */
-  color: #0078d7;
-}
-.concentration-boxes {
-  margin-top: 0;
-  margin-bottom: 8px;
-}
-/* Green preset button – styled like the blue concentration bubbles */
-.preset-container {
-  text-align: center;
-  margin-bottom: 10px;
-}
-
-.preset-btn {
-  background-color: #e6f4ea;       /* pale green background */
-  border: 1px solid #a5d6a7;       /* soft green border */
-  color: #2e7d32;                  /* darker green text */
-  font-weight: 700;
-  border-radius: 15px;
-  padding: 6px 14px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
-}
-
-.preset-btn:hover {
-  background-color: #c8e6c9;       /* slightly brighter on hover */
-}
-
-.preset-btn.active {
-  background-color: #2e7d32;       /* dark green active color */
-  border-color: #1b5e20;
-  color: white;
-}
+.instruction.header {
+  font-size: 12px;
+  line-height: 1.2;
+  margin-bottom: 4px;
 </style>
 </head>
 <body>
@@ -188,7 +76,7 @@
 <div class="preset-container">
   <button class="preset-btn" id="tkr-btn">TKR – ESH (Spinal, Adductor canal + LIA)</button>
 </div>  
-  <div class="button-container">
+  <div class="main-control-buttons">
     <button class="reset-btn">Reset</button>
     <button class="home-btn">Home</button>
   </div>
@@ -308,12 +196,12 @@ function updateCombinedTotals() {
     const row = document.createElement('div');
     row.className = 'concentration-row';
     row.innerHTML = `
-      <div class="concentration-label">${conc}</div>
-      <input type="number" min="0" placeholder="0" data-conc="${pctToNum(conc)}"/>
-      <span class="unit-label">mL</span>
-      <span class="bubble"><span class="bubble-value">0</span> <span class="unit">mg</span></span>
-      <button type="button" class="remove-conc">✖</button>
-    `;
+  <span class="bubble">${conc}</span>
+  <input type="number" min="0" placeholder="0" data-conc="${pctToNum(conc)}"/>
+  <span class="unit-label">mL</span>
+  <span class="dose-text"><span class="bubble-value">0</span> <span class="unit">mg</span></span>
+  <button type="button" class="remove-conc">✖</button>
+`;
 
     const inp = row.querySelector('input');
     const bub = row.querySelector('.bubble-value');
