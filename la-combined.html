@@ -13,11 +13,29 @@
   <title>Local anaesthetic combined dose calculator</title>
 
   <style>
-.instruction.header {
+.instruction-header {
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.2;
   margin-bottom: 4px;
+  color: var(--text-primary);
+    }
+#la1-conc-bubbles .bubble {
+  flex: 0 0 auto;
+  border-radius: 8px;
+  padding: 2px 4px;
+  font-size: 13px;
+  font-weight: 700;
+  max-width: none;
+  min-width: 5rem;
+  width: auto;
+}
+    .concentration-bubbles .bubble,
+#la1-conc-bubbles .bubble {
+  
+  
+
+}
 </style>
 </head>
 <body>
@@ -253,7 +271,7 @@ removeBtn.addEventListener('click', () => {
     block.dataset.drug = drug;
     block.dataset.withad = withAd?'1':'0';
     block.innerHTML = `
-  <div class="instruction header">
+  <div class="instruction-header">
     ${drug} ${withAd?'(+Ad)':''} – Max single dose: ${Math.round(safe)} mg
   </div>
   <div class="dyn-rows"></div>
@@ -339,7 +357,7 @@ function renderBubbles() {
     const drug   = block.dataset.drug;
     const withAd = block.dataset.withad === '1';
     const safe   = getSafeDose(drug, withAd);
-    const header = block.querySelector('.instruction.header');
+    const header = block.querySelector('.instruction-header');
     if (header) {
       header.textContent = `${drug} ${withAd ? '(+Ad)' : ''} – Max single dose: ${Math.round(safe)} mg`;
     }
