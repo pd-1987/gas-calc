@@ -4,218 +4,24 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-<link
-  href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
-  rel="stylesheet"
-/>
-<link
-  href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
-  rel="stylesheet"
-/>
+  
   <title>LA bolus and infusion calculator</title>
+
   <style>
-:root {
-  --bg-main: #f3f4f6;
-  --bg-card: #ffffff;
-
-  --text-main: #212529;
-  --text-secondary: #555;
-
-  --border-light: #e0e0e0;
-}
-    button {
-  -webkit-appearance: none;
-  appearance: none;      /* iOS Safari fix + standard reset */
-  font-size: 14px;
-  padding: 10px;
-  cursor: pointer;
-  border: none;
-  border-radius: 5px;
-  background-color: #f0f0f0;
-  transition: background-color 0.2s ease;
-  width: 100%;
-  color: inherit;
-}
-    .gender-buttons {
-  display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin: 0;
-    padding: 0 10px;
-}
-
-.gender-buttons button {
-  flex: 1;
-  font-size: 14px;
-  padding: 10px;
- margin: 5px;
-  cursor: pointer;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: #f0f0f0;
-  transition: background-color 0.2s ease;
-}
-
-.gender-buttons button.active {
-  background-color: #575757;
-  color: white;
-}
-    header.banner {
- background: linear-gradient(130deg, #2e8b57 0%, #1b5e20 100%   /* dark green */
-  );
-    margin-bottom: 5px;
-    }
-    /* Local Anesthetic Buttons */
-    .gender-buttons {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      row-gap: 4px;         /* only 8px between the two rows */
-  column-gap: 8px;      /* 8px between the two columns */
- margin: 5px 0;        /* only vertical margins */
-  justify-items: center; /* center buttons horizontally in each cell */
-    }
-    .gender-buttons button {
-  flex: 1;
-  font-size: 14px;
-  padding: 4px;
- margin: 3px;
-  cursor: pointer;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: #f0f0f0;
-  transition: background-color 0.2s ease;
-}
-.gender-buttons button:nth-child(3) {
-  grid-column: 1 / -1;
-  justify-self: center;
-  margin-top: 0;   /* override the 5px coming from the other rule */
-}    
-    .gender-buttons button small {
-      display: block;
-      font-size: 0.8em;
-      color: #555;
-      margin-top: 3px;
-    }
-    .gender-buttons button.active small {
-      color: white;
-    }
-    
-    /* Bolus Concentration */
-    .concentration-label {
-      margin: 10px 15px;
-      font-size: 14px;
-    }
-    .concentration-buttons, 
-    .infusion-concentration-buttons {
-      display: flex;
-      justify-content: space-around;
-      margin: 8px 0;
-    }
-.concentration-btn,
-.infusion-concentration-btn {
-  flex: 1 1 auto;
-  min-width: 0;
-  margin: 0 3px;
-  padding: 6px 6px;
-  font-size: 14px;
-
-  /* shared look & feel */
-  background-color: #e7f3fe;
-  border: 1px solid #bcdffc;
-  border-radius: 15px;
-  color: #0078d7;      /* text color */
-  cursor: pointer;     /* pointer on hover */
-}
-    .concentration-btn.active, 
-    .infusion-concentration-btn.active {
-      background-color: #0078d7;
-      color: white;
-    }
-    .input-group {
-  display: flex;
-  align-items: center;
-  margin: 2px 0 0;
-}
-    .input-group label {
-  font-size: 14px;
-  margin: 0px 10px 0 0;
-  font-weight: 700;
-   width: auto;
-    flex-shrink: 0;
-}
-
-.input-group input {
-  width: 50px;
-  padding: 5px;
-  font-size: 14px;
-  box-sizing: border-box;
-  margin: 5px 0;
-}
-    .input-note {
-  font-size: 0.6em;
-  color: #555;
-  margin-bottom: 10px; /* top 0 | right 0 | bottom 15px | left 0 */
-}
-    /* Bolus Volume Group */
-    .input-group.bolus-group {
-      margin: 5px 0;
-    }
-    .input-group.bolus-group label {
-      margin-right: 5px;
-      font-size: 14px;
-    }
-    .input-group.bolus-group input {
-      width: 50px;
-      padding: 5px;
-      font-size: 14px;
-    }
-    .input-group.bolus-group .unit {
-      margin-left: 5px;
-      font-size: 14px;
-    }
-.result {
-  margin: 4px;
-  font-size: 14px;
-  text-align: center;
-}
-.result span.unit {
-  font-size: 14px;
-  margin-left: 2px;
-}
-    .boxed-section {
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 8px;
-  margin-bottom: 0.5rem;
-  box-sizing: border-box;
-  background-color: #fafafa;
-}
-    .dose-note {
-  display: block;
-  text-align: center;
-  font-size: 0.5em;
-  margin-top: 4px;
-}
-  .over-limit {
-    color: darkred;
-    font-weight: bold;
-  }
-            ol {
-  text-align: left;
-margin-left: 0;
-  padding-left: 1.5em; /* or 0 if you want no indent at all */
-}
-       ul {
-  text-align: left;
-        margin-left: 0;
-  padding-left: 1.5em; /* or 0 if you want no indent at all */
-}
   </style>
 </head>
 <body>
-  <header class="banner">LA Bolus and Infusion in Adults ≥45 kg</header>
-    <div class="boxed-section first-section">
+  <header class="calc-header regional">
+  LA Bolus and Infusion (≥45 kg)
+</header>
+  <div class="calc-wrapper">
+    <div class="calc-section">
   <!-- Weight Entry Group -->
   <div class="input-group">
     <label for="weight">Weight (kg):</label>
@@ -224,7 +30,7 @@ margin-left: 0;
   <p class="input-note">Use IBW (BNF) / LBW (SOBA/AoA) if BMI ≥ 30 kg/m².</p>
   
   <!-- Local Anesthetic Selection Buttons -->
-  <div class="gender-buttons">
+  <div class="la-select-buttons">
     <button id="bupivacaineBtn" onclick="selectLA('Bupivacaine')">
       Bupivacaine<small>2 mg/kg<br>Max. 175mg</small>
     </button>
@@ -237,44 +43,40 @@ margin-left: 0;
   </div> 
   
   <!-- Maximum Bolus Display -->
+  <div class="result-group">
   <div class="result max-safe-dose">
     <strong>Max bolus:</strong>
     <span id="maxSafeDose">0</span>
     <span class="unit">mg</span>
   </div>
-      <small class="dose-note">Not to be exceeded in any 4-hour period.</small>
-        <div class="result max-24h-dose">
+  <small class="note">Not to be exceeded in any 4-hour period.</small>
+</div>
+<div class="result-group">
+  <div class="result max-24h-dose">
     <strong>Max over 24 h:</strong>
     <span id="max24hDose">0</span>
     <span class="unit">mg</span>
   </div>
-      <small class="dose-note">Not to be exceeded in any 24-hour period.</small>
+  <small class="note">Not to be exceeded in any 24-hour period.</small>
+</div>
     </div>
 
-      
-    </div>
+  <div class="calc-section">
+ <div class="instruction-header">Bolus Concentration:</div>
+<div class="concentration-bubbles">
+  <button class="bubble concentration-btn">0.25%</button>
+  <button class="bubble concentration-btn">0.375%</button>
+  <button class="bubble concentration-btn">0.5%</button>
+</div>
   
-  <div class="boxed-section bolus-section">
-  
-  <!-- Bolus Concentration -->
-  <div class="input-group"><label><strong>Bolus Concentration:</strong></label></div>
-  <div class="concentration-buttons">
-    <!-- <button class="concentration-btn" onclick="selectConcentration('0.2%')">0.2%</button> -->
-    <button class="concentration-btn" onclick="selectConcentration('0.25%')">0.25%</button>
-    <button class="concentration-btn" onclick="selectConcentration('0.375%')">0.375%</button>
-    <button class="concentration-btn" onclick="selectConcentration('0.5%')">0.5%</button>
-  </div>
-  
-  <!-- Bolus Volume Entry Group -->
   <div class="input-group bolus-group">
     <label for="bolusVolume">Bolus volume:</label>
     <input type="number" id="bolusVolume" placeholder="0" min="0">
     <span class="unit">mL</span>
   </div>
   
-  <!-- Bolus Dose Display -->
- <div class="result bolus-dose">
-  <strong><u>Bolus dose</u>:</strong>
+ <div class="result la-result bolus-dose">
+  <strong class="result-label">Bolus dose:</strong>
   <span id="bolusDose">0</span>
   <span class="unit">mg</span>
   <span id="bolusPct"></span>
@@ -282,43 +84,38 @@ margin-left: 0;
 
 </div>
 
-  <div class="boxed-section infusion-section">
-  
-  <!-- Infusion Concentration -->
-  <div class="input-group"><label><strong>Infusion Concentration:</strong></label></div>
-  <div class="infusion-concentration-buttons">
-    <button class="infusion-concentration-btn" onclick="selectInfusionConcentration('0.1%')">0.1%</button>
-    <button class="infusion-concentration-btn" onclick="selectInfusionConcentration('0.125%')">0.125%</button>
-   <!-- <button class="infusion-concentration-btn" onclick="selectInfusionConcentration('0.2%')">0.2%</button> -->
-  </div>
+  <div class="calc-section">
+  <div class="instruction-header">Infusion Concentration:</div>
+<div class="concentration-bubbles">
+  <button class="bubble infusion-concentration-btn">0.1%</button>
+  <button class="bubble infusion-concentration-btn">0.125%</button>
+</div>
 
-<!-- Infusion Rate Entry Group -->
 <div class="input-group bolus-group">
   <label for="infusionRate">Infusion rate:</label>
   <input type="number" id="infusionRate" placeholder="0" min="0">
   <span class="unit">mL/h</span>
 </div>
-  
-  <!-- Infusion Dose Display -->
-<div class="result first4hours">
-  <strong><u>Dose over first 4 h</u>:</strong>
+
+<div class="result la-result first4hours">
+   <strong class="result-label">Dose over first 4 h</u>:</strong>
   <span id="4HoursDose">0</span>
   <span class="unit">mg</span>
   <span id="4HoursPct"></span>
 </div>
   
- <div class="result first24hours">
-  <strong><u>Dose over first 24 h</u>:</strong>
+ <div class="result la-result first24hours">
+   <strong class="result-label">Dose over first 24 h</u>:</strong>
   <span id="24HoursDose">0</span>
   <span class="unit">mg</span>
   <span id="24HoursPct"></span>
 </div>
     
-<small class="dose-note">Bupivacaine / Levobupivacaine max rates: 0.1% = 16.6 mL/hr, 0.125% = 13.3 mL/hr (400 mg/24h); Ropivacaine max rate: 0.2% = 14 mL/hr (675 mg/24h).</small>
+<small class="note">Bupivacaine / Levobupivacaine max rates: 0.1% = 16.6 mL/hr, 0.125% = 13.3 mL/hr (400 mg/24h)<br>Ropivacaine max rate: 0.2% = 14 mL/hr (675 mg/24h).</small>
   </div>
-    
+  </div>
   <!-- Home and Reset Buttons -->
-  <div class="button-container">
+  <div class="main-control-buttons">
     <button class="reset-btn" onclick="resetCalculator()">Reset</button>
     <button class="home-btn" onclick="goHome()">Home</button>
   </div>
@@ -468,7 +265,7 @@ function updateBolusDose() {
   // Reset
   doseDisplay.textContent = "0";
   pctSpan.textContent = "";
-  pctSpan.classList.remove("over-limit");
+  pctSpan.classList.remove("overlimit");
   doseDisplay.style.color = "inherit";
 
   if (activeConcBtn && !isNaN(volume) && volume > 0) {
@@ -481,7 +278,7 @@ function updateBolusDose() {
     if (maxBolusValue > 0) {
       const pct = (bolusDose / maxBolusValue) * 100;
       pctSpan.textContent = ` (${pct.toFixed(0)}%)`;
-      pctSpan.classList.toggle("over-limit", pct > 100);
+      pctSpan.classList.toggle("overlimit", pct > 100);
     }
 
     doseDisplay.style.color =
@@ -551,9 +348,9 @@ document.getElementById("maxSafeDose").textContent = Number(finalDose.toFixed(1)
 
   // Clear % by default
   pctSpan4.textContent = "";
-  pctSpan4.classList.remove("over-limit");
+  pctSpan4.classList.remove("overlimit");
   pctSpan24.textContent = "";
-  pctSpan24.classList.remove("over-limit");
+  pctSpan24.classList.remove("overlimit");
 
   if (!weightStr || isNaN(weight) || weight < 45) {
     document.getElementById("4HoursDose").textContent = "0";
@@ -588,13 +385,13 @@ if (activeInfBtn) {
   if (maxBolusValue > 0) {
     const pct = (doseOver4h / maxBolusValue) * 100;
     pctSpan4.textContent = ` (${pct.toFixed(0)}%)`;
-    pctSpan4.classList.toggle("over-limit", pct > 100);
+    pctSpan4.classList.toggle("overlimit", pct > 100);
   }
    
    if (max24hValue > 0) {
   const pct24 = (doseOver24h / max24hValue) * 100;
   pctSpan24.textContent = ` (${pct24.toFixed(0)}%)`;
-  pctSpan24.classList.toggle("over-limit", pct24 > 100);
+  pctSpan24.classList.toggle("overlimit", pct24 > 100);
 }
 
  }
@@ -660,7 +457,7 @@ document.getElementById("infusionRate")
     
     const bolusPct = document.getElementById("bolusPct");
 bolusPct.textContent = "";
-bolusPct.classList.remove("over-limit");
+bolusPct.classList.remove("overlimit");
 
   // Reset infusion rate and doses
   document.getElementById("infusionRate").value = "";
@@ -672,8 +469,8 @@ bolusPct.classList.remove("over-limit");
   const pct24 = document.getElementById("24HoursPct");
   pct4.textContent = "";
   pct24.textContent = "";
-  pct4.classList.remove("over-limit");
-  pct24.classList.remove("over-limit");
+  pct4.classList.remove("overlimit");
+  pct24.classList.remove("overlimit");
 
   // Reset LA selection buttons
   document.getElementById("bupivacaineBtn").classList.remove("active");
@@ -699,8 +496,20 @@ document.getElementById("max24hDose").textContent = "0";
 }
 
     function goHome() {
-      window.location.href = "index.html";
-    }
+  window.location.href = "index.html";
+}
+
+document.querySelectorAll(".concentration-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    selectConcentration(btn.textContent.trim());
+  });
+});
+
+document.querySelectorAll(".infusion-concentration-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    selectInfusionConcentration(btn.textContent.trim());
+  });
+});
   </script>
 </body>
 </html>
