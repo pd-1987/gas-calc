@@ -222,7 +222,8 @@
       const rem = (parseFloat(maxDoseSpan.textContent)||0) - totalDose;
       const el  = document.getElementById('doseRemaining');
       el.textContent = Math.floor(rem);
-      el.style.color = rem<0 ? 'darkred':'';
+      el.classList.toggle("overlimit", rem < 0);
+document.getElementById("doseGiven").classList.toggle("overlimit", rem < 0);
     }
 
     function resetForm() {
@@ -232,6 +233,10 @@
         document.getElementById(pref+'Input').value='';
         document.getElementById(pref+'Output').textContent='0';
       });
+
+    document.getElementById("doseGiven").classList.remove("overlimit");
+document.getElementById("doseRemaining").classList.remove("overlimit");
+      
       updateTotalDose();
     }
 
