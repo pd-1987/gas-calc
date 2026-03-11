@@ -12,6 +12,7 @@
 /* Backgrounds */
   --bg-main: #f3f4f6;
   --bg-card: #ffffff;
+  --input-bg: var(--bg-card);
   --btn-bg: #f0f0f0;  
   --bubble-bg: #e7f3fe;
   --bubble-text: #0078d7;
@@ -46,9 +47,10 @@
     --bg-main: #0f1115;
     --bg-card: #1f232a;
     --btn-bg: #2a2f36;
+    --input-bg: #262b33;
     --text-main: #f1f3f5;
     --text-secondary: #a8adb3;
-    --border-light: #2e333b;
+    --border-light: #3a4048;
     --toggle-border: #4a515a;
   }
     h1 {
@@ -364,15 +366,12 @@ h3 {
 }
 input,
 select {
-  background-color: var(--bg-card);
+  background-color: var(--input-bg);
   color: var(--text-main);
-
   border: 1px solid var(--border-light);
   border-radius: var(--radius);
-
   padding: 5px;
   font-size: 14px;
-
   box-sizing: border-box;
 }
 
@@ -723,7 +722,6 @@ button.active small {
   font-size: 15px;
   white-space: nowrap;
   background: var(--btn-bg);
-  border-color: var(--clr-primary);
   border: 1px solid var(--border-light);
   color: var(--text-main);
   border-radius: 10px;
