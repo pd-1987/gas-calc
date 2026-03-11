@@ -396,18 +396,13 @@ input::placeholder {
   align-items: baseline;
   column-gap: 6px;
   gap: 6px;
-  padding: 6px 8px;
+  padding: 6px 0 6px 8px;
   margin-top: 6px;
   background: var(--btn-bg);
   border: 1px solid var(--border-light);
   border-radius: 6px;
 }
 .la-result .result-value {
-  min-width: 48px;
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-.la-result span:last-child {
   min-width: 48px;
   text-align: right;
   font-variant-numeric: tabular-nums;
@@ -1055,6 +1050,16 @@ footer a:hover {
   display: block;
   margin-top: 0px;
 }
+.checkbox-inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0;
+  font-size: 14px;
+}
+.checkbox-inline input {
+  transform: scale(1.05);
+}
 /*=============================================
 =        LA Combined Dose Calculator       =
 =============================================*/  
@@ -1211,7 +1216,7 @@ footer a:hover {
       color: white;
     }
 .infusion-results {
-  padding: 4px 8px;
+  padding: 4px 0 4px 8px;
   border: 1px solid var(--border-light);
   border-radius: var(--radius);
   background: var(--btn-bg);
