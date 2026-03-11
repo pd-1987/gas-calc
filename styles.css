@@ -162,7 +162,25 @@ footer ul {
   flex-direction: column;
   gap: 20px;
 }
-
+.main-control-buttons {
+  display: flex;
+  width: 100%;
+  gap: 0;
+  margin-top: 24px;
+  align-items: stretch;
+}
+.main-control-buttons .reset-btn {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.main-control-buttons .home-btn {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: 1px solid var(--border-light);
+}
+.main-control-buttons > * {
+  flex: 1;
+}
 /*=============================================
 =            4. Banner & Header                =
 =============================================*/
@@ -233,46 +251,17 @@ header.banner2 div {
   padding: 0;
   line-height: 1;
 }
-
-header.calc-header {
-  background: none;
-  border: none;
-  box-shadow: none;
-  border-radius: 0;
-
-  text-align: center;
-  margin: 0 0 10px 0;
-
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-main);
-  letter-spacing: 0.2px;
-
-  padding-bottom: 2px;
-
-  border-bottom-width: 3px;
-  border-bottom-style: solid;
-}
 /*=============================================
 =            Calculator Header                =
 =============================================*/
-
 .calc-header {
-  background: none;
-  border: none;
-  box-shadow: none;
-  border-radius: 0;
-
   text-align: center;
   margin: 0 0 10px 0;
-
   font-size: 20px;
   font-weight: 700;
   color: var(--text-main);
   letter-spacing: 0.2px;
-
   padding-bottom: 2px;
-
   border-bottom-width: 3px;
   border-bottom-style: solid;
 }
@@ -356,19 +345,9 @@ h3 {
   width: 70px;
   margin: 0;
 }
-.calc-section .gender-buttons {
-  display: flex;
-  justify-content: center;
-  margin: 4px auto 14px auto;
-  padding: 0;
-  max-width: 300px;
-}
-.calc-section .results {
-  padding: 4px 0;
-}
 .calc-section .results div {
   display: grid;
-  grid-template-columns: minmax(0,1fr) auto;
+  grid-template-columns: 1fr auto;
   gap: 12px;
   align-items: baseline;
 }
@@ -417,6 +396,7 @@ input::placeholder {
   font-weight: 700;
   color: #212529;
   margin-top: 10px;
+  padding: 4px 0;
 }
 .results .unit {
   margin-left: 2px;
@@ -555,8 +535,10 @@ button:hover {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    margin: 0;
-    padding: 0 10px;
+    display: flex;
+    margin: 4px auto 14px auto;
+    padding: 0;
+    max-width: 300px;
 }
 
 .gender-buttons button {
@@ -615,7 +597,7 @@ button:hover {
 .button-group-text {
   margin-top: 5px;
   font-size: 12px;
-  color: color: var(--text-secondary);
+  color: var(--text-secondary);
 }
 .button-group button {
   border: 1px solid #ccc;   /* light grey */
@@ -626,13 +608,14 @@ button:hover {
 button .instruction-text {
   display: block;
   font-size: 12px;
-  color: color: var(--text-secondary);
+  color: var(--text-secondary);
   margin-top: 5px;
   font-style: normal;
 }
 button.active {
-  background-color: #575757;
+  background-color: var(--clr-dark-grey);
   color: white;
+  border-color: var(--clr-dark-grey);
 }
 
 button.active small {
@@ -723,7 +706,7 @@ button.active small {
     .la-buttons button small {
       display: block;
       font-size: 12px;
-      color: color: var(--text-secondary);
+      color: var(--text-secondary);
       margin-top: 3px;
     }
 
@@ -819,7 +802,7 @@ button.active small {
 }
 .dose-label {
   font-size: 0.8em;
-  color: color: var(--text-secondary);
+  color: var(--text-secondary);
 }
 
 /*=============================================
@@ -844,10 +827,8 @@ button.active small {
 .home-btn {
   flex: 1;
   padding: 10px 20px;
-  font-size: 14px;
-  border-radius: 5px;
+  border-radius: var(--radius);
   cursor: pointer;
-  border: none;
   transition: background-color 0.2s ease;
   font-weight: 600;
 }
@@ -860,15 +841,14 @@ button.active small {
 .home-btn {
   text-decoration: none;
   text-align: center;
-
-  background-color: var(--clr-primary);
-  color: white;
-
-  border: 1px solid var(--clr-primary);
+  background-color: var(--btn-bg);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
 }
+
 .home-btn:hover {
-  background-color: #0069d9;
-  border-color: #0069d9;
+  background-color: rgba(0,0,0,0.05);
+  color: var(--text-main);
 }
 button:active {
   transform: translateY(1px);
@@ -1009,7 +989,7 @@ footer {
   margin-top: 30px;
   text-align: center;
   font-size: 12px;
-  color: color: var(--text-secondary);
+  color: var(--text-secondary);
 }
 
 footer a {
