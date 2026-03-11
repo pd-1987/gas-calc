@@ -62,7 +62,7 @@
     </div>
 
   <div class="calc-section">
- <div class="instruction-header">Bolus Concentration:</div>
+ <div class="instruction-header">Bolus</div>
 <div class="concentration-bubbles">
   <button class="bubble concentration-btn">0.25%</button>
   <button class="bubble concentration-btn">0.375%</button>
@@ -70,13 +70,13 @@
 </div>
   
   <div class="input-group bolus-group">
-    <label for="bolusVolume">Bolus volume:</label>
+    <label for="bolusVolume">Volume:</label>
     <input type="number" id="bolusVolume" placeholder="0" min="0">
     <span class="unit">mL</span>
   </div>
   
- <div class="result la-result bolus-dose">
-  <strong class="result-label">Bolus dose:</strong>
+ <div class="result la-result">
+  <strong class="result-label">Dose:</strong>
   <span id="bolusDose">0</span>
   <span class="unit">mg</span>
   <span id="bolusPct"></span>
@@ -85,14 +85,14 @@
 </div>
 
   <div class="calc-section">
-  <div class="instruction-header">Infusion Concentration:</div>
+  <div class="instruction-header">Infusion</div>
 <div class="concentration-bubbles">
   <button class="bubble infusion-concentration-btn">0.1%</button>
   <button class="bubble infusion-concentration-btn">0.125%</button>
 </div>
 
 <div class="input-group bolus-group">
-  <label for="infusionRate">Infusion rate:</label>
+  <label for="infusionRate">Rate:</label>
   <input type="number" id="infusionRate" placeholder="0" min="0">
   <span class="unit">mL/h</span>
 </div>
@@ -110,17 +110,17 @@
   </div>
 </div>
 
-<div class="result-group infusion-results">
+<div class="infusion-results">
 
   <div class="la-result infusion-row">
-    <strong class="result-label">Dose over first 4 h:</strong>
+    <strong class="result-label">First 4 h:</strong>
     <span id="4HoursDose">0</span>
     <span class="unit">mg</span>
     <span id="4HoursPct"></span>
   </div>
 
   <div class="la-result infusion-row">
-    <strong class="result-label">Dose over first 24 h:</strong>
+    <strong class="result-label">First 24 h:</strong>
     <span id="24HoursDose">0</span>
     <span class="unit">mg</span>
     <span id="24HoursPct"></span>
