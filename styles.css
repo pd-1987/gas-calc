@@ -88,7 +88,7 @@ body {
   font-weight: 400;
   max-width: 600px;
   margin: 0 auto;
-  padding: 10px;
+  padding: 6px;
   line-height: 1.45;
   background-color: var(--bg-main);
   font-variant-numeric: tabular-nums;
@@ -315,7 +315,7 @@ h3 {
 }
 .calc-section {
   padding: 14px 12px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   border-radius: 10px;
   border: 1px solid var(--border-light);
   background-color: var(--bg-card);
@@ -776,17 +776,16 @@ button.active small {
   align-items: center;
   justify-content: center;
   margin-left: 5px;
-  padding: 4px 8px;
+  padding: 0px 10px;
   font-size: 14px;
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
   background: var(--bubble-bg);
   border: 1px solid var(--bubble-border);
   border-radius: 15px;
   color: var(--bubble-text);
   min-width: 60px;
-  min-height: 34px;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
+  height: 34px;
   transition: background-color 0.15s ease, border-color 0.15s ease;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
