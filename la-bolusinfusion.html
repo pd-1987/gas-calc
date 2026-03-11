@@ -49,7 +49,7 @@
     <span id="maxSafeDose">0</span>
     <span class="unit">mg</span>
   </div>
-  <small class="note">Not to be exceeded in any 4-hour period.</small>
+  <small>Not to be exceeded in any 4-hour period.</small>
 </div>
 <div class="result-group">
   <div class="result max-24h-dose">
@@ -57,7 +57,7 @@
     <span id="max24hDose">0</span>
     <span class="unit">mg</span>
   </div>
-  <small class="note">Not to be exceeded in any 24-hour period.</small>
+  <small>Not to be exceeded in any 24-hour period.</small>
 </div>
     </div>
 
@@ -96,22 +96,39 @@
   <input type="number" id="infusionRate" placeholder="0" min="0">
   <span class="unit">mL/h</span>
 </div>
-
-<div class="result la-result first4hours">
-   <strong class="result-label">Dose over first 4 h</u>:</strong>
-  <span id="4HoursDose">0</span>
-  <span class="unit">mg</span>
-  <span id="4HoursPct"></span>
+    
+    <label class="checkbox-inline">
+  <input type="checkbox" id="differentRate">
+  Different rate after 4 h
+</label>
+    
+    <div id="maintenanceRateGroup" style="display:none;">
+  <div class="input-group">
+    <label for="maintenanceRate">Rate after 4 h:</label>
+    <input type="number" id="maintenanceRate" placeholder="0" min="0">
+    <span class="unit">mL/h</span>
+  </div>
 </div>
-  
- <div class="result la-result first24hours">
-   <strong class="result-label">Dose over first 24 h</u>:</strong>
-  <span id="24HoursDose">0</span>
-  <span class="unit">mg</span>
-  <span id="24HoursPct"></span>
+
+<div class="result-group infusion-results">
+
+  <div class="result">
+    <strong class="result-label">Dose over first 4 h:</strong>
+    <span id="4HoursDose">0</span>
+    <span class="unit">mg</span>
+    <span id="4HoursPct"></span>
+  </div>
+
+  <div class="result">
+    <strong class="result-label">Dose over first 24 h:</strong>
+    <span id="24HoursDose">0</span>
+    <span class="unit">mg</span>
+    <span id="24HoursPct"></span>
+  </div>
+
 </div>
     
-<small class="note">Bupivacaine / Levobupivacaine max rates: 0.1% = 16.6 mL/hr, 0.125% = 13.3 mL/hr (400 mg/24h)<br>Ropivacaine max rate: 0.2% = 14 mL/hr (675 mg/24h).</small>
+<small class="note">Bupivacaine / Levobupivacaine max rate: 0.1% = 16.6 mL/hr, 0.125% = 13.3 mL/hr (400 mg/24h)<br>Ropivacaine max rate: 0.2% = 14 mL/hr (675 mg/24h).</small>
   </div>
   </div>
   <!-- Home and Reset Buttons -->
@@ -371,10 +388,27 @@ if (activeInfBtn) {
   const conc = infusionConcMap[concText] || 0;
   const rate = parseFloat(document.getElementById("infusionRate").value) || 0;
 
-  if (conc > 0 && rate > 0) {
-    doseOver4h  += rate * conc * 4;
+  const maintenanceRateInput = document.getElementById("maintenanceRate");
+const maintenanceRate = maintenanceRateInput ? parseFloat(maintenanceRateInput.value) || 0 : 0;
+
+const differentRate = document.getElementById("differentRate")?.checked;
+  
+if (conc > 0 && (rate > 0 || maintenanceRate > 0)) {
+
+  // first 4 hours always use initial rate
+  doseOver4h += rate * conc * 4;
+
+  if (differentRate && maintenanceRateInput) {
+
+    doseOver24h += (rate * conc * 4) + (maintenanceRate * conc * 20);
+
+  } else {
+
     doseOver24h += rate * conc * 24;
+
   }
+
+}
 }
 
   // Update UI
@@ -410,7 +444,13 @@ document.getElementById("bolusVolume")
 // Listen for changes in infusion rate
 document.getElementById("infusionRate")
   .addEventListener("input", updateInfusionRates);
-   
+
+const maintenanceInput = document.getElementById("maintenanceRate");
+
+if (maintenanceInput) {
+  maintenanceInput.addEventListener("input", updateInfusionRates);
+}    
+    
    function updateBolusOptions() {
     const isBupi = document.getElementById('bupivacaineBtn').classList.contains('active');
     const isLevo = document.getElementById('levobupivacaineBtn').classList.contains('active');
@@ -489,7 +529,15 @@ bolusPct.classList.remove("overlimit");
     max24hValue = 0;
 document.getElementById("max24hDose").textContent = "0";
 
+// Reset maintenance rate controls
+const checkbox = document.getElementById("differentRate");
+const maintenanceInput = document.getElementById("maintenanceRate");
+const maintenanceGroup = document.getElementById("maintenanceRateGroup");
 
+if (checkbox) checkbox.checked = false;
+if (maintenanceInput) maintenanceInput.value = "";
+if (maintenanceGroup) maintenanceGroup.style.display = "none";
+    
   // Restore all bolus and infusion options
   updateInfusionOptions();
   updateBolusOptions();
@@ -510,6 +558,36 @@ document.querySelectorAll(".infusion-concentration-btn").forEach(btn=>{
     selectInfusionConcentration(btn.textContent.trim());
   });
 });
+    
+const checkbox = document.getElementById("differentRate");
+
+if (checkbox) {
+  checkbox.addEventListener("change", function () {
+
+    const group = document.getElementById("maintenanceRateGroup");
+    const rateInput = document.getElementById("infusionRate");
+    const maintenanceInput = document.getElementById("maintenanceRate");
+
+    if (this.checked) {
+
+      group.style.display = "block";
+
+      // copy initial rate into maintenance rate
+      if (rateInput && maintenanceInput) {
+        maintenanceInput.value = rateInput.value;
+      }
+
+    } else {
+
+      group.style.display = "none";
+
+    }
+
+    // recalculate doses whenever checkbox changes
+    updateInfusionRates();
+
+  });
+}
   </script>
 </body>
 </html>
