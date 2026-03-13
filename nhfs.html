@@ -4,187 +4,177 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <title>Nottingham Hip Fracture Score</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
-    rel="stylesheet"
-  />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
-    rel="stylesheet"
-  />
+
   <style>
-:root {
-  --bg-main: #f3f4f6;
-  --bg-card: #ffffff;
-
-  --text-main: #212529;
-  --text-secondary: #555;
-
-  --border-light: #e0e0e0;
-}
-       body {
-  background-color: #f8f9fa; /* mid-light grey */
-}  
-    header.banner {
- background: linear-gradient(130deg, #adb5bd 0%, #6c757d 100%);
-      margin-bottom: 5px;
-    }
-    .input-group {
-      margin-left: 20px;
-    }
-    .input-group label {
-      font-size: 14px;
-    }
-      .input-group input {
-      font-size: 14px;
-    }
-      .input-group button {
-      font-size: 14px;
-    }
-    .boxed-section {
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      padding: 0px 8px;
-      margin: 10px auto;
-      background-color: #ffffff;
-      box-sizing: border-box;
-      width: 100%;
-    }
-     .boxed-section small {
-    font-size: 10px;
-    }
-    .result {
-  font-size: 14px;
-  font-weight: 700;
-      margin: 10px 10px 0px;
-      text-align: center;
-} 
-    .result .NHFS {
-  font-size: 14px;
-  font-weight: 700;
-  text-align: center;
-  margin: 0 10px;
-}
-    .result span {
-  font-weight: 400;
-}
-        .button-container {
-  margin-top: 10px;
-}
-    .age-buttons {
-  display: flex;
-    justify-content: center;
-    gap: 5px;    
-}
-.age-btn {
-  font-size: 14px;
-  padding: 10px 0; 
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  background-color: #f0f0f0;
-  cursor: pointer;
-  white-space: nowrap; 
-  flex: 1;
-  font-size: 14px;
-  padding: 10px;
-  transition: background-color 0.2s ease;
-  min-width: 80px;
-}
-.age-btn.active {
-  background-color: #ffffff;
-  border: 2px solid #575757;
-  color: #212529;
-  font-weight: 600;
-}
-    ol {
-  text-align: left;
-margin-left: 0;
-  padding-left: 1.5em; /* or 0 if you want no indent at all */
-}
-    .amt4-note {
-      font-size: 10px;
+   .amt4-note {
       margin-bottom: 5px;
       text-align: left;
     }
+.result.NHFS {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: 0px;
+  padding: 2px 0;
+}
+    .result.NHFS + .result.NHFS {
+  margin-top: 0;
+}
+.result.NHFS strong {
+  font-size: 1.35em;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.nhfs-score {
+  display: inline-block;
+  min-width: 36px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 20px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.nhfs-score.nhfs-low {
+  background: rgba(21,101,192,0.12);
+  color: #1565c0;
+}
+
+.nhfs-score.nhfs-high {
+  background: rgba(255,152,0,0.18);
+  color: #e65100;
+}
+    .nhfs-risk {
+  font-weight: 700;
+  font-size: 1.25em;
+  font-variant-numeric: tabular-nums;
+  margin-left: 4px;
+}
+.nhfs-risk.nhfs-low { 
+      color:#1565c0; 
+    }
+.nhfs-risk.nhfs-high { 
+  color:#e65100; 
+    }
+.calc-section .result:first-of-type {
+  margin-top: 4px;
+}
+.calc-section .result + .result {
+  margin-top: 6px;
+}
+    
+@media (prefers-color-scheme: dark) {
+.nhfs-score.nhfs-low {
+  background: rgba(21,101,192,0.12);
+  color: #1565c0 !important;
+}
+
+.nhfs-score.nhfs-high {
+  background: rgba(255,152,0,0.18);
+  color: #e65100 !important;
+}
+  .nhfs-risk.nhfs-low { 
+  color:#1565c0 !important;
+}
+
+.nhfs-risk.nhfs-high { 
+  color:#e65100 !important;
+}
+}
   </style>
 </head>
 <body>
-  <header class="banner">Nottingham Hip Fracture Score</header>
+  
+<header class="calc-header risk">
+  Nottingham Hip Fracture Score
+</header>
 
-
-    <!-- Inputs in any order -->
+<div class="calc-wrapper">
+<div class="calc-section">  
+  
  <div class="input-group">
   <label>Age:</label>
-  <div class="age-buttons">
-    <button id="age1" class="age-btn" onclick="setAge('≤65')">≤65 y</button>
-    <button id="age2" class="age-btn" onclick="setAge('66–85')">66–85 y</button>
-    <button id="age3" class="age-btn" onclick="setAge('≥86')">≥86 y</button>
+  <div class="option-buttons">
+    <button id="age1" onclick="setAge('≤65', this)">≤65 y</button>
+    <button id="age2" onclick="setAge('66–85', this)">66–85 y</button>
+    <button id="age3" onclick="setAge('≥86', this)">≥86 y</button>
   </div>
 </div>
     <div class="input-group">
       <label>Gender:</label>
-      <div class="age-buttons">
-        <button id="nhfsMale" class="age-btn" onclick="setGender('male')">Male</button>
-        <button id="nhfsFemale" class="age-btn" onclick="setGender('female')">Female</button>
+      <div class="option-buttons">
+        <button id="nhfsMale" onclick="setGender('male', this)">Male</button>
+        <button id="nhfsFemale" onclick="setGender('female', this)">Female</button>
       </div>
     </div>
     <div class="input-group">
   <label>Hb on admission:</label>
-  <div class="age-buttons">
-    <button id="hgbLow"  class="age-btn" onclick="setHgb('low')">≤100 g/L</button>
-    <button id="hgbHigh" class="age-btn" onclick="setHgb('high')">&gt;100 g/L</button>
+  <div class="option-buttons">
+    <button id="hgbLow" onclick="setHgb('low', this)">&le;100 g/L</button>
+    <button id="hgbHigh" onclick="setHgb('high', this)">&gt;100 g/L</button>
   </div>
 </div>
   
     <div class="input-group">
   <label>Major comorbidities:</label>
-  <div class="age-buttons">
-    <button id="comorbLow" class="age-btn" onclick="setComorb('low')">&lt;2</button>
-    <button id="comorbHigh" class="age-btn" onclick="setComorb('high')">&ge;2</button>
+  <div class="option-buttons">
+    <button id="comorbLow" onclick="setComorb('low', this)">&lt;2</button>
+    <button id="comorbHigh" onclick="setComorb('high', this)">&ge;2</button>
   </div>
 </div>
 
   <div class="input-group">
 <label>Active malignancy:</label>
-      <div class="age-buttons">
-        <button id="nhfsMaligNo"  class="age-btn" onclick="setMalignancy(false)">No</button>
-        <button id="nhfsMaligYes" class="age-btn" onclick="setMalignancy(true)">Yes</button>
+      <div class="option-buttons">
+        <button id="nhfsMaligNo" onclick="setMalignancy(false, this)">No</button>
+        <button id="nhfsMaligYes" onclick="setMalignancy(true, this)">Yes</button>
       </div>
     </div>
   
     <div class="input-group">
       <label>AMTS ≤6 / AMT4 ≤3<sup>*</sup>:</label>
-  <div class="age-buttons">
-    <button id="amtsLow" class="age-btn" onclick="setAmts('low')">Yes</button>
-    <button id="amtsHigh" class="age-btn" onclick="setAmts('high')">No</button>
+  <div class="option-buttons">
+    <button id="amtsLow" onclick="setAmts('low', this)">Yes</button>
+    <button id="amtsHigh" onclick="setAmts('high', this)">No</button>
   </div>
 </div>
  
 
     <div class="input-group">
       <label>Residence:</label>
-      <div class="age-buttons">
-        <button id="nhfsHome" class="age-btn" onclick="setResidence('home')">Home</button>
-        <button id="nhfsInst" class="age-btn" onclick="setResidence('inst')">Institution</button>
+      <div class="option-buttons">
+        <button id="nhfsHome" onclick="setResidence('home', this)">Home</button>
+        <button id="nhfsInst" onclick="setResidence('inst', this)">Institution</button>
       </div>
     </div>
 
-<div class="boxed-section">
-  <p class="result">
-    NHFS Score: <span id="nhfsScore">0</span>
-  </p>
-    <p class="result NHFS">
-      30-day mortality (Moppett, 2012): <span id="nhfsRisk2">—</span> 
-  <p class="result NHFS">
-    30-day mortality (Maxwell, 2008): <span id="nhfsRisk1">—</span>
-  </p>
+</div>
+
+<div class="calc-section">
+  <div class="result">
+    NHFS Score: <strong id="nhfsScore" class="nhfs-score nhfs-low">0</strong>
+  </div>
+    <div class="result NHFS">
+      30-day mortality (Moppett, 2012): <strong id="nhfsRisk2" class="nhfs-risk">—</strong>
+  </div>
+  <div class="result NHFS">
+    30-day mortality (Maxwell, 2008): <strong id="nhfsRisk1" class="nhfs-risk">—</strong>
+  </div>
   <p style="text-align: center; margin-bottom: 10px;"><small><strong>NHFS ≤4:</strong> Low risk; 30-day survival 96.5%, 1-year survival 84.1%
     <br><strong>NHFS ≥5:</strong> High risk; 30-day survival 86.3%, 1-year survival 54.5%.</small></p>
   </div>
-
-  <div class="button-container">
+  </div>
+</div>
+  
+  <div class="main-control-buttons">
     <button class="reset-btn" onclick="resetForm()">Reset</button>
     <button class="home-btn"  onclick="goHome()">Home</button>
   </div>
@@ -213,8 +203,13 @@ margin-left: 0;
       <p>&copy; 2025 #OneTeam Anaesthesia. All rights reserved.</p></small>
   </footer>
 
-  <script>
-    //–– HELPERS ––//
+  <script>  
+function activateButton(button) {
+  const group = button.parentElement;
+  group.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  button.classList.add('active');
+}    
+    
     function clearToggles() {
       ['nhfsMale','nhfsFemale','nhfsHome','nhfsInst','nhfsMaligNo','nhfsMaligYes']
         .forEach(id => document.getElementById(id).classList.remove('active'));
@@ -230,65 +225,56 @@ margin-left: 0;
 
    let agePoints = 0;
 
-function setAge(category) {
-  agePoints = 0; // default
+function setAge(category, btn) {
+  activateButton(btn);
 
-  // toggle buttons like other setters
-  document.getElementById('age1').classList.toggle('active', category==='≤65');
-  document.getElementById('age2').classList.toggle('active', category==='66–85');
-  document.getElementById('age3').classList.toggle('active', category==='≥86');
-
-  // assign points
-  if (category==='66–85') agePoints = 3;
-  if (category==='≥86')   agePoints = 4;
+  agePoints = 0;
+  if (category === '66–85') agePoints = 3;
+  if (category === '≥86') agePoints = 4;
 
   calculateNHFS();
 }
     
     //–– SETTER FUNCTIONS ––//
-    function setGender(g) {
-      gender = g;
-      document.getElementById('nhfsMale').classList.toggle('active', g==='male');
-      document.getElementById('nhfsFemale').classList.toggle('active', g!=='male');
-      calculateNHFS();
-    }
-    function setResidence(r) {
-      residence = r;
-      document.getElementById('nhfsHome').classList.toggle('active', r==='home');
-      document.getElementById('nhfsInst').classList.toggle('active', r!=='home');
-      calculateNHFS();
-    }
-    function setMalignancy(v) {
-      malignancy = v;
-      document.getElementById('nhfsMaligNo').classList.toggle('active', !v);
-      document.getElementById('nhfsMaligYes').classList.toggle('active', v);
-      calculateNHFS();
-    }
+function setGender(g, btn) {
+  gender = g;
+  activateButton(btn);
+  calculateNHFS();
+}
+
+function setResidence(r, btn) {
+  residence = r;
+  activateButton(btn);
+  calculateNHFS();
+}    
     
     let hgbLow = false;
 
-function setHgb(level) {
+function setHgb(level, btn) {
   hgbLow = (level === 'low');
-  document.getElementById('hgbLow').classList.toggle('active', hgbLow);
-  document.getElementById('hgbHigh').classList.toggle('active', !hgbLow);
+  activateButton(btn);
   calculateNHFS();
 }
     
     let comorbHigh = false;
 
-function setComorb(level) {
+function setComorb(level, btn) {
   comorbHigh = (level === 'high');
-  document.getElementById('comorbLow').classList.toggle('active', !comorbHigh);
-  document.getElementById('comorbHigh').classList.toggle('active', comorbHigh);
-  calculateNHFS();  
+  activateButton(btn);
+  calculateNHFS();
 }
+ 
+function setMalignancy(v, btn) {
+  malignancy = v;
+  activateButton(btn);
+  calculateNHFS();
+}    
     
     let amtsLow = false;
 
-function setAmts(level) {
+function setAmts(level, btn) {
   amtsLow = (level === 'low');
-  document.getElementById('amtsLow').classList.toggle('active', amtsLow);
-  document.getElementById('amtsHigh').classList.toggle('active', !amtsLow);
+  activateButton(btn);
   calculateNHFS();
 }
 
@@ -306,10 +292,16 @@ function setAmts(level) {
 
     // Display NHFS
     nhfsScore.textContent = score;
+      
+nhfsScore.classList.remove('nhfs-low','nhfs-high');
+nhfsScore.classList.add(score >= 5 ? 'nhfs-high' : 'nhfs-low');      
 
+const riskClass = score >= 5 ? 'nhfs-high' : 'nhfs-low';
+nhfsRisk1.className = 'nhfs-risk ' + riskClass;
+nhfsRisk2.className = 'nhfs-risk ' + riskClass;      
+      
 // Original Maxwell 2008
 const risk1 = 100 / (1 + Math.exp(4.718 - (score / 2)));
-nhfsRisk1.textContent = risk1.toFixed(1) + '%';
 nhfsRisk1.textContent = risk1.toFixed(1) + '%';
 
 // Moppett 2012
@@ -321,16 +313,16 @@ nhfsRisk2.textContent = risk2.toFixed(1) + '%';
     //–– RESET ––//
     function resetForm() {
       agePoints = 3; // default = 66–85y
-document.querySelectorAll('.age-btn').forEach(btn => btn.classList.remove('active'));
-document.getElementById('age2').classList.add('active');
+
+  document.querySelectorAll('.option-buttons button')
+    .forEach(btn => btn.classList.remove('active'));
+
+  document.getElementById('age2').classList.add('active');
       hgbLow = false;
-document.getElementById('hgbLow').classList.remove('active');
 document.getElementById('hgbHigh').classList.add('active');
       comorbHigh = false;
 document.getElementById('comorbLow').classList.add('active');
-document.getElementById('comorbHigh').classList.remove('active');
       amtsLow = false;
-document.getElementById('amtsLow').classList.remove('active');
 document.getElementById('amtsHigh').classList.add('active');
       clearToggles();
       gender     = 'female';
