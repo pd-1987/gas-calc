@@ -815,11 +815,17 @@ button.active small {
   margin-left: 0px;
 }
 .cycle-icon {
+  position: absolute;
+  right: -2px;
   font-size: 14px;
   opacity: 0.6;
   margin-left: 4px;
 }
+.la-cycle-btn:hover .cycle-icon {
+  opacity: 1;
+}
 .drug-label {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -827,7 +833,7 @@ button.active small {
 }
 
 .drug-name {
-  min-width: 115px;
+  min-width: 160px;
   text-align: center;
 }
 .dose-label {
