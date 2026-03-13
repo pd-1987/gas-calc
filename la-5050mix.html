@@ -13,6 +13,21 @@
   <title>LA 50:50 mixture combined maximum calculator</title>
 
   <style>
+.calc-section .results .result-block {
+  display: block !important;
+}
+
+.calc-section .results .result-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.calc-section .results .result-value {
+  display: block;
+  margin-left: 6px;
+  font-variant-numeric: tabular-nums;
+}
   </style>
 </head>
 <body>
@@ -72,7 +87,7 @@ LA 50:50 mixture combined maximum
       </div>
     </div>
   </div>
-
+    </div>
 <div class="calc-section">
 
 <div class="instruction-header">
@@ -81,34 +96,34 @@ Combined 50:50 mixture
 
 <div class="results">
 
-<div>
-<span id="comb1-label">LA 1</span>
-<span>
+<div class="result-block">
+<span class="result-label" id="comb1-label">LA 1</span>
+<span class="result-value">
 <span id="comb1-dose">0</span><span class="unit"> mg</span> |
 <span id="comb1-vol">0</span><span class="unit"> mL</span>
 (<span id="comb1-perc">0</span><span class="unit">%</span>)
 </span>
 </div>
-
-<div>
-<span id="comb2-label">LA 2</span>
-<span>
+  
+<div class="result-block">
+<span class="result-label" id="comb2-label">LA 2</span>
+<span class="result-value">
 <span id="comb2-dose">0</span><span class="unit"> mg</span> |
 <span id="comb2-vol">0</span><span class="unit"> mL</span>
 (<span id="comb2-perc">0</span><span class="unit">%</span>)
 </span>
 </div>
 
-<div>
-<span>Total volume</span>
-<span>
+<div class="result-block">
+<span class="result-label">Total volume</span>
+<span class="result-value">
 <span id="total-vol">0</span><span class="unit"> mL</span>
 </span>
 </div>
 
 </div>
 </div>
-    
+ 
   <div class="button-container">
     <button class="reset-btn">Reset</button>
     <button class="home-btn">Home</button>
