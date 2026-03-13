@@ -13,7 +13,11 @@
   <title>Nottingham Hip Fracture Score</title>
 
   <style>
-   .amt4-note {
+.calc-section .option-buttons button {
+  min-width: 70px;
+  padding: 8px 6px;
+}
+    .amt4-note {
       margin-bottom: 5px;
       text-align: left;
     }
@@ -28,18 +32,20 @@
     .result.NHFS + .result.NHFS {
   margin-top: 0;
 }
-.result.NHFS strong {
-  font-size: 1.35em;
+.nhfs-risk {
   font-weight: 700;
+  font-size: 1.15em;
   font-variant-numeric: tabular-nums;
+  margin-left: 4px;
 }
+
 .nhfs-score {
   display: inline-block;
   min-width: 36px;
   padding: 4px 10px;
   border-radius: 999px;
   font-weight: 700;
-  font-size: 20px;
+  font-size: 1.15em;
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
@@ -51,12 +57,6 @@
 .nhfs-score.nhfs-high {
   background: rgba(255,152,0,0.18);
   color: #e65100;
-}
-    .nhfs-risk {
-  font-weight: 700;
-  font-size: 1.25em;
-  font-variant-numeric: tabular-nums;
-  margin-left: 4px;
 }
 .nhfs-risk.nhfs-low { 
       color:#1565c0; 
@@ -70,13 +70,18 @@
 .calc-section .result + .result {
   margin-top: 6px;
 }
-    
+@media (max-width: 480px) {
+  .calc-section .option-buttons button {
+    min-width: 60px;
+    font-size: 13px;
+    padding: 8px 4px;
+  }
+}    
 @media (prefers-color-scheme: dark) {
 .nhfs-score.nhfs-low {
   background: rgba(21,101,192,0.12);
   color: #1565c0 !important;
 }
-
 .nhfs-score.nhfs-high {
   background: rgba(255,152,0,0.18);
   color: #e65100 !important;
@@ -172,7 +177,6 @@
     <br><strong>NHFS ≥5:</strong> High risk; 30-day survival 86.3%, 1-year survival 54.5%.</small></p>
   </div>
   </div>
-</div>
   
   <div class="main-control-buttons">
     <button class="reset-btn" onclick="resetForm()">Reset</button>
