@@ -4,182 +4,24 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-<link
-  href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
-  rel="stylesheet"
-/>
-<link
-  href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
-  rel="stylesheet"
-/>
   <title>LA 50:50 mixture combined maximum calculator</title>
 
   <style>
-:root {
-  --bg-main: #f3f4f6;
-  --bg-card: #ffffff;
-
-  --text-main: #212529;
-  --text-secondary: #555;
-
-  --border-light: #e0e0e0;
-}
-   :root {
-  --section-gap: 0.5rem;  /* or 20px, whichever you prefer */
-}
-body {
-  background-color: #f8f9fa;
-  font-family: 'Roboto', sans-serif;
-  font-size: 14px;
-}
-    header.banner {
-      background: linear-gradient(130deg, #2e8b57 0%, #1b5e20 100%);
-    }
-    /* Inputs */
-    .input-group {
-      display: flex;
-      align-items: center;
-      margin-bottom: 2px;
-      margin-top: 0px;
-    }
-    .input-group label {
-      font-weight: 700;
-      margin-right: 10px;
-    }
-    .input-group input {
-      width: 60px;
-      padding: 5px;
-    }
-  .input-note {
-      font-size: 0.6em;
-      margin-bottom: 10px;
-      color: #555;
-    }
-.la-column {
-  background-color: #ffffff;  /* or white if you prefer */
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 10px;
-  box-sizing: border-box;
-  text-align: left;
-}
-    .result {
-      text-align: center;
-      margin-top: 8px;
-    }
-.dose-options {
-  display: flex;
-  justify-content: flex-start;  /* instead of center */
-  margin: 8px 0 12px;            /* same vertical spacing */
-  width: auto;                   /* shrink-wrap */
-}
-    .dose-options .concentration-btn {
-      background-color: #e7f3fe;
-      border: 1px solid #bcdffc;
-      border-radius: 15px;
-      color: #0078d7;
-      cursor: pointer;
-      margin: 0 6px;
-      padding: 4px 8px;
-    }
-    .dose-options .concentration-btn.active {
-      background-color: #0078d7;
-      color: white;
-    }
-
-    /* Combined box */
-    .combined-box {
-     background-color: #ffffff;  /* or white if you prefer */
-  border: 1px solid #ddd;
-  border-radius: 6px;
-      padding: 10px;
-      box-sizing: border-box;
-      text-align: center;
-    }
-.combined-results {
-  display: block;       /* stack them vertically */
-  margin-bottom: 0px;
-  text-align: left;     /* left-align content */
-  font-weight: 400;
-}
-.combined-results > div {
-  margin-bottom: 8px;
-}
-    .instruction.header {
-      font-weight: 700;
-        text-align: left;
-    }
-/* Increase the gap under the "Max 50:50 volume" heading */
-.combined-box .instruction.header {
-  margin-bottom: 10px; /* or whatever spacing you like */
-}
-    .maxresult {
-      text-align: center;
-    }
-    .given-volume-box {
- background-color: #ffffff;  /* or white if you prefer */
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 10px;
-  text-align: left;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.given-volume-box label {
-  font-weight: 700;
-    }
-.given-volume-box input {
-  width: 60px;
-  padding: 5px;
-  font-size: 14px;
-  box-sizing: border-box;
-}
-    .overlimit { 
-    color: darkred; 
-    }
-        button small {
-  display: block;
-  font-size: 12px;
-  color: #555;
-  margin-bottom: 0px;
-}
-.la-column,
-.combined-box,
-.given-volume-box,
-.input-note, .la-sections {
-  margin-bottom: var(--section-gap);
-}
-        .mode-buttons {
-  display: flex;
-    justify-content: center;
-    gap: 5px;
-          margin: 10px;
-}
-.mode-btn {
-  font-size: 14px;
-  padding: 10px; 
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  background-color: #f0f0f0;
-  cursor: pointer;
-  white-space: nowrap; 
-  flex: 1;
-  transition: background-color 0.2s ease;
-  min-width: 80px;
-}
-.mode-btn.active {
-  background-color: #ffffff;
-  border: 2px solid #575757;
-  color: #212529;
-  font-weight: 600;
-}
   </style>
 </head>
 <body>
 
-  <header class="banner">LA 50:50 mixture combined maximum</header>
+<header class="calc-header regional">
+LA 50:50 mixture combined maximum
+</header>
+  <div class="calc-wrapper">
+  <div class="calc-section">
   <div class="la-sections">
     
   <div class="input-group">
@@ -188,17 +30,17 @@ body {
   </div>
   <p class="input-note">Use IBW (BNF) / LBW (SOBA/AoA) if BMI ≥ 30 kg/m².</p>
 
-  <div class="mode-buttons">
-    <button type="button" id="mode-volume" class="mode-btn active">50:50 Volume</button>
-    <button type="button" id="mode-dose"   class="mode-btn">50:50 Dose</button>
+  <div class="gender-buttons" id="mode-toggle">
+    <button type="button" id="mode-volume" class="active">50:50 Volume</button>
+    <button type="button" id="mode-dose">50:50 Dose</button>
 
     </div>
-  <div class="la-column" id="la1">
+  <div class="calc-section" id="la1">
           <!-- LA 1 -->
-      <div class="instruction header">LA 1: Short-acting</div>
+      <div class="instruction-header">LA 1: Short-acting</div>
      <div class="la-buttons">
-  <button type="button" disabled>
-    Lidocaine 2% with 1:200,000 adrenaline
+  <button type="button" class="la-cycle-btn" disabled>
+    Lidocaine 2% + 1:200,000 adrenaline
   <small>Max: 7 mg/kg; 500 mg</small>
   </button>
 </div>
@@ -209,41 +51,64 @@ body {
     </div>
 
     <!-- LA 2 -->
-    <div class="la-column" id="la2">
-      <div class="instruction header">LA 2: Long-acting</div>
+    <div class="calc-section" id="la2">
+      <div class="instruction-header">LA 2: Long-acting</div>
       <div class="la-buttons">
-  <button type="button" id="la2-name-btn">
-  Levobupivacaine 0.5%</button>
+<button type="button" class="la-cycle-btn" id="la2-name-btn">
+<span class="drug-label">
+<span class="drug-name">Levobupivacaine</span>
+  <span class="cycle-icon">⟳</span>
+  </span>
+  <span class="dose-label">0.5%</span>
+</button>
 </div>
-      <div class="dose-options" id="dose-options">
-        <button class="concentration-btn active" data-dose="2">Max: <br>2 mg/kg</button>
-        <button class="concentration-btn" data-dose="2.5">Max: <br>2.5 mg/kg</button>
-        <button class="concentration-btn" data-dose="3">Max: <br>3 mg/kg</button>
-      </div>
+     <div class="concentration-bubbles" id="dose-options">
+  <button class="bubble active" data-dose="2">2 mg/kg</button>
+  <button class="bubble" data-dose="2.5">2.5 mg/kg</button>
+  <button class="bubble" data-dose="3">3 mg/kg</button>
+</div>
        <div class="maxresult">
         Max single dose: <span id="la2-max">0</span><span class="unit"> mg</span>
       </div>
     </div>
   </div>
 
-  <!-- Combined 50:50 -->
-  <div class="combined-box">
+<div class="calc-section">
 
-   <div class="combined-results">
-  <div>
-    <span id="comb1-label">LA 1</span>:<br>
-    <strong><span id="comb1-dose">0</span></strong><span class="unit"> mg</span> in <strong><span id="comb1-vol">0</span><span class="unit"> mL</span></strong> (<span class="combined-percent unit" id="comb1-perc">0</span><span class="unit">%</span>)
-      </div>
-      <div>
-         <span id="comb2-label">LA 2</span>:<br>
-        <strong><span id="comb2-dose">0</span></strong><span class="unit"> mg</span> in <strong><span id="comb2-vol">0</span><span class="unit"> mL</span></strong> (<span class="combined-percent unit" id="comb2-perc">0</span><span class="unit">%</span>)
-      </div>
-      <div class="total-volume">
-  <strong>Total volume: <span id="total-vol">0</span></strong><span class="unit"> mL</span>
+<div class="instruction-header">
+Combined 50:50 mixture
+</div>
+
+<div class="results">
+
+<div>
+<span id="comb1-label">LA 1</span>
+<span>
+<span id="comb1-dose">0</span><span class="unit"> mg</span> |
+<span id="comb1-vol">0</span><span class="unit"> mL</span>
+(<span id="comb1-perc">0</span><span class="unit">%</span>)
+</span>
+</div>
+
+<div>
+<span id="comb2-label">LA 2</span>
+<span>
+<span id="comb2-dose">0</span><span class="unit"> mg</span> |
+<span id="comb2-vol">0</span><span class="unit"> mL</span>
+(<span id="comb2-perc">0</span><span class="unit">%</span>)
+</span>
+</div>
+
+<div>
+<span>Total volume</span>
+<span>
+<span id="total-vol">0</span><span class="unit"> mL</span>
+</span>
+</div>
+
 </div>
 </div>
-  </div>
-
+    
   <div class="button-container">
     <button class="reset-btn">Reset</button>
     <button class="home-btn">Home</button>
@@ -277,8 +142,8 @@ body {
   const comb2Vol      = document.getElementById('comb2-vol');
   const comb2Perc     = document.getElementById('comb2-perc');
 
-  const doseButtons   = document.querySelectorAll('.dose-options .concentration-btn');
-  const defaultDoseBtn = document.querySelector('.dose-options .concentration-btn[data-dose="2"]');
+  const doseButtons = document.querySelectorAll('#dose-options .bubble');
+  const defaultDoseBtn = document.querySelector('#dose-options .bubble[data-dose="2"]');
   const resetBtn      = document.querySelector('.reset-btn');
   const homeBtn       = document.querySelector('.home-btn');
   const la1NameBtn    = document.querySelector('#la1 .la-buttons button');
@@ -293,7 +158,9 @@ let mode = 'volume';  // default
 
 const doseOptions = document.getElementById('dose-options');
 const extraDoseButtons = doseOptions.querySelectorAll('[data-dose="2.5"], [data-dose="3"]');
-
+const la2DrugName = la2NameBtn.querySelector('.drug-name');
+const la2DoseLabel = la2NameBtn.querySelector('.dose-label');
+  
 // function to toggle extra buttons
 function toggleExtraDoseButtons() {
   if (mode === 'dose') {
@@ -376,7 +243,7 @@ function getMainLabel(btn) {
   // Update the LA max-dose displays and recalc combined mix
   function updateDoses() {
     comb1Label.textContent = getMainLabel(la1NameBtn);
-    comb2Label.textContent = la2NameBtn.textContent.trim();
+   comb2Label.textContent = `${la2DrugName.textContent} ${la2DoseLabel.textContent}`;
     const { s1, s2 } = getSafeDoses();
     la1Max.textContent = Math.round(s1);
     la2Max.textContent = Math.round(s2);
@@ -441,9 +308,8 @@ function getMainLabel(btn) {
   la2NameBtn.style.cursor = 'pointer';
   la2NameBtn.addEventListener('click', () => {
     isLevo = !isLevo;
-    la2NameBtn.textContent = isLevo
-      ? 'Levobupivacaine 0.5%'
-      : 'Bupivacaine 0.5%';
+la2DrugName.textContent = isLevo ? 'Levobupivacaine' : 'Bupivacaine';
+la2DoseLabel.textContent = '0.5%';
     updateDoses();
   });
 
@@ -453,7 +319,8 @@ function getMainLabel(btn) {
   // Reset everything
   resetBtn.addEventListener('click', () => {
   isLevo           = true;
-  la2NameBtn.textContent = 'Levobupivacaine 0.5%';
+  la2DrugName.textContent = 'Levobupivacaine';
+  la2DoseLabel.textContent = '0.5%';
 
   // reset mode toggle
   mode = 'volume';
