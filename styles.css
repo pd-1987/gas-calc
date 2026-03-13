@@ -5,7 +5,7 @@
   --clr-light-grey: #f5f6f7;
   --clr-med-grey:   #ccc;
   --clr-dark-grey:  #555;
-  --clr-primary:    #007BFF;
+  --clr-primary: #2b7de9;
   --radius:         5px;
   --gap:            0.5rem;
   
@@ -38,43 +38,8 @@
   --clr-other: #1abc9c;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-main: #0f1115;
-    --bg-card: #1f232a;
-    --btn-bg: #2a2f36;
-    --input-bg: #262b33;
-    --text-main: #f1f3f5;
-    --text-secondary: #a8adb3;
-    --border-light: #3a4048;
-    --toggle-border: #4a515a;
-  }
-    h1 {
-    color: #ffffff;
-  }
-  button:hover {
-    background-color: rgba(255,255,255,0.06);
-  }
-    .gender-buttons button:hover:not(.active) {
-    background-color: rgba(255,255,255,0.06);
-  }
-  .bubble {
-    background-color: #1c2a3a;
-    border-color: #355070;
-    color: #7fb6ff;
-  }
-    .toggle-container {
-    background: #2a2f36;
-  }
-
-  .toggle-slider {
-    border-color: #3a4048;
-  }
-}
- @media (max-width: 480px) {
-  .button-group button {
-    padding: 12px 10px;
-  }
+.calc-header.regional { 
+  border-bottom-color: var(--clr-regional);
 }
 /*=============================================
 =            2. Base & Resets                  =
@@ -531,6 +496,12 @@ input::placeholder {
 /*=============================================
 =            7. Buttons                       =
 =============================================*/
+.button-row {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
 button {
   -webkit-appearance: none;
   appearance: none;
@@ -546,6 +517,7 @@ button {
   background-color: var(--bg-card);
   color: var(--text-main);
   transition: background-color 0.2s ease, transform 0.08s ease;
+  touch-action: manipulation;
 }
 button:hover {
   background-color: rgba(0,0,0,0.04);
@@ -556,6 +528,7 @@ button:hover {
     color: var(--text-secondary);
     margin-bottom: 5px;
   }
+.option-buttons,
 .gender-buttons {
     display: flex;
     justify-content: center;
@@ -566,6 +539,7 @@ button:hover {
     max-width: 300px;
 }
 
+.option-buttons button,
 .gender-buttons button {
   flex: 1;
   padding: 10px;
@@ -578,46 +552,36 @@ button:hover {
   border-radius: 0;
   margin: 0;
 }
-      .gender-buttons button:first-child {
+ .option-buttons button:first-child,
+ .gender-buttons button:first-child {
   border-top-left-radius: var(--radius);
   border-bottom-left-radius: var(--radius);
 }
-
+.option-buttons button:last-child,
 .gender-buttons button:last-child {
   border-top-right-radius: var(--radius);
   border-bottom-right-radius: var(--radius);
 }
-      .gender-buttons button + button {
+.option-buttons button + button,
+.gender-buttons button + button {
   border-left: none;
 }
+.option-buttons button.active,
 .gender-buttons button.active {
   background-color: var(--clr-primary);
   border-color: var(--clr-primary);
   color: white;
   font-weight: 600;
 }
+.option-buttons button:hover:not(.active),
 .gender-buttons button:hover:not(.active) {
   background-color: rgba(0,0,0,0.04);
 }
-.unit-toggle {
-  width: 100%;
-  font-size: 14px;
-  margin: 5px 0;
-  padding: 5px;
-  cursor: pointer;
-  border-radius: var(--radius);
-  background-color: var(--btn-bg);
-  border: 1px solid var(--border-light);
-  color: var(--text-main);
-}
 .button-group {
   display: flex;
-  flex-direction: row;
-  align-items: center;
   gap: 0.5rem;
   max-width: 425px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto;
 }
 .button-group-text {
   margin-top: 5px;
@@ -666,7 +630,17 @@ button.active small {
   color: #ffffff;
   font-style: normal;
 }
-
+.unit-toggle {
+  width: 100%;
+  font-size: 14px;
+  margin: 5px 0;
+  padding: 5px;
+  cursor: pointer;
+  border-radius: var(--radius);
+  background-color: var(--btn-bg);
+  border: 1px solid var(--border-light);
+  color: var(--text-main);
+}
 .menu-card {
   display: block;
   text-decoration: none;
@@ -703,26 +677,16 @@ button.active small {
 .menu-card:active {
   transform: translateY(0);
 }
+  .la-buttons {
+  display: flex;
+  justify-content: center;
+  padding: 0 10px;
+}
 
-    .la-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-       margin: 0;
-      padding: 0 10px;
-    }
-    .la-buttons button {
-      flex: 1;
-      font-size: 14px;
-      margin: 5px;
-      padding: 10px;
-      cursor: pointer;
-       border: 1px solid #ccc;
-      border-radius: 5px;
-      background-color: #f0f0f0;
-      transition: background-color 0.2s ease;
-    }
-
+.la-buttons button {
+  flex: 1;
+  margin: 5px;
+}
     .la-buttons button.active {
       background-color: #575757;
       color: white;
@@ -1024,7 +988,7 @@ footer a:hover {
   text-decoration: underline;
 }
 /*=============================================
-=        Calculator Components (Reusable)      =
+=        Calculator Components (Reusable, Shared)      =
 =============================================*/
 .calc-row {
   display: grid;
@@ -1337,4 +1301,44 @@ footer a:hover {
 .classIV {
   background-color: #E57373;
   color: #212529;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-main: #0f1115;
+    --bg-card: #1f232a;
+    --btn-bg: #2a2f36;
+    --input-bg: #262b33;
+    --text-main: #f1f3f5;
+    --text-secondary: #a8adb3;
+    --border-light: #3a4048;
+    --toggle-border: #4a515a;
+  }
+    h1 {
+    color: #ffffff;
+  }
+  button:hover {
+    background-color: rgba(255,255,255,0.06);
+  }
+  .option-buttons button:hover:not(.active),
+  .gender-buttons button:hover:not(.active) {
+    background-color: rgba(255,255,255,0.06);
+  }
+  .bubble {
+    background-color: #1c2a3a;
+    border-color: #355070;
+    color: #7fb6ff;
+  }
+    .toggle-container {
+    background: #2a2f36;
+  }
+
+  .toggle-slider {
+    border-color: #3a4048;
+  }
+}
+ @media (max-width: 480px) {
+  .button-group button {
+    padding: 12px 10px;
+  }
 }
