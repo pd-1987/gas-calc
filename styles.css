@@ -841,7 +841,11 @@ button.active small {
   line-height: 1.2;
   color: var(--text-secondary);
 }
-
+.dose-value {
+  color: var(--clr-regional);
+  font-weight: 700;
+  font-size: 1.1em;
+}
 /*=============================================
 =           9. Button Variants                 =
 =============================================*/
