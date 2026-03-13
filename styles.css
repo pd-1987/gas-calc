@@ -306,8 +306,7 @@ h3 {
 =          6. Form Elements & Inputs           =
 =============================================*/
 .calc-wrapper {
-  width: 96%;
-  max-width: 520px;
+  width: 100%;
   margin: 0 auto;
 }
 .calc-wrapper > * + * {
