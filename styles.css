@@ -846,6 +846,11 @@ button.active small {
   font-weight: 700;
   font-size: 1.1em;
 }
+.total-volume {
+  color: var(--clr-regional);
+  font-weight: 800;
+  font-size: 1.15em;
+}
 /*=============================================
 =           9. Button Variants                 =
 =============================================*/
