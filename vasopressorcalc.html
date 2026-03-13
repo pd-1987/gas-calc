@@ -4,182 +4,120 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-<link
-  href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
-  rel="stylesheet"
-/>
-<link
-  href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
-  rel="stylesheet"
-/>
   <title>Vasopressor calculator</title>
   <style>
-:root {
-  --bg-main: #f3f4f6;
-  --bg-card: #ffffff;
-
-  --text-main: #212529;
-  --text-secondary: #555;
-
-  --border-light: #e0e0e0;
+    .infusion-input-group .unit-toggle {
+  width: auto;
+  min-width: 85px;
+  white-space: nowrap;
 }
-     body {
-  background-color: #f8f9fa; /* mid-light grey */
-       font-size: 14px;
-}
-    header.banner {
-  background: linear-gradient(130deg, #5E35B1 0%, #3a0f81 100%);
-}
-    /* Drug selection button styling matching your la-buttons style */
-    .la-buttons button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      margin: 5px;
-      padding: 10px 16px;
-      font-size: 14px;
-      font-weight: 700;
-      background-color: #f0f0f0; /* grey background */
-      border: 1px solid #ccc;    /* grey border */
-      border-radius: 15px;
-      color: #333;               /* dark grey text */
-      min-width: 120px;
-      cursor: pointer;
-      transition: all 0.2s ease-in-out;
-    }
-
-    .la-buttons button.selected-drug {
-      background-color: #575757; /* darker grey when active */
-      color: white;
-      border-color: #575757;
-    }
     /* Dose bubble styling */
-    .dose-options {
-      display: flex;
-      justify-content: space-around;
-      margin: 20px 0;
-      flex-wrap: wrap;
-    }
-
-    .dose-bubble {
-      flex: 1;
-      margin: 0 5px;
-      padding: 12px 8px;
-      font-size: 12px;
-      background-color: #E0CDEA;      
-      border: 1px solid #E0CDEA;       
-      border-radius: 15px;
-      color: #000;               
-      cursor: pointer;
-      text-align: center;
-    }
-
-    .dose-bubble small {
-      display: block;
-      font-size: 8px;
-      color: #000;
-    }
-    .dose-bubble.selected small {
-      color: #000;
-    }
-    .dose-bubble.selected {
-      background-color: #B58FD1;     /* Active state background purple */
-      color: #000;                  /* Active state text color */
-          }
-
-    /* Infusion input group styling */
-    .infusion-label {
-  font-size: 14px;
-  font-weight: 700;
-      text-align: center;
+    .option-buttons button.active {
+  background-color: var(--clr-dark-grey);
+  border-color: var(--clr-dark-grey);
+  color: white;
+  font-weight: 600;
 }
-    .infusion-input-group {
-  display: flex;
-  align-items: center;
-      justify-content: center;
-  gap: 8px;
-  margin: 20px auto;    /* centers the container horizontally */
-  width: auto; 
+    /* Purple bubbles for vasopressor doses */
+#centralDoses .bubble,
+#peripheralDose .bubble,
+#vasopressor2 .bubble {
+  background: color-mix(in srgb, var(--clr-critical) 12%, white);
+  border-color: color-mix(in srgb, var(--clr-critical) 30%, white);
+  color: var(--clr-critical);
+  flex-direction: column;
+  line-height: 1.2;
+}
+#centralDoses .bubble small,
+#peripheralDose .bubble small,
+#vasopressor2 .bubble small {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  opacity: 0.8;
+}
+#centralDoses .bubble.active,
+#peripheralDose .bubble.active,
+#vasopressor2 .bubble.active {
+  background: var(--clr-critical);
+  border-color: var(--clr-critical);
+  color: white;
+}#centralDoses .bubble:hover,
+#peripheralDose .bubble:hover {
+  border-color: var(--clr-critical);
+}
+#infusionRateDisplay,
+#infusionRateDisplay2 {
+  font-weight: 700;
+}
+
+#infusionRateDisplay:not(.unit),
+#infusionRateDisplay2:not(.unit) {
+  color: var(--clr-critical);
+}
+
+#infusionRateDisplay .unit,
+#infusionRateDisplay2 .unit {
+  color: var(--text-secondary);
+  font-weight: 400;
 }
 .infusion-input-group input {
   width: 60px;
-  padding: 6px;       /* you can also shrink the padding */
-  box-sizing: border-box;
-  font-size: 14px;    /* and/or the font-size if you like */
-   text-align: center
-}
-.infusion-input-group button {
-  width: 100px;
-  box-sizing: border-box;
-}
-    .result {
-  margin: 10px 0;
-  font-size: 14px;
-  text-align: center;
-}
-.result span.unit {
-  font-size: 14px;
-  margin-left: 5px;
-}
-    .unit-toggle {
-      font-size: 14px;
-    }
-    /* Remove mobile tap highlight for buttons and clickable divs */
-button,
-.dose-bubble {
-  -webkit-tap-highlight-color: transparent; /* Safari / iOS */
-  outline: none; /* removes focus outline on click/tap */
-}
-    .vasopressor-box {
-  background-color: #ffffff;  /* or white if you prefer */
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 10px;
-  margin-bottom: 0.5rem;
-   box-sizing: border-box;
-  text-align: center;
 }
     </style>
 </head>
 
-  <!-- Header with Title -->
-  <header class="banner">
-    Vasopressor Infusions
-  </header>
+<header class="calc-header critical">
+  Vasopressor Infusions
+</header>
 
-  <!-- Weight Entry Group -->
+  <div class="calc-wrapper">
+  <div class="calc-section">
   <div class="input-group">
     <label for="weight">Weight (kg):</label>
-    <!-- Added oninput to trigger a recalculation when weight is changed -->
     <input type="number" id="weight" placeholder="0" min="0" oninput="updateInfusionRate()">
   </div>
-  <p class="input-note"> Consider using ideal or adjusted body weight if BMI ≥30 kg/m².</p>
-  <div class="vasopressor-box" id="vasopressor1">
+
+  <p class="input-note">
+    Consider using ideal or adjusted body weight if BMI ≥30 kg/m².
+  </p>
+</div>
+    
+  <div class="calc-section" id="vasopressor1">
   <h3>Noradrenaline / Adrenaline</h3>
-  <!-- Noradrenaline/Adrenaline selection buttons -->
-  <div class="la-buttons">
-  <button id="CentralBtn" onclick="selectDrug('Central')">Central</button>
-  <button id="PeripheralBtn" onclick="selectDrug('Peripheral')">Peripheral</button>
+<div class="option-buttons">
+  <button id="CentralBtn" onclick="selectDrug('Central')">
+    Central
+  </button>
+
+  <button id="PeripheralBtn" onclick="selectDrug('Peripheral')">
+    Peripheral
+  </button>
 </div>
 
-<div class="dose-options" id="centralDoses">
-  <div class="dose-bubble" data-label="4 mg in 50 ml" data-conc="0.08" onclick="selectDose(this)">
+<div class="concentration-bubbles" id="centralDoses">
+  <div class="bubble" data-label="4 mg in 50 ml" data-conc="0.08" onclick="selectDose(this)">
     4 mg in 50 ml
     <small>0.08 mg/mL</small>
   </div>
-  <div class="dose-bubble" data-label="8 mg in 50 ml" data-conc="0.16" onclick="selectDose(this)">
+  <div class="bubble" data-label="8 mg in 50 ml" data-conc="0.16" onclick="selectDose(this)">
     8 mg in 50 ml
     <small>0.16 mg/mL</small>
   </div>
-  <div class="dose-bubble" data-label="16 mg in 50 ml" data-conc="0.32" onclick="selectDose(this)">
+  <div class="bubble" data-label="16 mg in 50 ml" data-conc="0.32" onclick="selectDose(this)">
     16 mg in 50 ml
     <small>0.32 mg/mL</small>
   </div>
 </div>
 
-<div class="dose-options" id="peripheralDose" style="display:none;">
-  <div class="dose-bubble selected" data-label="4 mg in 250 ml" data-conc="0.016">
+<div class="concentration-bubbles" id="peripheralDose" style="display:none;">
+  <div class="bubble active" data-label="4 mg in 250 ml" data-conc="0.016">
     4 mg in 250 ml
     <small>0.016 mg/mL</small>
   </div>
@@ -188,7 +126,7 @@ button,
   <!-- Infusion Input Group -->
   <div class="infusion-input-group">
     <input type="number" id="infusionInput" placeholder="0" step="any" oninput="updateInfusionRate()">
-    <!-- Toggle button styled using .unit-toggle -->
+
     <button type="button" id="unitToggle" class="unit-toggle" onclick="toggleUnit()">ml/hr</button>
   </div>
   <p class="infusion-label result">
@@ -196,16 +134,19 @@ button,
   <span id="infusionRateDisplay">-</span>
 </p>
   </div>
-<div class="vasopressor-box" id="vasopressor2">
+<div class="calc-section" id="vasopressor2">
   <h3>Vasopressin</h3>
-  <div class="dose-bubble selected" data-label="20 units in 50 mL" data-conc="0.4">
+
+<div class="concentration-bubbles">
+  <div class="bubble active" data-label="20 units in 50 mL" data-conc="0.4">
     20 units in 50 mL
     <small>0.4 units/mL</small>
   </div>
-  <!-- Infusion Input Group -->
+</div>
+
   <div class="infusion-input-group">
     <input type="number" id="infusionInput2" placeholder="0" step="any" oninput="updateInfusionRate2()">
-    <!-- Toggle button styled using .unit-toggle -->
+
     <button type="button" id="unitToggle2" class="unit-toggle" onclick="toggleUnit2()">ml/hr</button>
   </div>
   <p class="infusion-label result">
@@ -217,17 +158,17 @@ button,
     <p>Optimal vasopressin timing in septic shock lacks guidance. Guidelines suggest noradrenaline doses 0.25–0.50 mcg/kg/min.</p>
   </small>
   </div>
-  <div class="vasopressor-box" id="vasopressor3">
+  <div class="calc-section" id="vasopressor3">
     <h3>Hydrocortisone</h3>
     <p>For adults with septic shock and an ongoing requirement for vasopressor therapy.</p>
-    <p>200 mg/24 hours: 50 mg IV every 6 hours or a continuous infusion. 
+    <p>200 mg/24 hours: 50 mg IV every 6 hours or a continuous infusion.</p> 
       <p>Commenced at a dose of noradrenaline or adrenaline ≥0.25 mcg/kg/min at least 4 hours after initiation.</p>
   </div>
+  </div>
 
-  <!-- Home and Reset Buttons -->
-  <div class="button-container">
-    <button type="button" class="reset-btn" onclick="resetForm()">Reset</button>
-    <button type="button" class="home-btn" onclick="goHome()">Home</button>
+  <div class="main-control-buttons">
+    <button class="reset-btn" onclick="resetForm()">Reset</button>
+    <button class="home-btn"  onclick="goHome()">Home</button>
   </div>
 
   <!-- Footer -->
@@ -260,8 +201,8 @@ function selectDrug(drug) {
   selectedDrug = drug;
 
   // Highlight the selected button
-  centralBtn.classList.toggle('selected-drug', drug === 'Central');
-  peripheralBtn.classList.toggle('selected-drug', drug === 'Peripheral');
+  centralBtn.classList.toggle('active', drug === 'Central');
+  peripheralBtn.classList.toggle('active', drug === 'Peripheral');
 
   if (drug === 'Central') {
   centralDoses.style.display = "flex";
@@ -269,12 +210,12 @@ function selectDrug(drug) {
 
   // Clear previous selection
   selectedDose = null;
-  const centralBubbles = document.querySelectorAll('#centralDoses .dose-bubble');
-  centralBubbles.forEach(b => b.classList.remove('selected'));
+  const centralBubbles = document.querySelectorAll('#centralDoses .bubble');
+  centralBubbles.forEach(b => b.classList.remove('active'));
 
   // ✅ Auto-select the first bubble (4 mg in 50 ml)
   const defaultBubble = centralBubbles[0];
-  defaultBubble.classList.add('selected');
+  defaultBubble.classList.add('active');
   selectedDose = {
     label: defaultBubble.getAttribute("data-label"),
     concentration: parseFloat(defaultBubble.getAttribute("data-conc"))
@@ -286,8 +227,8 @@ function selectDrug(drug) {
     peripheralDose.style.display = "flex";
 
     // Auto-select the single peripheral bubble
-    const periphBubble = peripheralDose.querySelector('.dose-bubble');
-    periphBubble.classList.add('selected');
+    const periphBubble = peripheralDose.querySelector('.bubble');
+    periphBubble.classList.add('active');
     selectedDose = {
       label: periphBubble.getAttribute("data-label"),
       concentration: parseFloat(periphBubble.getAttribute("data-conc"))
@@ -308,37 +249,39 @@ function selectDose(element) {
   }
 
   // Remove selection from all, then select the clicked one
-  document.querySelectorAll('#centralDoses .dose-bubble, #peripheralDose .dose-bubble').forEach(b => b.classList.remove('selected'));
-  element.classList.add('selected');
+  document.querySelectorAll('#centralDoses .bubble, #peripheralDose .bubble').forEach(b => b.classList.remove('active'));
+  element.classList.add('active');
   selectedDose = { label, concentration: conc };
 
   updateInfusionRate();
 }
 
 function toggleUnit() {
-  const unitToggle    = document.getElementById("unitToggle");
+  const unitToggle = document.getElementById("unitToggle");
   const infusionInput = document.getElementById("infusionInput");
 
-  if (!selectedDose) return; // safety check
+  const currentUnit = unitToggle.textContent.trim();
   const weight = parseFloat(document.getElementById('weight').value);
-  if (isNaN(weight) || weight === 0) return; // can't convert without weight
+  const infusionVal = parseFloat(infusionInput.value);
 
-  const currentUnit = unitToggle.textContent;
+  // Just toggle if values missing
+  if (isNaN(infusionVal) || isNaN(weight) || !selectedDose || weight === 0) {
+    unitToggle.textContent = currentUnit === "ml/hr" ? "mcg/kg/min" : "ml/hr";
+    updateInfusionRate();
+    return;
+  }
 
-  // Convert the value to the other unit
   let newValue;
+
   if (currentUnit === "ml/hr") {
-    // ml/hr → mcg/kg/min
-    newValue = (parseFloat(infusionInput.value) * selectedDose.concentration * 1000) / (weight * 60);
+    newValue = (infusionVal * selectedDose.concentration * 1000) / (weight * 60);
     unitToggle.textContent = "mcg/kg/min";
   } else {
-    // mcg/kg/min → ml/hr
-    newValue = (parseFloat(infusionInput.value) * weight * 60) / (selectedDose.concentration * 1000);
+    newValue = (infusionVal * weight * 60) / (selectedDose.concentration * 1000);
     unitToggle.textContent = "ml/hr";
   }
 
   infusionInput.value = newValue.toFixed(2);
-
   updateInfusionRate();
 }
 
@@ -346,7 +289,7 @@ function updateInfusionRate() {
   const weight          = parseFloat(document.getElementById('weight').value);
   const infusionVal     = parseFloat(document.getElementById('infusionInput').value);
   const infusionDisplay = document.getElementById('infusionRateDisplay');
-  const currentUnit     = document.getElementById("unitToggle").textContent;
+  const currentUnit = document.getElementById("unitToggle").textContent.trim();
 
   // Determine the "display unit" even if input is empty
   const displayUnit = currentUnit === "ml/hr" ? "mcg/kg/min" : "ml/hr";
@@ -376,7 +319,7 @@ function updateInfusionRate() {
   const infusionDisplay = document.getElementById("infusionRateDisplay2");
   const concentration = 0.4; // Vasopressin: 20 units in 50 mL = 0.4 units/mL
 
-  const currentUnit = unitToggle.textContent;
+  const currentUnit = unitToggle.textContent.trim();
   let newValue;
 
   if (currentUnit === "ml/hr") {
@@ -400,7 +343,7 @@ function updateInfusionRate2() {
   const concentration = 0.4; // Vasopressin
 
   const infusionVal = parseFloat(infusionInput.value);
-  const currentUnit = unitToggle.textContent;
+  const currentUnit = unitToggle.textContent.trim();
 
   if (isNaN(infusionVal)) {
     infusionDisplay.innerHTML = `0 <span class="unit">${currentUnit === "ml/hr" ? "units/hr" : "ml/hr"}</span>`;
@@ -432,8 +375,8 @@ function resetForm() {
   selectedDose = null;
 
   // Only reset Noradrenaline/Adrenaline selections
-  document.querySelectorAll('#centralDoses .dose-bubble, #peripheralDose .dose-bubble')
-    .forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('#centralDoses .bubble, #peripheralDose .bubble')
+    .forEach(b => b.classList.remove('active'));
 
   // Reset to Central default
   selectDrug('Central');
@@ -447,8 +390,8 @@ function resetForm() {
   unitToggle2.textContent = 'ml/hr';
 
   // Ensure Vasopressin bubble is still selected
-  const vasopressinBubble = document.querySelector('#vasopressor2 .dose-bubble');
-  vasopressinBubble.classList.add('selected');
+  const vasopressinBubble = document.querySelector('#vasopressor2 .bubble');
+  vasopressinBubble.classList.add('active');
 
   // Update Vasopressin display
   updateInfusionRate2();
@@ -459,8 +402,8 @@ window.addEventListener('DOMContentLoaded', () => {
   selectDrug('Central'); // auto-selects 4 mg bubble
 
   // Initialize Vasopressin as always selected
-  const vasopressinBubble = document.querySelector('#vasopressor2 .dose-bubble');
-  vasopressinBubble.classList.add('selected');
+  const vasopressinBubble = document.querySelector('#vasopressor2 .bubble');
+  vasopressinBubble.classList.add('active');
 
   // Update infusion displays
   updateInfusionRate();
