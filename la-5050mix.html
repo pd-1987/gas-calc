@@ -19,7 +19,8 @@
 
 .calc-section .results .result-label {
   display: block;
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--text-main);
   margin-bottom: 2px;
 }
 
@@ -27,6 +28,34 @@
   display: block;
   margin-left: 6px;
   font-variant-numeric: tabular-nums;
+}
+    .la-mixture-results {
+  padding: 6px 8px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  background: var(--btn-bg);
+}
+    .la-mixture-results {
+  display: block !important;
+  padding: 6px 8px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  background: var(--btn-bg);
+    }
+.la-mixture-results .result-block + .result-block {
+  margin-top: 4px;
+}
+
+.la-mixture-total {
+  margin-top: 6px;
+  padding: 6px 8px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  background: var(--btn-bg);
+}
+
+.la-mixture-total .result-value {
+  margin-left: 6px;
 }
   </style>
 </head>
@@ -96,6 +125,8 @@ Combined 50:50 mixture
 
 <div class="results">
 
+<div class="la-mixture-results">
+
 <div class="result-block">
 <span class="result-label" id="comb1-label">LA 1</span>
 <span class="result-value">
@@ -104,7 +135,7 @@ Combined 50:50 mixture
 (<span id="comb1-perc">0</span><span class="unit">%</span>)
 </span>
 </div>
-  
+
 <div class="result-block">
 <span class="result-label" id="comb2-label">LA 2</span>
 <span class="result-value">
@@ -114,11 +145,15 @@ Combined 50:50 mixture
 </span>
 </div>
 
-<div class="result-block">
+</div>
+
+<div class="la-mixture-total">
+
 <span class="result-label">Total volume</span>
 <span class="result-value">
 <span id="total-vol">0</span><span class="unit"> mL</span>
 </span>
+
 </div>
 
 </div>
