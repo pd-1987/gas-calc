@@ -26,7 +26,23 @@
 
 .calc-section .input-group label {
   margin: 0;
+  width: 150px;
   font-weight: 600;
+}
+    .calc-section .result:first-of-type {
+  margin-top: 4px;
+}
+.calc-section .result + .result {
+  margin-top: 6px;
+}
+    .calc-section .option-buttons {
+  width: 100%;
+  max-width: none;
+}
+.calc-section .option-buttons button {
+  flex: 1;
+  min-width: 0;
+  margin: 4px 0 12px 0;
 }
     .amt4-note {
       margin-bottom: 5px;
@@ -75,22 +91,6 @@
 .nhfs-risk.nhfs-high { 
   color:#e65100; 
     }
-.calc-section .result:first-of-type {
-  margin-top: 4px;
-}
-.calc-section .result + .result {
-  margin-top: 6px;
-}
-    .calc-section .option-buttons {
-  width: 100%;
-  max-width: none;
-}
-
-.calc-section .option-buttons button {
-  flex: 1;
-  min-width: 0;
-  margin: 4px 0 12px 0;
-}
 @media (max-width: 480px) {
   .calc-section .option-buttons button {
     font-size: 13px;
