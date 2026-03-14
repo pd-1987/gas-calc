@@ -1317,9 +1317,9 @@ footer a:hover {
     h1 {
     color: #ffffff;
   }
-  button:hover {
-    background-color: rgba(255,255,255,0.06);
-  }
+button:hover:not(.active) {
+  background-color: rgba(0,0,0,0.04);
+}
   .option-buttons button:hover:not(.active),
   .gender-buttons button:hover:not(.active) {
     background-color: rgba(255,255,255,0.06);
