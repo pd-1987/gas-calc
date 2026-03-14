@@ -519,9 +519,6 @@ button {
   transition: background-color 0.2s ease, transform 0.08s ease;
   touch-action: manipulation;
 }
-button:hover:not(.active) {
-  background-color: rgba(0,0,0,0.04);
-}
   button small {
     display: block;
     font-size: 12px;
@@ -572,10 +569,6 @@ button:hover:not(.active) {
   border-color: var(--clr-primary);
   color: white;
   font-weight: 600;
-}
-.option-buttons button:hover:not(.active),
-.gender-buttons button:hover:not(.active) {
-  background-color: rgba(0,0,0,0.04);
 }
 .button-group {
   display: flex;
@@ -669,11 +662,6 @@ button.active small {
   line-height: 1.35;
   font-weight: 400;
 }
-
-.menu-card:hover {
-  transform: translateY(-1px);
-}
-
 .menu-card:active {
   transform: translateY(0);
 }
@@ -752,11 +740,6 @@ button.active small {
   font-weight: 400;
   font-size: 0.9em;
   opacity: 0.8;
-}
-.bubble:hover {
-  background-color: var(--bubble-active-bg);
-  border-color: var(--bubble-active-bg);
-  color: white;
 }
 .bubble.active {
   background: var(--bubble-active-bg);
@@ -853,11 +836,6 @@ button.active small {
   background-color: var(--btn-bg);
   color: var(--text-secondary);
   border: 1px solid var(--border-light);
-}
-
-.home-btn:hover {
-  background-color: rgba(0,0,0,0.05);
-  color: var(--text-main);
 }
 button:active {
   transform: translateY(1px);
@@ -983,7 +961,6 @@ footer a {
   color: #007BFF;
   text-decoration: none;
 }
-
 footer a:hover {
   text-decoration: underline;
 }
@@ -1143,12 +1120,6 @@ footer a:hover {
   cursor: pointer;
   transition: background-color 0.2s, color 0.2s, border-color 0.2s;
 }
-
-.preset-btn:hover {
-  background-color: var(--bubble-active-bg);
-  color: white;
-}
-
 .preset-btn.active {
   background-color: #2e7d32;       /* dark green active color */
   border-color: #1b5e20;
@@ -1316,13 +1287,6 @@ footer a:hover {
   }
     h1 {
     color: #ffffff;
-  }
-button:hover:not(.active) {
-  background-color: rgba(0,0,0,0.04);
-}
-  .option-buttons button:hover:not(.active),
-  .gender-buttons button:hover:not(.active) {
-    background-color: rgba(255,255,255,0.06);
   }
   .bubble {
     background-color: #1c2a3a;
