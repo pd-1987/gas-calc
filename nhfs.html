@@ -13,7 +13,7 @@
   <title>Nottingham Hip Fracture Score</title>
 
   <style>
-    .calc-section .input-group {
+.calc-section .input-group {
   display: grid;
   grid-template-columns: max-content 1fr;
   align-items: center;
@@ -24,22 +24,32 @@
   margin: 0;
   font-weight: 600;
 }
-    .calc-section .result:first-of-type {
-  margin-top: 4px;
-}
-.calc-section .result + .result {
-  margin-top: 6px;
-}
-    .calc-section .option-buttons {
+
+.calc-section .option-buttons {
   width: 100%;
   max-width: 340px;
+  margin: 0;
+  justify-self: end;
 }
+
 .calc-section .option-buttons button {
   flex: 1;
   min-width: 0;
   white-space: nowrap;
   font-size: 13px;
   padding: 8px 6px;
+}
+
+#age1,
+#age2,
+#age3 {
+  min-width: 70px;
+}
+.calc-section .result:first-of-type {
+  margin-top: 4px;
+}
+.calc-section .result + .result {
+  margin-top: 6px;
 }
     .amt4-note {
       margin-bottom: 5px;
