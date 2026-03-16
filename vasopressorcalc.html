@@ -287,7 +287,7 @@ function toggleUnit() {
     unitToggle.textContent = "ml/hr";
   }
 
-  infusionInput.value = newValue.toFixed(2);
+  infusionInput.value = Math.round(newValue * 100) / 100;
   updateInfusionRate();
 }
 
@@ -327,7 +327,6 @@ function toggleUnit2() {
   const currentUnit = unitToggle.textContent.trim();
   const infusionVal = parseFloat(infusionInput.value);
 
-  // If empty just toggle units (same behaviour as noradrenaline)
   if (isNaN(infusionVal)) {
     unitToggle.textContent = currentUnit === "ml/hr" ? "units/hr" : "ml/hr";
     updateInfusionRate2();
@@ -344,7 +343,7 @@ function toggleUnit2() {
     unitToggle.textContent = "ml/hr";
   }
 
-  infusionInput.value = newValue.toFixed(2);
+  infusionInput.value = Math.round(newValue * 100) / 100;
   updateInfusionRate2();
 }
 
