@@ -12,6 +12,12 @@
   <link rel="stylesheet" href="styles.css">
   <title>Vasopressor calculator</title>
   <style>
+    .concentration-bubbles .bubble {
+  flex: 1;
+  min-width: 6rem;
+  padding: 4px 12px;
+  margin-bottom: 16px;
+}
     .infusion-input-group .unit-toggle {
   width: auto;
   min-width: 85px;
@@ -127,10 +133,10 @@
   <div class="infusion-input-group">
     <input type="number" id="infusionInput" placeholder="0" step="any" oninput="updateInfusionRate()">
 
-    <button type="button" id="unitToggle" class="unit-toggle" onclick="toggleUnit()">ml/hr</button>
+    <button type="button" id="unitToggle" class="unit-toggle" onclick="toggleUnit()">mcg/kg/min</button>
   </div>
   <p class="infusion-label result">
-  <u>Infusion rate</u>:
+  Infusion rate:
   <span id="infusionRateDisplay">-</span>
 </p>
   </div>
@@ -147,15 +153,15 @@
   <div class="infusion-input-group">
     <input type="number" id="infusionInput2" placeholder="0" step="any" oninput="updateInfusionRate2()">
 
-    <button type="button" id="unitToggle2" class="unit-toggle" onclick="toggleUnit2()">ml/hr</button>
+    <button type="button" id="unitToggle2" class="unit-toggle" onclick="toggleUnit2()">units/hr</button>
   </div>
   <p class="infusion-label result">
-  <u>Infusion rate</u>:
+  Infusion rate:
   <span id="infusionRateDisplay2">-</span>
 </p>
   <small>
-    <p>Dose range 0.01–0.04 units/min / 0.5–2.4 units/hr.</p>
-    <p>Optimal vasopressin timing in septic shock lacks guidance. Guidelines suggest noradrenaline doses 0.25–0.50 mcg/kg/min.</p>
+    <p>Dose range:<br>0.01–0.04 units/min<br>0.5–2.4 units/hr = 1.25–6 mL/hr.</p>
+    <p>Optimal vasopressin timing in septic shock lacks guidance. Guidelines suggest noradrenaline doses &ge;0.25–0.50 mcg/kg/min.</p>
   </small>
   </div>
   <div class="calc-section" id="vasopressor3">
@@ -313,22 +319,28 @@ function updateInfusionRate() {
     resultValue.toFixed(2) + '<span class="unit"> ' + displayUnit + '</span>';
 }
     
-    function toggleUnit2() {
+function toggleUnit2() {
   const infusionInput = document.getElementById("infusionInput2");
   const unitToggle = document.getElementById("unitToggle2");
-  const infusionDisplay = document.getElementById("infusionRateDisplay2");
-  const concentration = 0.4; // Vasopressin: 20 units in 50 mL = 0.4 units/mL
 
+  const concentration = 0.4;
   const currentUnit = unitToggle.textContent.trim();
+  const infusionVal = parseFloat(infusionInput.value);
+
+  // If empty just toggle units (same behaviour as noradrenaline)
+  if (isNaN(infusionVal)) {
+    unitToggle.textContent = currentUnit === "ml/hr" ? "units/hr" : "ml/hr";
+    updateInfusionRate2();
+    return;
+  }
+
   let newValue;
 
   if (currentUnit === "ml/hr") {
-    // ml/hr → units/hr
-    newValue = parseFloat(infusionInput.value || 0) * concentration;
+    newValue = infusionVal * concentration;
     unitToggle.textContent = "units/hr";
   } else {
-    // units/hr → ml/hr
-    newValue = parseFloat(infusionInput.value || 0) / concentration;
+    newValue = infusionVal / concentration;
     unitToggle.textContent = "ml/hr";
   }
 
