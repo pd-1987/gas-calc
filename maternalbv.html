@@ -201,7 +201,7 @@ function toggleMode() {
     bmi = weight > 0 ? weight / (h_m * h_m) : 0;
   }
 
-  if (weight > 0 && bmi > 0) {
+  if (weight > 0 && bmi >= 10) {
     const volume = (95 / Math.sqrt(bmi / 22)) * weight;
     circulatingVolume = volume;
     output.textContent = formatNumber(volume) + ' ml';
