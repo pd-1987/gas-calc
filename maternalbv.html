@@ -39,26 +39,18 @@
       <input type="number" id="weight" placeholder="0" min="0" oninput="updateCalculations()">
     </div>
   
-<div class="input-group">
-
-<div class="toggle-container">
-  <input type="checkbox" id="modeToggle">
-
-  <label class="toggle-label" for="modeToggle">Height (cm)</label>
-  <label class="toggle-label" for="modeToggle">BMI (kg/m<sup>2</sup>)</label>
-
-  <div class="toggle-slider"></div>
-</div>
-
-<input
-  type="number"
-  id="secondaryInput"
-  min="0"
-  step="any"
-  oninput="updateCalculations()"
->
-
-</div>
+ <div class="input-group">
+    <label for="secondaryInput" id="secondaryLabel">Height (cm):</label>
+    <input
+      type="number"
+      id="secondaryInput"
+      placeholder="0"
+      min="0"
+      step="any"
+      oninput="updateCalculations()"
+    >
+    <button type="button" id="unit-toggle">Use BMI</button>
+  </div>
   
     <!-- Circulating Blood Volume Output -->
     <div class="result">
@@ -149,48 +141,65 @@
   </footer>
   
   <script>
-    // Global variable to store circulating blood volume
-    let circulatingVolume = null;
-    let useBMI = false; // false = interpret secondaryInput as Height
+let circulatingVolume = null;
+let useBMI = false; // false = interpret secondaryInput as Height
 
 function toggleMode() {
-  const input = document.getElementById('secondaryInput');
-  const toggle = document.getElementById('modeToggle');
-
-  const weight = parseFloat(document.getElementById('weight').value) || 0;
+  // grab elements & readings
+  const label    = document.getElementById('secondaryLabel');
+  const input    = document.getElementById('secondaryInput');
+  const btn      = document.getElementById('unit-toggle');
+  const weight   = parseFloat(document.getElementById('weight').value) || 0;
   const rawValue = parseFloat(input.value) || 0;
 
-  const newModeIsBMI = toggle.checked;
+  // compute the new value, if possible
   let newValue = '';
-
-  if (newModeIsBMI) {
-    // switching Height → BMI
+  if (useBMI) {
+    // we’re switching *from* BMI → *to* Height
+    if (weight > 0 && rawValue > 0) {
+      // height (m) = sqrt(weight / BMI)
+      // convert to cm:
+      newValue = (Math.sqrt(weight / rawValue) * 100).toFixed(0);
+    }
+  } else {
+    // we’re switching *from* Height → *to* BMI
     if (weight > 0 && rawValue > 0) {
       const h_m = rawValue / 100;
       newValue = (weight / (h_m * h_m)).toFixed(2);
     }
-  } else {
-    // switching BMI → Height
-    if (weight > 0 && rawValue > 0) {
-      newValue = (Math.sqrt(weight / rawValue) * 100).toFixed(0);
-    }
   }
 
-  useBMI = newModeIsBMI;
+  // flip the mode
+  useBMI = !useBMI;
 
+  // set label, placeholder, button text
+  if (useBMI) {
+    label.textContent = 'BMI (kg/m²):';
+    input.placeholder = '0';
+    btn.textContent   = 'Use Height';
+    input.step        = 'any';
+  } else {
+    label.textContent = 'Height (cm):';
+    input.placeholder = '0';
+    btn.textContent   = 'Use BMI';
+    input.step        = 'any';
+  }
+
+  // apply the converted value (or clear if we couldn’t)
   input.value = newValue;
 
+  // re-run your volume calculation with the newly‐set input
   updateCalculations();
 }
-    
+
     // Helper to format numbers with zero decimals
     function formatNumber(num) {
       return num.toFixed(0);
     }
     
     // Calculate circulating blood volume using modified Lemmen's formula:
-    // Circulating blood volume = (95 / sqrt(BMI / 22)) * Weight
-    function updateBloodVolume() {
+    // Circulating blood volume = (70 / sqrt(BMI / 22)) * Weight
+   function updateBloodVolume() {
   const weight   = parseFloat(document.getElementById('weight').value) || 0;
   const rawValue = parseFloat(document.getElementById('secondaryInput').value) || 0;
   const output   = document.getElementById('bloodVolumeOutput');
@@ -206,7 +215,7 @@ function toggleMode() {
   }
 
   if (weight > 0 && bmi > 0) {
-    const volume = (95 / Math.sqrt(bmi / 22)) * weight;
+    const volume = (70 / Math.sqrt(bmi / 22)) * weight;
     circulatingVolume = volume;
     output.textContent = formatNumber(volume) + ' ml';
     updateShockClassification(volume);
@@ -217,6 +226,7 @@ function toggleMode() {
   }
 }
     
+    // Update the shock classification table based on circulating blood volume.
     function updateShockClassification(volume) {
   document
     .querySelectorAll('#shockClassificationTable td[data-percent]')
@@ -244,11 +254,11 @@ function clearShockClassification() {
     }
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('modeToggle')
-          .addEventListener('change', toggleMode);
+  document.getElementById('unit-toggle')
+          .addEventListener('click', toggleMode);
 });
     
-    function resetForm() {
+   function resetForm() {
   // clear weight
   document.getElementById('weight').value = "";
   // clear the shared secondary input (BMI or Height)
@@ -264,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleMode();
   }
 }
-    
+
     function goHome() {
       window.location.href = "index.html";
     }
