@@ -4,79 +4,34 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-<link
-  href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
-  rel="stylesheet"
-/>
-<link
-  href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
-  rel="stylesheet"
-/>
   <title>Adult blood volume calculator</title>
   <style>
-:root {
-  --bg-main: #f3f4f6;
-  --bg-card: #ffffff;
-
-  --text-main: #212529;
-  --text-secondary: #555;
-
-  --border-light: #e0e0e0;
-}
-    header.banner {
-      background: linear-gradient(130deg, #5E35B1 0%, #3a0f81 100%);
-    }
-
-    .input-group {
-      margin: 10px 0;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;  /* ← labels+inputs line up at the start */
-      gap: 8px;                    /* ← consistent spacing between label & input */
-      font-size: 14px;
-    }
-    .input-group label {
-      white-space: nowrap;
-       flex: 0 0 100px;     /* lock every label to 100px */
-    }
-    .input-group input {
-      width: 60px;
-      padding: 5px;
-      font-size: 14px;
-    }
-   
-    .result {
-      text-align: center;
-      font-size: 14px;
-      margin: 20px 0;
-    }
-            ol {
-  text-align: left;
-margin-left: 0;
-  padding-left: 1.5em; /* or 0 if you want no indent at all */
-}
-      ul {
-  text-align: left;
-        margin-left: 0;
-  padding-left: 1.5em; /* or 0 if you want no indent at all */
+    .calc-section .unit-toggle {
+  width: auto;
+  min-width: 85px;
+  white-space: nowrap;
 }
   </style>
 </head>
 <body>
-  <!-- Header with Title -->
-  <header class="banner">Adult Blood Volume</header>
   
-  <!-- Grouped Inputs and Calculation Output -->
+<header class="calc-header critical">
+  Adult Blood Volume
+</header>
+<div class="calc-wrapper">
   <div class="calc-section">
-    <!-- Weight Entry Group -->
+
     <div class="input-group">
       <label for="weight">Weight (kg):</label>
       <input type="number" id="weight" placeholder="0" min="0" oninput="updateCalculations()">
     </div>
-  
-    <!-- BMI Entry Group -->
-   <!-- Secondary entry: BMI or Height -->
+
   <div class="input-group">
     <label for="secondaryInput" id="secondaryLabel">Height (cm):</label>
     <input
@@ -87,24 +42,19 @@ margin-left: 0;
       step="any"
       oninput="updateCalculations()"
     >
-    <button type="button" id="toggleBtn">Use BMI</button>
+    <button type="button" id="unit-toggle">Use BMI</button>
   </div>
   
-    <!-- Circulating Blood Volume Output -->
-    <div class="result">
-      <strong><u>Circulating Blood Volume</u>:</strong>
-      <span id="bloodVolumeOutput">-</span>
-    </div>
+<div class="result">
+  Circulating Blood Volume:
+  <span id="bloodVolumeOutput"></span>
+</div>
   </div>
 
-  <div class="classification-section">
-    <p><u>Classification of Haemorrhagic Shock</u></p>
-    <table id="shockClassificationTable">
-  <colgroup>
-<col style="width: 30%;">
-<col style="width: 15%;">
- <col style="width: 55%;">   
-  </colgroup>
+  <div class="calc-section">
+    <div class="instruction-header">
+      Classification of Haemorrhagic Shock</div>
+    <table id="shockClassificationTable" class="classification-table">
       <tr>
     <th>Class</th>
     <th>%</th>
@@ -156,15 +106,15 @@ margin-left: 0;
   </tr>
 </table>
   </div>
-   
-  <!-- Home and Reset Buttons -->
-  <div class="button-container" style="text-align: center; margin-bottom: 20px;">
+  </div>
+    
+<div class="main-control-buttons">
     <button type="button" class="reset-btn" onclick="resetForm()">Reset</button>
     <button type="button" class="home-btn" onclick="goHome()">Home</button>
   </div>
   
   <!-- Footer -->
-  <footer style="text-align: center;">
+  <footer>
     <details>
     <summary>Notes and references</summary>
       <small>
@@ -185,7 +135,7 @@ function toggleMode() {
   // grab elements & readings
   const label    = document.getElementById('secondaryLabel');
   const input    = document.getElementById('secondaryInput');
-  const btn      = document.getElementById('toggleBtn');
+  const btn      = document.getElementById('unit-toggle');
   const weight   = parseFloat(document.getElementById('weight').value) || 0;
   const rawValue = parseFloat(input.value) || 0;
 
@@ -258,7 +208,7 @@ function toggleMode() {
     updateShockClassification(volume);
   } else {
     circulatingVolume = 0;
-    output.textContent = '-';
+    output.textContent = '';
     clearShockClassification();
   }
 }
@@ -291,7 +241,7 @@ function clearShockClassification() {
     }
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('toggleBtn')
+  document.getElementById('unit-toggle')
           .addEventListener('click', toggleMode);
 });
     
@@ -301,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // clear the shared secondary input (BMI or Height)
   document.getElementById('secondaryInput').value = "";
   // reset volume display
-  document.getElementById('bloodVolumeOutput').textContent = "-";
+  document.getElementById('bloodVolumeOutput').textContent = "";
   // clear the table
   clearShockClassification();
   // reset your globals
