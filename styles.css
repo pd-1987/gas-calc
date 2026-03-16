@@ -1232,6 +1232,7 @@ footer a:hover {
 }
 #shockClassificationTable td[data-percent] {
   font-variant-numeric: tabular-nums;
+  font-weight: 600;
 }
    .classI {
   background-color: #FFEBEE;
@@ -1290,10 +1291,25 @@ footer a:hover {
 #shockClassificationTable th {
   background: #2a2f36;
 }
-  #shockClassificationTable .classI  { background-color: #5a1a1a; }
-#shockClassificationTable .classII { background-color: #6e2222; }
-#shockClassificationTable .classIII{ background-color: #8a2d2d; }
-#shockClassificationTable .classIV { background-color: #a53a3a; }
+#shockClassificationTable .classI  { 
+  background-color: #5a1a1a;
+  color: #ffffff;
+}
+
+#shockClassificationTable .classII { 
+  background-color: #6e2222;
+  color: #ffffff;
+}
+
+#shockClassificationTable .classIII{ 
+  background-color: #8a2d2d;
+  color: #ffffff;
+}
+
+#shockClassificationTable .classIV { 
+  background-color: #a53a3a;
+  color: #ffffff;
+}
 }
  @media (max-width: 480px) {
   .button-group button {
