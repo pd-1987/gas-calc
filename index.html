@@ -4,58 +4,35 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="styles.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
-<!-- Default: light mode -->
 <link rel="icon" href="/favicon/favicon.svg" type="image/svg+xml">
-<!-- Dark override -->
 <link rel="icon" href="/favicon/favicon.svg" media="(prefers-color-scheme: dark)" type="image/svg+xml">
 <link rel="shortcut icon" href="/favicon/favicon.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="Gas-calc.xyz" />
-<link rel="manifest" href="/favicon/site.webmanifest" />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="manifest" href="/favicon/site.webmanifest" />  
+  
+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
   <title>Gas-Calc.xyz</title>
   <style>
   .button-container {
-  display: flex;
   flex-direction: column;
   gap: 6px;
-     margin-top: 0;
+  margin-top: 0;
 }
     .button-container h1 {
       margin: 0px;
       font-size: 18px;
     }
-header.banner2 {
-  background: none;
-  border: none;
-  box-shadow: none;
-  text-align: center;
-  margin: 0px;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-main);
-  letter-spacing: 0.2px;
-  padding-bottom: 6px;
-}
-
-header.banner2 small {
-  color: var(--text-secondary);
-}
 h1 {
-  font-size: 18px;
-  margin-top: 0px;
-  margin-bottom: 0px;
   text-align: left;
   border-bottom: 3px solid var(--border-light);
-  padding-bottom: 4px;
+  padding-bottom: 2px;
   color: var(--text-main);
-}
-    
-    .grey-btn {
-margin: 0px;
-box-shadow: none; 
 }
 h1.section-general { border-bottom-color: var(--clr-general); }
 
@@ -76,7 +53,7 @@ h1.section-other { border-bottom-color: var(--clr-other); }
 </head>
 <body>
   <!-- Banner header -->
-  <header class="banner2">
+  <header class="calc-header">
    Anaesthetic Calculators
   </header>
 
@@ -90,8 +67,8 @@ h1.section-other { border-bottom-color: var(--clr-other); }
 
 <h1 class="section-airway">Airway</h1>
     <a href="dasaticalc.html" class="menu-card airway-btn">
-      DAS Awake Tracheal Intubation (ATI) topicalisation
-      <small>Calculate local anaesthetic dosing based on the Difficult Airway Society (UK) guidelines for awake tracheal intubation in adults</small>
+      DAS Awake Tracheal Intubation topicalisation
+      <small>Calculate lidocaine dosing based on the Difficult Airway Society (UK) guidelines for awake tracheal intubation (ATI) in adults</small>
     </a>
     <a href="freeaticalc.html" class="menu-card airway-btn">
       ATI topicalisation
@@ -100,16 +77,16 @@ h1.section-other { border-bottom-color: var(--clr-other); }
 
 <h1 class="section-regional">Regional</h1> 
     <a href="la-combined.html" class="menu-card regional-btn">
-      Local anaesthetic (LA) combined doses
-      <small>Calculate the combined dose % for multiple local anaesthetics at varying concentrations and volumes</small>
+      Local anaesthetic combined doses
+      <small>Calculate the combined dose % for multiple local anaesthetics (LAs) at varying concentrations and volumes</small>
     </a>
        <a href="la-bolusinfusion.html" class="menu-card regional-btn">
-      LA bolus and infusion rates
+      Local anaesthetic bolus and infusion rates
       <small>Calculate maximum safe bolus and infusion rates for adults ≥45 kg</small>
     </a> 
         <a href="la-5050mix.html" class="menu-card regional-btn">
-      LA 50:50 mixtures
-      <small>Calculate the combined maximum dose and volume of a 50:50 mixture of a short- and long-acting local anaesthetic</small>
+      Local anaesthetic 50:50 mixtures
+      <small>Calculate the combined maximum dose and volume of a 50:50 mixture of short- and long-acting local anaesthetics</small>
         </a>
     
 <h1 class="section-risk">Risk</h1>
@@ -121,7 +98,7 @@ h1.section-other { border-bottom-color: var(--clr-other); }
 <h1 class="section-critical">Critical care</h1>
     <a href="vasopressorcalc.html" class="menu-card critical-btn">
       Vasopressor infusions
-      <small>Calculate infusion rates for noradrenaline and adrenaline (central & peripheral) and vasopressin</small>
+      <small>Calculate infusion rates for noradrenaline, adrenaline (central & peripheral) and vasopressin</small>
     </a>
      <a href="adultbv.html" class="menu-card critical-btn">
      Adult blood volume
@@ -141,7 +118,7 @@ h1.section-other { border-bottom-color: var(--clr-other); }
 <h1 class="section-paeds">Paediatrics</h1>
     <a href="paeds.html" class="menu-card paeds-btn">
      Paediatric anaesthesia
-      <small>Calculate drugs and equipment sizes for routine and emergency anaesthesia</small>
+      <small>Calculate drug doses and equipment sizes for routine and emergency anaesthesia</small>
     </a>
 
 <h1 class="section-other">Other</h1>
