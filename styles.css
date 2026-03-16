@@ -1188,27 +1188,6 @@ footer a:hover {
 /*=============================================
 =        Blood loss Calculators       =
 =============================================*/
-    /* Box for shock classification */
-    .classification-section {
-      width: 90%;
-      max-width: 400px;
-      margin: 0 auto 20px auto;
-      padding: 15px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      background-color: #fff;
-    }
-
-    .classification-section p {
-      margin-top: 0;    
-      margin-bottom: 10px;
-      text-align: center; 
-      font-size: 14px; 
-      font-weight: 700;
-    }
-
-    /* New Box for Allowable Blood Loss */
     .allowable-section {
       width: 90%;
       max-width: 400px;
@@ -1219,44 +1198,40 @@ footer a:hover {
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       background-color: #fff;
     }
-
     .allowable-section p {
       margin: 0 0 10px 0;
       text-align: center;
       font-size: 14px;
       font-weight: 700;
     }
-
- /* Styling for the shock classification table */
+/* Styling for the shock classification table */
     #shockClassificationTable {
       width: 100%;
-      border-collapse: collapse;
+      border-collapse: separate;
+      border-spacing: 0;
       margin-top: 10px;
       font-size: 14px;
       table-layout: fixed; /* This enforces fixed widths */
     }
      #shockClassificationTable th, 
     #shockClassificationTable td {
-      border: 1px solid #ccc;
-      padding: 8px;
+      border: none;
+      padding: 6px 8px;
       text-align: center;
     }
     #shockClassificationTable th {
-      background-color: #f0f0f0;
-      color: #212529;
+  background: var(--btn-bg);
+  font-weight: 600;
     }
-
-    #toggleBtn {
-  margin-left: 8px;
-  padding: 5px 8px;
-      width: auto;
-      min-width: 80px;       /* ← lock width so both labels fit */
-        flex: 0 0 auto;       /* in case your container is flex, don’t let it grow */
-  font-size: 14px;
-  cursor: pointer;
-      border: 1px solid #ccc;
+#shockClassificationTable tr + tr td {
+  border-top: 1px solid var(--border-light);
 }
-
+.classification-table td[rowspan] {
+  font-weight: 600;
+}
+#shockClassificationTable td[data-percent] {
+  font-variant-numeric: tabular-nums;
+}
    .classI {
   background-color: #FFEBEE;
   color: #212529;
@@ -1300,6 +1275,24 @@ footer a:hover {
   .toggle-slider {
     border-color: #3a4048;
   }
+    #shockClassificationTable th {
+  background-color: #2a2f36;
+  color: var(--text-main);
+}
+#shockClassificationTable td,
+#shockClassificationTable th {
+  border-color: #3a4048;
+}
+  #shockClassificationTable tr + tr td {
+  border-top: 1px solid #3a4048;
+}
+#shockClassificationTable th {
+  background: #2a2f36;
+}
+  #shockClassificationTable .classI  { background-color: #5a1a1a; }
+#shockClassificationTable .classII { background-color: #6e2222; }
+#shockClassificationTable .classIII{ background-color: #8a2d2d; }
+#shockClassificationTable .classIV { background-color: #a53a3a; }
 }
  @media (max-width: 480px) {
   .button-group button {
