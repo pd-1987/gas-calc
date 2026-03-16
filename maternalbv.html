@@ -4,58 +4,34 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-<link
-  href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
-  rel="stylesheet"
-/>
-<link
-  href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
-  rel="stylesheet"
-/>
   <title>Maternal blood volume calculator</title>
     <style>
-:root {
-  --bg-main: #f3f4f6;
-  --bg-card: #ffffff;
-
-  --text-main: #212529;
-  --text-secondary: #555;
-
-  --border-light: #e0e0e0;
+      .toggle-container {
+  width: auto;
+  min-width: max-content;
 }
-    header.banner {
-      background: linear-gradient(130deg, #894070 0%, #5a1f4e 100%);
-    }
-    .input-group {
-      margin: 10px 0;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;  /* ← labels+inputs line up at the start */
-      gap: 8px;                    /* ← consistent spacing between label & input */
-      font-size: 14px;
-    }
-    .input-group label {
-      white-space: nowrap;
-       flex: 0 0 100px;     /* lock every label to 100px */
-    }
-    .input-group input {
-      width: 60px;
-      padding: 5px;
-      font-size: 14px;
-    }
-    .result {
-      text-align: center;
-      font-size: 14px;
-      margin: 20px 0;
-    }
+
+.toggle-label {
+  white-space: nowrap;
+  padding: 6px 12px;
+}
+      #secondaryInput {
+  width: 70px;
+}
   </style>
 </head>
 <body>
   <!-- Header with Title -->
-  <header class="banner">Maternal Blood Volume</header>
-  
-  <!-- Grouped Inputs and Calculation Output -->
+<header class="calc-header obstetrics">
+  Maternal Blood Volume
+</header>
+  <div class="calc-wrapper">
   <div class="calc-section">
     <!-- Weight Entry Group -->
     <div class="input-group">
@@ -63,29 +39,37 @@
       <input type="number" id="weight" placeholder="0" min="0" oninput="updateCalculations()">
     </div>
   
-    <!-- Secondary entry: BMI or Height -->
-  <div class="input-group">
-    <label for="secondaryInput" id="secondaryLabel">Height (cm):</label>
-    <input
-      type="number"
-      id="secondaryInput"
-      placeholder="0"
-      min="0"
-      step="any"
-      oninput="updateCalculations()"
-    >
-    <button type="button" id="toggleBtn">Use BMI</button>
-  </div>
+<div class="input-group">
+
+<div class="toggle-container">
+  <input type="checkbox" id="modeToggle">
+
+  <label class="toggle-label" for="modeToggle">Height (cm)</label>
+  <label class="toggle-label" for="modeToggle">BMI (kg/m<sup>2</sup>)</label>
+
+  <div class="toggle-slider"></div>
+</div>
+
+<input
+  type="number"
+  id="secondaryInput"
+  min="0"
+  step="any"
+  oninput="updateCalculations()"
+>
+
+</div>
   
     <!-- Circulating Blood Volume Output -->
     <div class="result">
-      <u>Circulating Blood Volume</u>:
-      <span id="bloodVolumeOutput">-</span>
+      Circulating Blood Volume:
+      <span id="bloodVolumeOutput"></span>
     </div>
   </div>
   
-  <div class="classification-section">
-    <p><u>Classification of Haemorrhagic Shock</u></p>
+  <div class="calc-section">
+    <div class="instruction-header">
+      Classification of Haemorrhagic Shock</div>
     <table id="shockClassificationTable">
   <colgroup>
 <col style="width: 30%;">
@@ -143,15 +127,14 @@
   </tr>
 </table>
   </div>
-
+  </div>
  
   <!-- Home and Reset Buttons -->
-  <div class="button-container" style="text-align: center; margin-bottom: 20px;">
+  <div class="main-control-buttons">
     <button type="button" class="reset-btn" onclick="resetForm()">Reset</button>
     <button type="button" class="home-btn" onclick="goHome()">Home</button>
   </div>
-  
-  <!-- Footer -->
+
   <footer>
     <details>
     <summary>Notes and references</summary>
@@ -171,50 +154,32 @@
     let useBMI = false; // false = interpret secondaryInput as Height
 
 function toggleMode() {
-  // grab elements & readings
-  const label    = document.getElementById('secondaryLabel');
-  const input    = document.getElementById('secondaryInput');
-  const btn      = document.getElementById('toggleBtn');
-  const weight   = parseFloat(document.getElementById('weight').value) || 0;
+  const input = document.getElementById('secondaryInput');
+  const toggle = document.getElementById('modeToggle');
+
+  const weight = parseFloat(document.getElementById('weight').value) || 0;
   const rawValue = parseFloat(input.value) || 0;
 
-  // compute the new value, if possible
+  const newModeIsBMI = toggle.checked;
   let newValue = '';
-  if (useBMI) {
-    // we’re switching *from* BMI → *to* Height
-    if (weight > 0 && rawValue > 0) {
-      // height (m) = sqrt(weight / BMI)
-      // convert to cm:
-      newValue = (Math.sqrt(weight / rawValue) * 100).toFixed(0);
-    }
-  } else {
-    // we’re switching *from* Height → *to* BMI
+
+  if (newModeIsBMI) {
+    // switching Height → BMI
     if (weight > 0 && rawValue > 0) {
       const h_m = rawValue / 100;
       newValue = (weight / (h_m * h_m)).toFixed(2);
     }
-  }
-
-  // flip the mode
-  useBMI = !useBMI;
-
-  // set label, placeholder, button text
-  if (useBMI) {
-    label.textContent = 'BMI (kg/m²):';
-    input.placeholder = '0';
-    btn.textContent   = 'Use Height';
-    input.step        = 'any';
   } else {
-    label.textContent = 'Height (cm):';
-    input.placeholder = '0';
-    btn.textContent   = 'Use BMI';
-    input.step        = 'any';
+    // switching BMI → Height
+    if (weight > 0 && rawValue > 0) {
+      newValue = (Math.sqrt(weight / rawValue) * 100).toFixed(0);
+    }
   }
 
-  // apply the converted value (or clear if we couldn’t)
+  useBMI = newModeIsBMI;
+
   input.value = newValue;
 
-  // re-run your volume calculation with the newly‐set input
   updateCalculations();
 }
     
@@ -247,7 +212,7 @@ function toggleMode() {
     updateShockClassification(volume);
   } else {
     circulatingVolume = 0;
-    output.textContent = '-';
+    output.textContent = '';
     clearShockClassification();
   }
 }
@@ -278,9 +243,9 @@ function clearShockClassification() {
       updateBloodVolume();
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('toggleBtn')
-          .addEventListener('click', toggleMode);
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('modeToggle')
+          .addEventListener('change', toggleMode);
 });
     
     function resetForm() {
@@ -289,7 +254,7 @@ function clearShockClassification() {
   // clear the shared secondary input (BMI or Height)
   document.getElementById('secondaryInput').value = "";
   // reset volume display
-  document.getElementById('bloodVolumeOutput').textContent = "-";
+  document.getElementById('bloodVolumeOutput').textContent = "";
   // clear the table
   clearShockClassification();
   // reset your globals
