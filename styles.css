@@ -1204,7 +1204,8 @@ footer a:hover {
       font-size: 14px;
       font-weight: 700;
     }
-/* Styling for the shock classification table */
+
+ /* Styling for the shock classification table */
     #shockClassificationTable {
       width: 100%;
       border-collapse: separate;
@@ -1275,7 +1276,7 @@ footer a:hover {
   .toggle-slider {
     border-color: #3a4048;
   }
-    #shockClassificationTable th {
+  #shockClassificationTable th {
   background-color: #2a2f36;
   color: var(--text-main);
 }
