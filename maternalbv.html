@@ -12,17 +12,10 @@
   <link rel="stylesheet" href="styles.css">
   <title>Maternal blood volume calculator</title>
     <style>
-      .toggle-container {
+   .unit-toggle {
   width: auto;
-  min-width: max-content;
-}
-
-.toggle-label {
+  min-width: 85px;
   white-space: nowrap;
-  padding: 6px 12px;
-}
-      #secondaryInput {
-  width: 70px;
 }
   </style>
 </head>
@@ -49,7 +42,7 @@
       step="any"
       oninput="updateCalculations()"
     >
-    <button type="button" id="unit-toggle">Use BMI</button>
+    <button type="button" id="unit-toggle" class="unit-toggle">Use BMI</button>
   </div>
   
     <!-- Circulating Blood Volume Output -->
@@ -62,12 +55,7 @@
   <div class="calc-section">
     <div class="instruction-header">
       Classification of Haemorrhagic Shock</div>
-    <table id="shockClassificationTable">
-  <colgroup>
-<col style="width: 30%;">
-<col style="width: 15%;">
- <col style="width: 55%;">   
-  </colgroup>
+    <table id="shockClassificationTable" class="classification-table">
       <tr>
     <th>Class</th>
     <th>%</th>
@@ -120,8 +108,7 @@
 </table>
   </div>
   </div>
- 
-  <!-- Home and Reset Buttons -->
+
   <div class="main-control-buttons">
     <button type="button" class="reset-btn" onclick="resetForm()">Reset</button>
     <button type="button" class="home-btn" onclick="goHome()">Home</button>
