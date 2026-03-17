@@ -4,55 +4,52 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
-    rel="stylesheet"
-  />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
-    rel="stylesheet"
-  />
   <title>LA Toxicity - 20% Intralipid</title>
   <style>
-:root {
-  --bg-main: #f3f4f6;
-  --bg-card: #ffffff;
+   .calc-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: baseline;
+  column-gap: 6px;
 
-  --text-main: #212529;
-  --text-secondary: #555;
+  padding: 6px 8px;
+  margin: 5px 0;
 
-  --border-light: #e0e0e0;
+  background: var(--btn-bg);        /* same as la-result */
+  border: 1px solid var(--border-light);
+  border-radius: 6px;               /* slightly softer than default */
+
+  font-size: 14px;
 }
-    header.banner {
-      background: linear-gradient(130deg, #5E35B1 0%, #3a0f81 100%);
-    }
-    .boxed-section {
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      padding: 8px;
-      margin: 10px;
-      box-sizing: border-box;
-      background-color: #fafafa;
-    }
-.highlight {
-  background-color: #e7f3fe;   /* light blue */
-  color:          #084298;     /* dark blue text */
-  padding:        2px 6px;
-  border-radius:  4px;
-  font-weight:    700;
-}
-.input-group {
-  margin-left: 1rem; /* pushes the entire group (label + input) right */
+  .calc-value {
+  min-width: 48px;
+  text-align: right;
+  font-weight: 700;
+  font-size: 1.1em;
+  font-variant-numeric: tabular-nums;
+
+  color: var(--clr-regional);  /* 👈 THIS gives you that “dose” feel */
+}  
+    .calc-row .highlight {
+  font-size: 1.15em;
+  font-weight: 800;
 }
   </style>
 </head>
 <body>
-  <header class="banner">LA Toxicity
-    <br>20% Intralipid</header>
+<header class="calc-header critical">
+  LA Toxicity – 20% Intralipid
+</header>
+<div class="calc-wrapper">
 
-  <!-- Weight Entry -->
-  <div class="input-group">
+  <div class="calc-section">
+    <div class="input-group">
     <label for="weight">Weight (kg):</label>
     <input
       type="number"
@@ -63,60 +60,77 @@
     >
   </div>
 
-  <div class="boxed-section immediate-section">
-    <h3>Immediate treatment</h3>
-    <p class="result">
-      <u>Bolus (1.5 ml/kg)</u>:
-      <span id="bolus1">0</span> <span class="unit">ml</span>
-    </p>
-    <!-- 15 ml/kg/hr infusion -->
-<p class="result">
-  <u>Infusion (15 ml/kg/hr)</u>:
-  <span id="infusion15">0</span><span class="unit"> ml/hr</span>
-</p>
-<p class="result">
-  <span id="time15" class="highlight">0</span>
-  <span class="unit"> mins to max cumulative dose</span>
-</p>
-      <p class="result">
-      <u>Max cumulative dose (12 ml/kg)</u>:
-      <span id="maxdose">0</span> <span class="unit">ml</span>
-    </p>
+  <div class="calc-section">
+  <div class="instruction-header">Immediate treatment</div>
+
+  <div class="calc-row">
+    <span class="result-label">Bolus (1.5 ml/kg)</span>
+    <span class="calc-value" id="bolus1">0</span>
+    <span class="unit">ml</span>
+ 
+    <span class="result-label">Infusion (15 ml/kg/hr)</span>
+    <span class="calc-value" id="infusion15">0</span>
+    <span class="unit">ml/hr</span>
+  </div>
+    
+  <div class="calc-row">
+    <span class="result-label">Max cumulative dose (12 ml/kg)</span>
+    <span class="calc-value" id="maxdose">0</span>
+    <span class="unit">ml</span>
+    
+    <span class="result-label">Time to max dose</span>
+    <span class="calc-value highlight" id="time15">0</span>
+    <span class="unit">mins</span>
   </div>
 
-  <div class="boxed-section 5min-section">
-    <h3>At 5 minutes</h3>
-    Repeat bolus and double the infusion rate if cardiovascular stability has not been restored or an adequate circulation deteriorates.
-    <p class="result">
-      <u>Repeat bolus (1.5 ml/kg)</u>:
-      <span id="bolus2">0</span> <span class="unit">ml</span>
-    </p>
- <!-- 30 ml/kg/hr infusion -->
-<p class="result">
-  <u>Infusion (30 ml/kg/hr)</u>:
-  <span id="infusion30">0</span><span class="unit"> ml/hr</span>
-</p>
-<p class="result">
-  <span id="time30" class="highlight">0</span>
-  <span class="unit"> mins to max cumulative dose</span>
-</p>
-  </div>
 
- <div class="boxed-section 10min-section">
-  <h3>At 10 minutes</h3>
-  Repeat bolus if cardiovascular stability has not been restored or an adequate circulation deteriorates.
-  <!-- 3rd bolus at 10 min -->
-<p class="result">
-  <u>Repeat bolus (1.5 ml/kg)</u>:
-  <span id="bolus3">0</span><span class="unit"> ml</span>
-</p>
-<p class="result">
-  <span id="time3" class="highlight">0</span>
-  <span class="unit"> mins to max cumulative dose</span>
-</p>
 </div>
 
-   <div class="button-container">
+  <div class="calc-section">
+  <div class="instruction-header">At 5 minutes</div>
+
+  <div class="input-note">
+    Repeat bolus and double the infusion rate if cardiovascular stability has not been restored or an adequate circulation deteriorates.
+  </div>
+
+  <div class="calc-row">
+    <span class="result-label">Repeat bolus (1.5 ml/kg)</span>
+    <span class="calc-value" id="bolus2">0</span>
+    <span class="unit">ml</span>
+ 
+    <span class="result-label">Double infusion (30 ml/kg/hr)</span>
+    <span class="calc-value" id="infusion30">0</span>
+    <span class="unit">ml/hr</span>
+  </div>
+
+  <div class="calc-row time-critical">
+    <span class="result-label">Time to max dose</span>
+    <span class="calc-value highlight" id="time30">0</span>
+    <span class="unit">mins</span>
+  </div>
+</div>
+
+<div class="calc-section">
+  <div class="instruction-header">At 10 minutes</div>
+
+  <div class="input-note">
+    Repeat bolus if cardiovascular stability has not been restored or an adequate circulation deteriorates.
+  </div>
+
+  <div class="calc-row">
+    <span class="result-label">Repeat bolus (1.5 ml/kg)</span>
+    <span class="calc-value" id="bolus3">0</span>
+    <span class="unit">ml</span>
+  </div>
+
+  <div class="calc-row time-critical">
+    <span class="result-label">Time to max dose</span>
+    <span class="calc-value highlight" id="time3">0</span>
+    <span class="unit">mins</span>
+  </div>
+</div>
+    
+   <div class="main-control-buttons">
     <button type="button" class="reset-btn" onclick="resetForm()">Reset</button>
     <button type="button" class="home-btn" onclick="goHome()">Home</button>
   </div>
