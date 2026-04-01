@@ -4,109 +4,97 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  <link
-  href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
-  rel="stylesheet"
-/>
-<link
-  href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
-  rel="stylesheet"
-/>
+  
   <title>Feedback</title>
   <style>
-:root {
-  --bg-main: #f3f4f6;
-  --bg-card: #ffffff;
-
-  --text-main: #212529;
-  --text-secondary: #555;
-
-  --border-light: #e0e0e0;
+.feedback-form .input-group {
+  display: block;
+  margin-bottom: 12px;
 }
-  /* Inline styles specific to the feedback form */
-  .feedback-container {
-    margin-top: 10px;
-    margin-bottom: 10px;
-  }
-  .feedback-container form {
-    display: flex;
-    flex-direction: column;
-    gap: 0px;
-  }
-  /* Override the global .input-group flex behavior */
-  .feedback-container .input-group {
-    display: block;
-    margin-bottom: 3px;
-  }
-  .feedback-container label {
-    font-size: 16px;
-    display: block;  /* Ensures the label takes a full line */
-    margin-bottom: 5px;
-  }
-  .feedback-container input,
-  .feedback-container textarea {
-    padding: 10px;
-    font-size: 16px;
-    width: 100%;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-  }
-  .feedback-container button {
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f0f0f0;  /* Matching global grey */
-    color: black;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-  }
-  .feedback-container button:hover {
-    background-color: #e0e0e0;
-  }
-  /* Force the label for feedback to display as a block element */
-  label[for="message"] {
-    display: block;
-  }
-    /* Apply consistent font to placeholder text */
-.feedback-container input::placeholder,
-.feedback-container textarea::placeholder {
-  font-family: 'Roboto', sans-serif;
+
+.feedback-form label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-secondary);
 }
-.feedback-container input,
-.feedback-container textarea {
-  font-family: inherit;
-}    
+.feedback-form input,
+.feedback-form textarea {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  box-sizing: border-box;   /* ← FIX */
+}
+.feedback-form textarea {
+  resize: vertical;
+  min-height: 90px;   /* was 100px */
+}
+    .submit-btn {
+  margin-top: 8px;
+  width: 100%;
+  background-color: var(--clr-primary);
+  border: 1px solid var(--clr-primary);
+  color: white;
+  font-weight: 600;
+}
+
+.submit-btn:hover {
+  filter: brightness(0.95);
+}
 </style>
 </head>
 <body>
-  <header class="banner">
-    Feedback
-  </header>
-  <div>If you have any feedback, questions or come across any calculation errors please get in touch.</div>
-  <div class="feedback-container">
-    <!-- Replace "YOUR_FORM_ID" with the ID provided by Formspree after signing up -->
-    <form action="https://formspree.io/f/mwplalwp" method="POST">
+<header class="calc-header general">Feedback</header>
+
+<div class="calc-wrapper">
+
+  <div class="calc-section">
+    <p>
+      If you have any feedback, questions or come across any calculation errors please get in touch.
+    </p>
+  </div>
+
+  <div class="calc-section">
+<div class="instruction-header">Send feedback</div>
+    <form class="feedback-form" action="https://formspree.io/f/mwplalwp" method="POST">
+
       <div class="input-group">
         <label for="name">Name</label>
-        <input type="text" id="name" name="name" placeholder="" required>
+        <input type="text" id="name" name="name" required>
       </div>
+
       <div class="input-group">
         <label for="email">Email</label>
-        <input type="email" id="email" name="_replyto" placeholder="" required>
+        <input type="email" id="email" name="_replyto" required>
       </div>
+
       <div class="input-group">
         <label for="message">Feedback</label>
-        <textarea id="message" name="message" placeholder="" rows="8" required></textarea>
+        <textarea id="message" name="message" rows="6" required></textarea>
       </div>
-      <button type="submit">Submit Feedback</button>
+
+      <button type="submit" class="submit-btn">Submit feedback</button>
+
     </form>
+
   </div>
-<a href="index.html" class="home-btn full-width">Home</a>
-  <footer>
-    <small>&copy; 2025 #OneTeam Anaesthesia. All rights reserved.</small>
-  </footer>
+
+</div>
+
+<div class="main-control-buttons">
+  <button type="button" class="home-btn" onclick="location.href='index.html'">Home</button>
+</div>
+
+<footer>
+  <small>&copy; 2025 #OneTeam Anaesthesia. All rights reserved.</small>
+</footer>
+
 </body>
 </html>
