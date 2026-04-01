@@ -4,60 +4,60 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="../styles.css">
-<link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
-<!-- Default: light mode -->
-<link rel="icon" href="/favicon/favicon.svg" type="image/svg+xml">
-<!-- Dark override -->
-<link rel="icon" href="/favicon/favicon.svg" media="(prefers-color-scheme: dark)" type="image/svg+xml">
-<link rel="shortcut icon" href="/favicon/favicon.ico" />
-<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
-<meta name="apple-mobile-web-app-title" content="Gas-calc.xyz" />
-<link rel="manifest" href="/favicon/site.webmanifest" />
-  <link
-  href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
-  rel="stylesheet"
-/>
-<link
-  href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
-  rel="stylesheet"
-/>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  
   <title>Reversal of Sugammadex</title>
   <style>
-      header.banner {
- background: linear-gradient(
-    to right,
-    #1abc9c 0%,   /* bright turquoise */
-    #117a65 100%  /* deep teal */
- );}
- table {
-    width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      font-size: 16px;
-      table-layout: fixed; /* This enforces fixed widths */
-     border-collapse: separate;      /* allow rounded corners */
+table {
+  width: 100%;
+  border-collapse: separate;
   border-spacing: 0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-top: 6px;
+  font-size: 14px;
+  table-layout: fixed;
+
+  border: 1px solid var(--border-light);
   border-radius: 8px;
   overflow: hidden;
-    }
-    table, th, td {
-      border: 1px solid #ccc;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: center;
-    }
-    th {
-      background-color: #f0f0f0;
-      color: #333;
-    }   
+  background: var(--bg-card);
+}
+
+th, td {
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid var(--border-light);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+th {
+  background: var(--btn-bg);
+  color: var(--text-main);
+  font-weight: 600;
+}
+.instruction-header {
+  font-size: 13px;
+  font-weight: 600;   /* ↓ from 700 */
+  color: var(--text-main);
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+}
     </style>
 </head>
 <body>
-  <header class="banner">Reversal of Sugammadex</header>
+<header class="calc-header other">Sugammadex Reversal</header>
+  <div class="calc-wrapper">
+
+  <div class="calc-section">
+    <div class="instruction-header">Recommended dosing</div>
   <table>
     <tr>
       <th>Type of block</th>
@@ -80,10 +80,14 @@
       <td>1.5 minutes</td>
     </tr>
   </table>
+    </div>
+  <div class="calc-section">
+    <div class="instruction-header">Re-administration of sugammadex</div>
+  <p>In the exceptional situation of recurrence of neuromuscular blockade post-operatively after an initial dose of 2 mg/kg or 4 mg/kg sugammadex, a repeat dose of 4 mg/kg sugammadex is recommended. Following a second dose of sugammadex, the patient should be closely monitored to ascertain sustained return of neuromuscular function.</p></div>
 
-  <p><b>Re-administration of sugammadex</b>: In the exceptional situation of recurrence of neuromuscular blockade post-operatively after an initial dose of 2 mg/kg or 4 mg/kg sugammadex, a repeat dose of 4 mg/kg sugammadex is recommended. Following a second dose of sugammadex, the patient should be closely monitored to ascertain sustained return of neuromuscular function.</p>
-
-  <p><b>Re-administration of rocuronium or vecuronium after routine reversal (up to 4 mg/kg sugammadex)</b>:</p>
+<div class="calc-section">
+  <div class="instruction-header">
+  Re-administration of rocuronium or vecuronium after routine reversal (up to 4 mg/kg sugammadex)</div>
 
     <table>
       <tr>
@@ -96,15 +100,25 @@
       </tr>
       <tr>
         <td>4 hours</td>
-        <td><p>Rocuronium<br>0.6 mg/kg</p> <p>Vecuronium<br>0.1 mg/kg</p></td>
+        <td>
+  Rocuronium 0.6 mg/kg<br>
+  Vecuronium 0.1 mg/kg
+</td>
       </tr>
     </table>
 
-<p>The onset of neuromuscular blockade may be prolonged up to approximately 4 minutes, and the duration of neuromuscular blockade may be shortened up to approximately 15 minutes after re-administration of rocuronium 1.2 mg/kg within 30 minutes after sugammadex administration. 
+<p>The onset of neuromuscular blockade may be prolonged up to approximately 4 minutes, and the duration of neuromuscular blockade may be shortened up to approximately 15 minutes after re-administration of rocuronium 1.2 mg/kg within 30 minutes after sugammadex administration.</p>
   <p>The recommended waiting time in patients with mild or moderate renal impairment for re-use of 0.6 mg/kg rocuronium or 0.1 mg/kg vecuronium after routine reversal with sugammadex should be 24 hours.</p> 
-  If a shorter waiting time is required, the rocuronium dose for a new neuromuscular blockade should be 1.2 mg/kg.</p>
-<p><b>Re-administration of rocuronium or vecuronium after immediate reversal (16 mg/kg sugammadex)</b>:</p> 
+  <p>If a shorter waiting time is required, the rocuronium dose for a new neuromuscular blockade should be 1.2 mg/kg.</p></div>
+    
+<div class="calc-section">
+    <div class="instruction-header">
+      Re-administration of rocuronium or vecuronium after immediate reversal (16 mg/kg sugammadex)</div>
 <p>For the very rare cases where this might be required, a waiting time of 24 hours is suggested.</p>  
+  </div>
+    <div class="main-control-buttons">
+  <button type="button" class="home-btn" onclick="location.href='../index.html'">Home</button>
+</div>
     <footer>
        <details>
     <summary>Notes and references</summary>
