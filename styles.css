@@ -139,6 +139,14 @@ footer ul {
 .main-control-buttons > * {
   flex: 1;
 }
+.main-control-buttons .home-btn:only-child {
+  border-radius: var(--radius);
+}
+
+.main-control-buttons .home-btn:not(:only-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
 /*=============================================
 =            4. Banner & Header                =
 =============================================*/
@@ -266,7 +274,6 @@ h3 {
   text-align: center;
   font-weight: 700;
 }
-
 /*=============================================
 =          6. Form Elements & Inputs           =
 =============================================*/
