@@ -64,6 +64,7 @@
   <div class="calc-section">
  <div class="instruction-header">Bolus</div>
 <div class="concentration-bubbles">
+  <button class="bubble concentration-btn">0.125%</button>
   <button class="bubble concentration-btn">0.25%</button>
   <button class="bubble concentration-btn">0.375%</button>
   <button class="bubble concentration-btn">0.5%</button>
@@ -258,6 +259,7 @@ updateInfusionRates();
     
     // --- Bolus Dose Calculation ---
  const concMap = {
+  "0.125%": 1.25,
   "0.2%": 2.0,
   "0.25%": 2.5,
   "0.375%": 3.75,
@@ -469,7 +471,7 @@ if (maintenanceInput) {
       // If no LA selected, show all; otherwise apply drug‑specific rules
       const show =
         !anyLA ||
-        ((isBupi || isLevo) && ['0.25%','0.375%','0.5%'].includes(txt)) /*||
+        ((isBupi || isLevo) && ['0.125%','0.25%','0.375%','0.5%'].includes(txt)) /*||
         (isRopi && ['0.2%','0.375%','0.5%'].includes(txt)); */
 
       btn.style.display = show ? '' : 'none';
