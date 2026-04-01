@@ -338,7 +338,17 @@ select {
   font-size: 14px;
   box-sizing: border-box;
 }
-
+input,
+select,
+textarea {
+  background-color: var(--input-bg);
+  color: var(--text-main);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 5px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
 input:focus {
   outline: none;
   border-color: var(--clr-primary);
