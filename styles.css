@@ -2,12 +2,15 @@
 =            1. CSS Variables                  =
 =============================================*/
 :root {
-  --clr-light-grey: #f5f6f7;
-  --clr-med-grey:   #ccc;
-  --clr-dark-grey:  #555;
-  --clr-primary: #2b7de9;
-  --radius:         5px;
-  --gap:            0.5rem;
+  --bg-main: #0f1115;
+  --bg-card: #1f232a;
+  --btn-bg: #2a2f36;
+  --input-bg: #262b33;
+  --text-main: #f1f3f5;
+  --text-secondary: #a8adb3;
+  --border-light: #3a4048;
+  --toggle-border: #4a515a;
+}
   
 /* Backgrounds */
   --bg-main: #f3f4f6;
