@@ -2,35 +2,29 @@
 =            1. CSS Variables                  =
 =============================================*/
 :root {
+  /* Backgrounds */
   --bg-main: #0f1115;
   --bg-card: #1f232a;
   --btn-bg: #2a2f36;
   --input-bg: #262b33;
+  --radius: 5px;
+  --gap: 0.5rem;
+
+  /* Text */
   --text-main: #f1f3f5;
   --text-secondary: #a8adb3;
-  --border-light: #3a4048;
-  --toggle-border: #4a515a;
-}
-  
-/* Backgrounds */
-  --bg-main: #f3f4f6;
-  --bg-card: #ffffff;
-  --input-bg: var(--bg-card);
-  --btn-bg: #f0f0f0;  
-  --bubble-bg: #e7f3fe;
-  --bubble-text: #0078d7;
-  --bubble-active-bg: #0078d7;
-  
-  /* Text */
-  --text-main: #212529;
-  --text-secondary: #555;
 
   /* Borders */
-  --border-light: #e0e0e0;
-  --toggle-border: #d5d7da;
-  --bubble-border: #bcdffc;
-  
-  /* Category colours */
+  --border-light: #3a4048;
+  --toggle-border: #4a515a;
+  --bubble-border: #355070;
+
+  /* Bubbles */
+  --bubble-bg: #1c2a3a;
+  --bubble-text: #7fb6ff;
+  --bubble-active-bg: #0078d7;
+
+  /* Category colours (UNCHANGED) */
   --clr-general: #6c757d;
   --clr-airway: #b71c1c;
   --clr-regional: #1565C0;
