@@ -5,8 +5,10 @@
   /* Backgrounds */
   --bg-main: #0f1115;
   --bg-card: #1f232a;
-  --btn-bg: #2a2f36;
+  --btn-bg: #2c3138;
   --input-bg: #262b33;
+  --clr-primary: #2b7de9;
+  --clr-dark-grey: #555;
   --radius: 5px;
   --gap: 0.5rem;
 
@@ -559,7 +561,7 @@ button {
   min-width: 100px;
   border: 1px solid var(--border-light);
   background-color: var(--btn-bg);
-  color: var(--text-secondary);   /* change this */
+  color: var(--text-secondary);
   border-radius: 0;
   margin: 0;
 }
