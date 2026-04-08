@@ -1161,7 +1161,6 @@ if (depth) {
       small.style.display   = 'block';
       small.style.marginTop = '2px';
       small.style.fontSize  = '0.8em';
-      small.style.color     = '#000000';
       laryEl.appendChild(small);
     }
   } else {
