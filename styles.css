@@ -15,6 +15,8 @@
   /* Text */
   --text-main: #f1f3f5;
   --text-secondary: #a8adb3;
+  --link-color: #4da3ff;
+  --link-visited: #a78bfa;
 
   /* Borders */
   --border-light: #3a4048;
@@ -36,7 +38,9 @@
   --clr-critical: #5E35B1;
   --clr-other: #1abc9c;
 }
-
+a {
+  color: var(--link-color);
+}
 .calc-header.regional { 
   border-bottom-color: var(--clr-regional);
 }
