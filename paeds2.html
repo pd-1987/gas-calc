@@ -1,0 +1,2079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <title>Paediatric anaesthesia</title>
+  <style>
+    .unit-toggle {
+      width: 80px;
+      font-size: 14px;
+      margin: 5px 5px;
+      padding: 5px;
+      cursor: pointer;
+      background-color: var(--btn-bg);
+      border: 1px solid var(--border-light);
+      color: var(--text-main);
+    }
+    #weight-calculations {
+      margin: 8px 5px;
+      font-family: inherit;
+      line-height: 1.4;
+      font-size: 12px;
+    }
+    #weight-calculations p {
+      margin: 2px 0;
+    }
+    .unit {
+      color: var(--text-secondary);
+    }
+  .normal-values,
+.airway-section,
+.emergency-section,
+.section {
+  margin: 0 auto 16px auto;
+  padding: 12px;
+  border-radius: 10px;
+
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  box-sizing: border-box;
+}
+      .section-header {
+      font-weight: 700;
+        text-align: center;
+        margin: 0 0 10px;
+    }
+    .normal-values .static {
+  display: none;
+}
+.result {
+  color: var(--text-main);
+  margin: 5px;
+}
+    .normal-values .result:first-child {
+  margin-top: 0;
+}
+    .input-group {
+  display: flex;
+  align-items: center;
+  margin: 5px;
+}
+.accordion {
+    max-width: 600px;
+    margin: 0px auto;
+  }
+  .accordion-item {
+  border-left: 3px solid #E37383;
+  background: var(--bg-card);
+  margin-bottom: 6px;
+  border-radius: 10px;
+  box-shadow: none;
+  overflow: hidden;
+  }
+  .accordion-header {
+  background: var(--bg-card);
+  color: var(--text-main);
+  padding: 12px 14px; /* ↓ tighter */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 600; /* slightly less heavy */
+  font-size: 0.98em; /* ↓ slightly smaller */
+  transition: background 0.15s ease;
+  }
+.accordion-header.active {
+  background: var(--btn-bg);
+}
+  .accordion-title {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* ↓ reduced */
+  }
+  .accordion-title i:first-child {
+  color: #E37383;
+  font-size: 1em;
+  }
+  .accordion-header .fa-plus,
+  .accordion-header .fa-minus {
+    color: var(--text-secondary);
+    transition: opacity 0.3s ease;
+  }
+  .accordion-header .fa-minus {
+    display: none;
+  }
+  .accordion-header.active .fa-plus {
+    display: none;
+  }
+  .accordion-header.active .fa-minus {
+    display: inline;
+  }
+.accordion-header .fa-plus,
+.accordion-header .fa-minus {
+  color: var(--text-secondary);
+  font-size: 0.9em;
+}
+  .accordion-content {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  background: var(--bg-main);
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+  font-size: 0.95em;
+  color: var(--text-main);
+  padding: 0 14px;
+  border-top: 1px solid var(--border-light);
+  }
+  .accordion-content.show {
+  opacity: 1;
+  }
+    .accordion-content-inner {
+  padding: 12px 0;
+  }
+    .airway-note {
+  margin: 4px 0 8px 5px;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+.estimate-toggle {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  margin: 5px;             /* adjust spacing as needed */
+}
+
+/* Hide the native checkbox */
+.estimate-toggle input[type="checkbox"] {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+/* The track + the round knob together live in this span */
+.estimate-toggle .slider {
+  position: relative;
+  width: 40px;    /* total width of the switch */
+  height: 20px;   /* total height of the switch */
+  background-color: #ccc;
+  border-radius: 10px;
+  transition: background-color 0.2s ease;
+  margin-right: 0px;  /* spacing between switch and text */
+  flex-shrink: 0;
+}
+
+/* The white circular knob inside the track */
+.estimate-toggle .slider::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+}
+
+/* When the checkbox is checked, turn track green */
+.estimate-toggle input:checked + .slider {
+  background-color: #4caf50;
+}
+
+/* When checked, move the knob to the right */
+.estimate-toggle input:checked + .slider::before {
+  transform: translateX(20px);
+}
+
+/* The visible text next to the slider */
+.estimate-toggle .toggle-label {
+  font-size: 14px;
+  color: var(--text-main);
+  margin-left: -8px;
+}
+    #weight {
+  margin-right: 12px;
+}
+    .reversal-text {
+  background-color: #fff;      /* text on solid white so it’s readable */
+  padding: 0px 6px;
+}
+    .accordion-title sup {
+  font-size: 0.6em;
+  vertical-align: super;
+  margin-left: 1px;
+}
+    .text-center {
+  text-align: center;
+}
+.accordion table th {
+  background-color: var(--btn-bg) !important;
+  color: var(--text-main);
+}  
+    
+.result-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+  font-size: 13px;
+  border: 1px solid var(--border-light); /* 👈 add this */
+}
+
+.result-table th,
+.result-table td {
+  padding: 8px;
+  border: 1px solid var(--border-light); /* 👈 single source of truth */
+  text-align: center;
+}
+/* Section headers */
+.result-table thead th {
+  background: var(--btn-bg);
+  color: var(--text-main);
+  font-weight: 600;
+}
+/* Row labels (left column) */
+.result-table tbody th {
+  font-weight: 500;
+  background: rgba(255,255,255,0.03);
+}
+/* Subtle alternating rows */
+.result-table tbody tr:not([class]):nth-child(even) td {
+  background: rgba(255,255,255,0.02);
+}
+/* Remove harsh forced black text */
+.result table td,
+.result table th {
+  color: var(--text-main);
+}
+    .result-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+    .result,
+.result span,
+.result small {
+  color: var(--text-main);
+}    
+/* ===== Primary rows (drug rows) ===== */
+.row-blue    { background-color: #98c9ee; color: #000; }
+.row-yellow  { background-color: #ffe733; color: #000; }
+.row-red     { background-color: #ec6f73; color: #000; }
+.row-green   { background-color: #a3ce6f; color: #000; }
+.row-orange  { background-color: #F68B2F; color: #000; }
+.row-purple  { background-color: #d3ace5; color: #000; }
+.row-grey    { background-color: #bcbdc0; color: #000; }
+
+/* ===== Sub rows (info / volume rows) ===== */
+.sub-blue    { background-color: #e0effa; color: #000; }
+.sub-yellow  { background-color: #fff9bf; color: #000; }
+.sub-red     { background-color: #f8d5d5; color: #000; }
+.sub-green   { background-color: #e3f0d4; color: #000; }
+.sub-orange  { background-color: #fff3e0; color: #000; }
+.sub-purple  { background-color: #f2e6f7; color: #000; }
+.sub-grey    { background-color: #e8e6e4; color: #000; }
+
+.row-blue,
+.row-yellow,
+.row-red,
+.row-green,
+.row-grey,
+.row-orange,
+.row-purple,
+.result-table tr[style*="background-color"] {
+  color: #000 !important;
+}
+
+.row-blue td,
+.row-yellow td,
+.row-red td,
+.row-green td,
+.row-grey td,
+.row-orange,
+.row-purple,
+.result-table tr[style*="background-color"] td {
+  color: #000 !important;
+}
+    /* Force sub-row text to be dark */
+.sub-blue,
+.sub-yellow,
+.sub-red,
+.sub-green,
+.sub-orange,
+.sub-purple,
+.sub-grey {
+  color: #000 !important;
+}
+
+.sub-blue td,
+.sub-yellow td,
+.sub-red td,
+.sub-green td,
+.sub-orange td,
+.sub-purple td,
+.sub-grey td,
+.sub-blue small,
+.sub-yellow small,
+.sub-red small,
+.sub-green small,
+.sub-orange small,
+.sub-purple small,
+.sub-grey small {
+  color: #000 !important;
+}
+    /* Force units + dynamic spans to follow row colour */
+.result-table td span,
+.result-table td .unit,
+.result-table td small {
+  color: inherit !important;
+}
+ .result-table td span:not(.unit) {
+  font-weight: 600;
+}
+.phys-table tbody th {
+  font-weight: 600;
+  background: var(--btn-bg);
+  color: var(--text-main);
+  text-align: left;
+  width: 35%;
+  border-right: 2px solid var(--border-light);
+}
+  </style>
+</head>
+  
+<body>
+<header class="calc-header paeds">Paediatric anaesthesia</header>
+  <div class="calc-wrapper">
+  <div class="section">
+  <div class="input-group">
+    <label for="age">Age:</label>
+    <input type="number" id="age" min="0" placeholder="0" />
+    <button class="unit-toggle" id="AgeUnitBtn">years</button>
+  </div>
+  
+  <div class="input-group">
+  <label for="weight">Weight (kg):</label>
+  <input type="number" id="weight" min="0" placeholder="0" />
+     <label class="estimate-toggle">
+    <input type="checkbox" id="EstimateToggle" checked>
+    <span class="slider"></span>
+    <span class="toggle-label">Estimate weight</span>
+  </label>
+</div>
+
+  <!-- new container for showing the two formula lines -->
+  <div id="weight-calculations"></div>
+    <p class="text-center">
+      <small>In Obesity, use <a href="https://www.paedspro.com/">Paeds Prescribing Pro.</a></small>
+      </p>
+  </div>
+ 
+  <div class="accordion">
+
+  <div class="accordion-item">
+
+    <div class="accordion-header">
+
+      <span class="accordion-title">
+
+        <i class="fa-solid fa-heart-pulse"></i>Weight and Body Mass Index
+
+      </span>
+
+      <span>
+
+        <i class="fas fa-plus"></i>
+
+        <i class="fas fa-minus"></i>
+
+      </span>
+
+    </div>
+
+    <div class="accordion-content">
+
+      <div class="accordion-content-inner">
+    <!-- Height input -->
+  <div class="input-group">
+    <label for="height">Height (cm):</label>
+    <input type="number" id="height" min="0" placeholder="0" />
+  </div>      
+        
+  <!-- Gender toggle -->
+  <div class="input-group">
+    <label for="GenderBtn">Gender:</label>
+    <button class="unit-toggle" id="GenderBtn" data-gender="male">Male</button>
+  </div>
+
+  <!-- BMI display -->
+<div class="input-group">
+  <label>BMI:</label>
+  <span id="bmi-value"></span>
+</div>
+
+<div class="input-group">
+  <label>Ideal body weight:</label>
+  <span id="ibw-value"></span>
+</div>
+
+<div class="input-group">
+  <label>Adjusted body weight:</label>
+  <span id="adjbw-value"></span>
+</div>        
+
+</div>
+      </div>
+      </div>
+    </div>
+  <div class="accordion-item">
+
+    <div class="accordion-header">
+
+      <span class="accordion-title">
+
+        <i class="fa-solid fa-heart-pulse"></i><span>Normal Physiological Values</span>
+
+      </span>
+
+      <span>
+
+        <i class="fas fa-plus"></i>
+
+        <i class="fas fa-minus"></i>
+
+      </span>
+
+    </div>
+
+    <div class="accordion-content">
+
+      <div class="accordion-content-inner">
+
+<table class="result-table phys-table">
+  <tbody>
+    <tr>
+      <th>SBP</th>
+      <td>
+        <span id="sbp-50"></span>
+        <span class="unit"> mmHg</span>
+        (<span id="sbp-5"></span>–<span id="sbp-95"></span>
+        <span class="unit"> mmHg</span>)<sup>*</sup>
+      </td>
+    </tr>
+    <tr>
+      <th>HR</th>
+      <td>
+        <span id="hr-5"></span>–<span id="hr-95"></span>
+        <span class="unit"> bpm</span><sup>†</sup>
+      </td>
+    </tr>
+    <tr>
+      <th>RR</th>
+      <td>
+        <span id="rr-5"></span>–<span id="rr-95"></span>
+        <span class="unit"> bpm</span><sup>†</sup>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<small>
+  <sup>*</sup>50th centile (5th – 95th)<br>
+  <sup>†</sup>5th – 95th centile
+</small>
+      </div>
+      </div>
+    </div>
+  
+  <div class="accordion-item">
+
+    <div class="accordion-header">
+
+      <span class="accordion-title">
+
+        <i class="fa-solid fa-mask-ventilator"></i>Airway and Ventilation
+
+      </span>
+
+      <span>
+
+        <i class="fas fa-plus"></i>
+
+        <i class="fas fa-minus"></i>
+
+      </span>
+
+    </div>
+
+    <div class="accordion-content">
+
+      <div class="accordion-content-inner">
+<div class="result-group">
+  <table class="result-table">
+  <thead>
+    <tr>
+      <th colspan="2">Endotracheal tube (ETT)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Laryngoscope</th>
+      <td><span id="laryngoscope"></span></td>
+    </tr>
+    <tr>
+      <th>Uncuffed ETT</th>
+      <td><span id="ett-uncuffed"></span></td>
+    </tr>
+    <tr>
+      <th>Cuffed ETT</th>
+      <td><span id="ett-cuffed"></span></td>
+    </tr>
+    <tr>
+      <th>Depth at lips</th>
+      <td>
+        <span id="ett-depth-lips"></span>
+        <span class="unit">cm</span>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>  
+
+<table class="result-table">
+  <thead>
+    <tr>
+      <th colspan="2">Supraglottic airway device (SAD)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>LMA</th>
+      <td><span id="lma"></span></td>
+    </tr>
+    <tr>
+      <th>i-Gel</th>
+      <td><span id="igel"></span></td>
+    </tr>
+  </tbody>
+</table>      
+
+        <table class="result-table">
+  <thead>
+    <tr>
+      <th colspan="2">Breathing circuits</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>T-piece</th>
+      <td>0–20 kg</td>
+    </tr>
+    <tr>
+      <th>Infant (Micro)</th>
+      <td>0–10 kg</td>
+    </tr>
+    <tr>
+      <th>Paediatric (Mini)</th>
+      <td>10–30 kg</td>
+    </tr>
+    <tr>
+      <th>Adult</th>
+      <td>&gt;20 kg</td>
+    </tr>
+  </tbody>
+</table>
+
+        <table class="result-table">
+  <thead>
+    <tr>
+      <th colspan="2">Ventilation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Tidal volume (6–8 ml/kg)</th>
+      <td><span id="tidalvolume"></span></td>
+    </tr>
+    <tr>
+      <th>Neonates / ARDS (4–6 ml/kg)</th>
+      <td><span id="tv-neonates-ards"></span></td>
+    </tr>
+  </tbody>
+</table>
+  </div>
+      </div>      
+</div>
+  
+<div class="accordion-item">
+
+    <div class="accordion-header">
+
+      <span class="accordion-title">
+
+        <i class="fas fa-syringe"></i>Emergency Intubation
+
+      </span>
+
+      <span>
+
+        <i class="fas fa-plus"></i>
+
+        <i class="fas fa-minus"></i>
+
+      </span>
+
+    </div>
+
+  <div class="accordion-content">
+  <div class="accordion-content-inner">
+      <div class="result">
+    <table class="result-table">
+   <thead>
+      <tr>
+        <th colspan="3">
+          Induction
+        </th>
+      </tr>
+    </thead>
+      <!-- Fentanyl -->
+  <tr class="row-blue">
+    <td>
+      Fentanyl
+    </td>
+    <td>
+      1–2 mcg/kg
+    </td>
+    <td>
+      <span id="fentanyl"></span><span class="static unit">mcg</span>
+    </td>
+  </tr>
+  <tr class="sub-blue">
+    <td colspan="3">
+      <small id="fentanyl-vol-extra"></small>
+    </td>
+  </tr>
+
+  <!-- Ketamine -->
+  <tr class="row-yellow">
+    <td>
+      Ketamine
+    </td>
+    <td>
+      1–2 mg/kg
+    </td>
+    <td>
+      <span id="ketamine"></span><span class="static unit">mg</span>
+    </td>
+  </tr>
+  <tr class="sub-yellow">
+    <td colspan="3">
+      <small id="ketamine-vol-extra"></small>
+    </td>
+  </tr>
+
+  <!-- Rocuronium -->
+  <tr class="row-red">
+    <td>
+     Rocuronium
+    </td>
+    <td>
+      1 mg/kg
+    </td>
+    <td>
+      <span id="rocuronium"></span><span class="static unit">mg</span>
+    </td>
+  </tr>
+  <tr class="sub-red">
+    <td colspan="3">
+      <small id="rocuronium-vol-extra"></small>
+    </td>
+  </tr>
+</table>
+
+<br>
+ <table class="result-table">
+   <thead>
+      <tr>
+        <th colspan="3">
+          Maintenance infusions
+        </th>
+      </tr>
+    </thead>
+      <!-- Fentanyl -->
+  <tr class="row-blue">
+    <td>
+      Morphine
+    </td>
+    <td>
+      10–40 mcg/kg/h (0.5–2 ml/h)
+    </td>
+  </tr>
+  <tr class="sub-blue">
+    <td colspan="3">
+      <small id="morphine-sed"></small>
+    </td>
+  </tr>
+
+  <tr class="row-orange">
+    <td>
+      Midazolam
+    </td>
+    <td>
+      1–3 mcg/kg/min (1–3 ml/h)
+    </td>
+  </tr>
+  <tr class="sub-orange">
+    <td colspan="3">
+      <small id="midaz-sed"></small>
+    </td>
+  </tr>
+          
+            <tr class="row-yellow">
+    <td>
+      Propofol
+    </td>
+    <td>
+      1–4 mg/kg/h<br>(4–10 mg/kg/h in routine anaesthesia)
+    </td>
+  </tr>
+  <tr class="sub-yellow">
+    <td colspan="3">
+      <small id="propofol-sed"></small>
+    </td>
+  </tr>
+        </table>
+        <br>
+          
+
+    <table class="result-table">
+   <thead>
+      <tr>
+        <th colspan="3">
+          Emergency Drugs
+        </th>
+      </tr>
+    </thead>
+  <!-- Atropine -->
+  <tr class="row-green">
+    <td>
+      Atropine
+    </td>
+    <td>
+      20 mcg/kg
+    </td>
+    <td>
+      <span id="atropine"></span><span class="static unit">mcg</span>
+    </td>
+  </tr>
+  <tr class="sub-green">
+    <td colspan="3">
+      <small id="atropine-vol-extra"></small>
+    </td>
+  </tr>
+
+  <!-- Adrenaline IV 1:10,000 -->
+  <tr class="row-purple">
+    <td>
+      Adrenaline IV 1:10,000
+    </td>
+    <td>
+      0.1 mL/kg
+    </td>
+    <td>
+      <span id="adrenalineiv"></span><span class="static unit">mL</span>
+    </td>
+  </tr>
+  <tr class="sub-purple">
+    <td colspan="3">
+      <small id="adrenalineiv-vol-extra"></small>
+    </td>
+  </tr>
+
+  <!-- Suxamethonium IV -->
+  <tr class="row-red">
+    <td>
+      Suxamethonium IV
+    </td>
+    <td>
+  <span id="sux-range">1–2</span>
+  <span class="unit">mg/kg</span>
+</td>
+    <td>
+      <span id="sux-iv"></span><span class="static unit">mg</span>
+    </td>
+  </tr>
+  <tr class="sub-red">
+    <td colspan="3">
+      <small id="sux-iv-vol-extra"></small>
+    </td>
+  </tr>
+
+  <!-- Suxamethonium IM -->
+  <tr class="row-red">
+    <td>
+      Suxamethonium IM
+    </td>
+    <td>
+      4 mg/kg<br>(Max 150 mg)
+    </td>
+    <td>
+      <span id="sux-im"></span><span class="static unit">mg</span>
+    </td>
+  </tr>
+  <tr class="sub-red">
+    <td colspan="3">
+      <small id="sux-im-vol-extra"></small>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+    <table class="result-table">
+   <thead>
+      <tr>
+        <th colspan="3">
+          Other
+        </th>
+      </tr>
+    </thead>
+  <!-- Non‐drug items (single rows) -->
+  <tr class="row-grey">
+    <td>
+      Fluid bolus
+    </td>
+    <td>
+      10–20 mL/kg
+    </td>
+    <td>
+      <span id="fluidbolus"></span><span class="static unit">mL</span>
+    </td>
+  </tr>
+  <tr class="row-grey">
+    <td>
+      Glucose 10%
+    </td>
+    <td>
+      2 mL/kg
+    </td>
+    <td>
+      <span id="glucose10"></span><span class="static unit">mL</span>
+    </td>
+  </tr>
+  <tr class="row-grey">
+    <td>
+      Defibrillation energy
+    </td>
+    <td>
+      4 J/kg
+    </td>
+    <td>
+      <span id="defib"></span><span class="static unit">J</span>
+    </td>
+  </tr>
+</table>
+        <p class="text-center">
+        <small>For other drugs and infusions, use Paediatric Emergency Tools: <a href="https://apps.apple.com/gb/app/paediatric-emergency-tools/id415663345">Apple</a> / <a href="https://play.google.com/store/apps/details?id=com.ubqo.paedscalc&hl=en_GB&pli=1">Android</a>.
+          </small></p>
+        <div style="text-align: center; margin-bottom: 0em;">
+        <small>
+          <p><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/Severe-bronchiolitis.pdf">STRS Bronchiolitis</a></p>
+          <p><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/Sepsis.pdf">STRS Sepsis</a></p>
+          <p><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/neonatal-collapse.pdf">STRS Neonatal collapse</a></p>
+        <p><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/peripheral-inotropes.pdf">STRS Peripheral inotropes</a></p>
+          </small>
+          </div>
+  </div>
+</div>
+    </div>
+  </div>
+  
+    <div class="accordion-item">
+
+    <div class="accordion-header">
+
+      <span class="accordion-title">
+
+        <i class="fas fa-pills"></i> Premedication & Sedation
+
+      </span>
+
+      <span>
+
+        <i class="fas fa-plus"></i>
+
+        <i class="fas fa-minus"></i>
+
+      </span>
+
+    </div>
+
+    <div class="accordion-content">
+
+      <div class="accordion-content-inner general-section">      
+ 
+  <div class="result">
+    
+    <table>
+
+          <tr style="background-color: rgba(250, 119, 10, 0.8);">
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              Midazolam - PO
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              0.5 mg/kg
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+              <span id="premed-midaz"></span>
+              <span class="static unit">mg</span>
+            </td>
+          </tr>
+          <tr style="background-color: #fff3e0;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+              <small>Max 20 mg per dose; 6 months - 14 years. Peak effect at 20-30 mins.</small>
+            </td>
+          </tr>
+      
+      <tr style="background-color: rgba(250, 119, 10, 0.8);">
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              Midazolam - NAS
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              0.2 mg/kg
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+              <span id="premed-midaz-intranasal"></span>
+              <span class="static unit">mg</span>
+            </td>
+          </tr>
+          <tr style="background-color: #fff3e0;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+              <small>Max 10 mg. Given via short atomiser: 0.1 ml dead space. Peak effect at 10 mins.</small>
+            </td>
+          </tr>
+      
+      <tr>
+            <td style="background-color: #f5f5f5; padding: 8px; border: 1px solid #ccc;">
+              Dexmedetomidine - NAS
+            </td>
+            <td style="background-color: #f5f5f5; padding: 8px; border: 1px solid #ccc;">
+              2–4 mcg/kg
+            </td>
+            <td style="background-color: #f5f5f5; padding: 8px; border: 1px solid #ccc; text-align: right;">
+              <span id="premed-dexmed"></span>
+              <span class="static unit">mcg</span>
+            </td>
+          </tr>
+          <tr style="background-color: #f5f5f5;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+              <small>Max 200 mcg per dose. Given 30 mins before intervention.</small>
+            </td>
+          </tr>
+      
+      </table>
+  </div>
+  </div>
+    </div>
+  </div>
+      
+    
+<div class="accordion-item">
+
+    <div class="accordion-header">
+
+      <span class="accordion-title">
+
+        <i class="fa-solid fa-bed"></i> Routine General Anaesthesia
+
+      </span>
+
+      <span>
+
+        <i class="fas fa-plus"></i>
+
+        <i class="fas fa-minus"></i>
+
+      </span>
+
+    </div>
+
+    <div class="accordion-content">
+
+      <div class="accordion-content-inner general-section">      
+ 
+  <div class="result">
+    
+    <table>
+<thead>
+      <tr>
+        <th colspan="3" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+          Induction
+        </th>
+      </tr>
+    </thead>
+          <!-- Fentanyl GA -->
+          <tr style="background-color: #98c9ee;">
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              Fentanyl
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              1–2 mcg/kg
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+              <span id="fentanyl-ga"></span>
+              <span class="static unit">mcg</span>
+            </td>
+          </tr>
+          <tr style="background-color: #e0f0ff;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+              <small id="fentanyl-ga-extra"></small>
+            </td>
+          </tr>
+
+          <!-- Propofol GA -->
+          <tr style="background-color: #ffe733;">
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              Propofol
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              3–5 mg/kg
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+              <span id="propofol"></span>
+              <span class="static unit">mg</span>
+            </td>
+          </tr>
+          <tr style="background-color: #fff8cc;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+              <small id="propofol-ga-extra"></small>
+            </td>
+          </tr>
+
+          <!-- Rocuronium GA -->
+          <tr style="background-color: #ec6f73;">
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              Rocuronium
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              0.6 mg/kg
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+              <span id="rocuronium-ga"></span>
+              <span class="static unit">mg</span>
+            </td>
+          </tr>
+          <tr style="background-color: #ffdada;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+              <small id="rocuronium-ga-extra"></small>
+            </td>
+          </tr>
+    </table>
+<br>
+      <table>
+        <thead>
+      <tr>
+        <th colspan="3" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+          Antiemetics
+        </th>
+      </tr>
+    </thead>  
+     
+          <!-- Dexamethasone GA -->
+          <tr style="background-color: #ffffff;">
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              Dexamethasone
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              0.15 mg/kg
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+              <span id="dexamethasone"></span>
+              <span class="static unit">mg</span>
+            </td>
+          </tr>
+          <tr style="background-color: #f5f5f5;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+              <small id="dexamethasone-ga-extra"></small>
+            </td>
+          </tr>
+        
+         <!-- Ondansetron GA -->
+          <tr style="background-color: #fdd7a0;">
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              Ondansetron
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              0.15 mg/kg
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+              <span id="ondansetron"></span>
+              <span class="static unit">mg</span>
+            </td>
+          </tr>
+          <tr style="background-color: #fff3e0;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+              <small id="ondansetron-ga-extra"></small>
+            </td>
+          </tr>
+        
+        <tr style="background-color: #fdd7a0;">
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              Cyclizine
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              0.5–1 mg/kg
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+              <span id="cyclizine"></span>
+              <span class="static unit">mg</span>
+            </td>
+          </tr>
+          <tr style="background-color: #fff3e0;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+              <small id="cyclizine-ga-extra"></small>
+            </td>
+          </tr>
+    </table>
+<br>
+        <table>
+          <thead>
+      <tr>
+        <th colspan="3" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+          Intraoperative analgesia
+        </th>
+      </tr>
+    </thead>
+          <tr style="background-color: #ffffff;">
+  <td style="padding: 8px; border: 1px solid #ccc;">
+   Paracetamol IV
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc;">
+   
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+    <span id="paracetamol-iv"></span><span class="static unit">mg</span>
+  </td>
+</tr>
+<tr style="background-color: #f5f5f5;">
+  <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+    <small id="paracetamol-iv-note"></small>
+  </td>
+</tr>
+
+<!-- Ibuprofen IV -->
+<tr style="background-color: #ffffff;">
+  <td style="padding: 8px; border: 1px solid #ccc;">
+   Ibuprofen IV
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc;">
+   
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+    <span id="ibuprofeniv"></span><span class="static unit">mg</span>
+  </td>
+</tr>
+<tr style="background-color: #f5f5f5;">
+  <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+    <small id="ibuprofeniv-note"></small>
+  </td>
+</tr>
+          <!-- Ketorolac -->
+<tr style="background-color: #ffffff;">
+  <td style="padding: 8px; border: 1px solid #ccc;">
+    Ketorolac
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc;">
+    0.5–1 mg/kg
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+    <span id="ketorolac"></span><span class="static unit">mg</span>
+  </td>
+</tr>
+<tr style="background-color: #f5f5f5;">
+  <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+    <small id="ketorolac-extra"></small>
+  </td>
+</tr>
+           <!-- Morphine IV -->
+<tr style="background-color: #98c9ee;">
+  <td style="padding: 8px; border: 1px solid #ccc;">
+    Morphine
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc;">
+    0.05–0.1 mg/kg
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+    <span id="morphineiv"></span><span class="static unit">mg</span>
+  </td>
+</tr>
+<tr style="background-color: #e0f0ff;">
+  <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+    <small id="morphine-iv-extra"></small>
+  </td>
+</tr>
+    </table>
+  
+    <br>
+    <table>
+      <thead>
+      <tr>
+        <th colspan="3" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+          Reversal of neuromuscular blockade
+        </th>
+      </tr>
+    </thead>     
+       <tr style="background: repeating-linear-gradient(
+  135deg,
+  #f8a8c2 0px,
+  #f8a8c2 8px,
+  #fafafa 8px,
+  #fafafa 16px
+);">
+  <td style="padding: 8px; border: 1px solid #ccc;">
+      Neostigmine &<br> Glycopyrulate
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc;">
+    
+      <span class="neo-dose">0.02 mL/kg</span>
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+   <span class="neos-dose"></span><span class="static unit">ml</span>
+  </td>
+</tr>
+<tr style="background-color: #fff5f7;">
+  <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+    <small class="neos-extra"></small>
+  </td>
+</tr> 
+       <tr style="background: repeating-linear-gradient(
+  135deg,
+  #f8a8c2 0px,
+  #f8a8c2 8px,
+  #fafafa 8px,
+  #fafafa 16px
+);">
+        <td style="padding: 8px; border: 1px solid #ccc;">
+   Sugammadex
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc;">
+    2 mg/kg
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+    <span class="sug-2-dose"></span><span class="static unit">mg</span>
+  </td>
+</tr>
+<tr style="background-color: #fff5f7;">
+  <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+    <small class="sug-2-extra"></small>
+    <br><small>Moderate block: Return of T<sub>2</sub> in response to TOF.</small>
+  </td>
+</tr> 
+      
+      <tr style="background: repeating-linear-gradient(
+  135deg,
+  #f8a8c2 0px,
+  #f8a8c2 8px,
+  #fafafa 8px,
+  #fafafa 16px
+);">
+  <td style="padding: 8px; border: 1px solid #ccc;">
+   Sugammadex
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc;">
+    4 mg/kg
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+    
+    <span class="sug-4-dose"></span><span class="static unit">mg</span>
+  </td>
+</tr>
+<tr style="background-color: #fff5f7;">
+  <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+    <small class="sug-4-extra"></small>
+    <br><small>Deep block: 1-2 PTCs, no twitch responses to TOF.</small>
+  </td>
+</tr>
+        </table>
+    
+    <br>
+    <table>
+      <thead>
+      <tr>
+        <th colspan="3" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+          Postoperative analgesia
+        </th>
+      </tr>
+    </thead>     
+      <tr style="background-color: #ffffff;">
+  <td style="padding: 8px; border: 1px solid #ccc;">
+    Paracetamol PO
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc;">
+    
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+    <span id="paracetamol-po"></span><span class="static unit">mg</span>
+  </td>
+</tr>
+<tr style="background-color: #f5f5f5;">
+  <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+    <small id="paracetamol-po-note"></small>
+  </td>
+</tr>
+          
+<!-- Ibuprofen PO -->
+<tr style="background-color: #ffffff;">
+  <td style="padding: 8px; border: 1px solid #ccc;">
+    Ibuprofen PO
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc;">
+    5–10 mg/kg
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+    <span id="ibuprofenpo"></span><span class="static unit">mg</span>
+  </td>
+</tr>
+<tr style="background-color: #f5f5f5;">
+  <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+    <small id="ibuprofenpo-note"></small>
+  </td>
+</tr>
+          
+          <!-- Morphine PO -->
+<tr style="background-color: #98c9ee;">
+  <td style="padding: 8px; border: 1px solid #ccc;">
+    Morphine PO
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc;">
+    
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+    <span id="morphinepo"></span><span class="static unit">mg</span>
+  </td>
+</tr>
+<tr style="background-color: #e0f0ff;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+              <small id="morphine-po-extra"></small>
+  </td>
+</tr>
+    </table>
+    <br>
+<table>
+      <thead>
+      <tr>
+        <th colspan="3" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+          Emergency Drugs
+        </th>
+      </tr>
+    </thead>     
+      <tr style="background-color: #a3ce6f;">
+  <td style="padding: 8px; border: 1px solid #ccc;">
+    Atropine
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc;">
+    20 mcg/kg
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+    <span class="atropine-dose"></span><span class="static unit">mcg</span>
+  </td>
+</tr>
+<tr style="background-color: #e3f0d4;">
+  <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+    <small class="atropine-extra"></small>
+  </td>
+</tr>
+          
+<tr style="background-color: #ec6f73;">
+  <td style="padding: 8px; border: 1px solid #ccc;">
+    Suxamethonium IV
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc;">
+  <span id="sux-ga-range">1–2</span> <span class="unit">mg/kg</span>
+</td>
+  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+    <span class="sux-iv-dose"></span><span class="static unit">mg</span>
+  </td>
+</tr>
+<tr style="background-color: #ffdada;">
+  <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+    <small class="sux-iv-extra"></small>
+  </td>
+</tr>
+          
+<tr style="background-color: #ec6f73;">
+  <td style="padding: 8px; border: 1px solid #ccc;">
+    Suxamethonium IM
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc;">
+    4 mg/kg<br>(Max 150 mg)
+  </td>
+  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+    <span class="sux-im-dose"></span><span class="static unit">mg</span>
+  </td>
+</tr>
+<tr style="background-color: #ffdada;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+              <small class="sux-im-extra"></small>
+  </td>
+</tr>
+    </table>    
+    
+  </div>
+  </div>
+    </div>
+  </div>
+    
+        <div class="accordion-item">
+
+    <div class="accordion-header">
+
+      <span class="accordion-title">
+
+        <i class="fa-solid fa-prescription-bottle-medical"></i> Antibiotics - Surgical prophylaxis
+
+      </span>
+
+      <span>
+
+        <i class="fas fa-plus"></i>
+
+        <i class="fas fa-minus"></i>
+
+      </span>
+
+    </div>
+
+    <div class="accordion-content">
+
+      <div class="accordion-content-inner general-section">      
+ 
+  <div class="result">
+    
+<table style="background-color: #f5f5f5;"> 
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              Amoxicillin
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              30 mg/kg (Max 1 g)
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+              <span id="amoxicillin"></span>
+              <span class="static unit">mg</span>
+            </td>
+          </tr>
+          <tr style="background-color: #f5f5f5;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+              <small></small>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              Cefuroxime
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              50 mg/kg (Max 1.5g)
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+              <span id="cefuroxime"></span>
+              <span class="static unit">mg</span>
+            </td>
+          </tr>
+          <tr style="background-color: #f5f5f5;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+              <small></small>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              Co-Amoxiclav
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              30 mg/kg (Max 1.2 g)
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+              <span id="co-amoxiclav"></span>
+              <span class="static unit">mg</span>
+            </td>
+          </tr>
+          <tr style="background-color: #f5f5f5;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+              <small></small>
+            </td>
+          </tr>
+  <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              Flucloxacillin (Soft tissue)
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              25 mg/kg (Max 1 g)
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+              <span id="flucloxacillin"></span>
+              <span class="static unit">mg</span>
+            </td>
+          </tr>
+   <tr style="background-color: #f5f5f5;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+              <small></small>
+            </td>
+  
+  <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              Flucloxacillin (Open orthopaedic surgery)
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              50 mg/kg (Max 2 g)
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+              <span id="flucloxacillin-bone"></span>
+              <span class="static unit">mg</span>
+            </td>
+          </tr>
+  
+          <tr style="background-color: #f5f5f5;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+              <small></small>
+            </td>
+          </tr>
+    
+   <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              Metronidazole
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              30 mg/kg (Max 500 mg)
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+              <span id="metronidazole"></span>
+              <span class="static unit">mg</span>
+            </td>
+          </tr>
+            <tr style="background-color: #f5f5f5;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+              <small></small>
+            </td>
+          </tr>
+  <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              Teicoplanin
+            </td>
+            <td id="teicoplanin-dosing" style="padding: 8px; border: 1px solid #ccc;"></td>
+            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+              <span id="teicoplanin"></span>
+              <span class="static unit">mg</span>
+            </td>
+          </tr>
+          <tr style="background-color: #f5f5f5;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+              <small id="teicoplanin-note"></small>
+            </td>
+          </tr>
+  
+  <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              Gentamicin
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              2.5 mg/kg (Max 160 mg)
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+              <span id="gentamicin"></span>
+              <span class="static unit">mg</span>
+            </td>
+          </tr>
+          <tr style="background-color: #f5f5f5;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+              <small>In obesity, doses should be calculated based on adjusted body weight.</small>
+            </td>
+          </tr>
+  
+  <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              Gentamicin (high-dose)
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              5 mg/kg (Max 480 mg)
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+              <span id="gentamicin-high"></span>
+              <span class="static unit">mg</span>
+            </td>
+          </tr>
+          <tr style="background-color: #f5f5f5;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+              <small>In obesity, doses should be calculated based on adjusted body weight.</small>
+            </td>
+          </tr>
+  
+    </table>
+  </div>
+  </div>
+    </div>
+  </div>
+   
+     <div class="accordion-item">
+    <div class="accordion-header">
+      <span class="accordion-title">
+        <i class="fa-solid fa-grip-lines"></i> Lines and Suction catheters
+      </span>
+      <span>
+        <i class="fas fa-plus"></i>
+        <i class="fas fa-minus"></i>
+      </span>
+    </div>    
+     <div class="accordion-content">
+      <div class="accordion-content-inner general-section">     
+  <div class="result">    
+<table> 
+      <thead>
+      <tr>
+        <th colspan="2" style="border:1px solid #ccc; padding:8px;">
+         Arterial lines - Radial
+        </th>
+      </tr>
+    </thead>        
+  <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              Neonates/Infants &lt;10 kg
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              24 G<br>Pressure transducer: 150 mmHg (generates a flow rate of 1.5 mL/hr)
+            </td>
+          </tr>
+   
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              Children &gt;10 kg
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              22 G<br>Pressure transducer: 300 mmHg (generates a flow rate of 3 mL/hr)
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              Children &gt;50 kg
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              20 G
+            </td>
+
+          </tr>
+    </table>
+  <br>
+      <table style="background-color: #f5f5f5;"> 
+      <thead>
+      <tr>
+        <th colspan="2" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+         Arterial lines - Femoral
+        </th>
+      </tr>
+    </thead>        
+  <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              Neonates
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              22 G, 8cm
+            </td>
+          </tr>
+
+    <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              Children
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              20 G, 8cm
+            </td>
+          </tr>
+    </table>
+      <br>
+      <table style="background-color: #f5f5f5;"> 
+      <thead>
+      <tr>
+        <th colspan="2" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+         Central venous access - Femoral (preferred)
+        </th>
+      </tr>
+    </thead>        
+  <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              &lt;6 months
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              4–5	Fr, triple lumen, 6–8cm lines	
+            </td>
+          </tr>
+
+    <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              6 m–5 y
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              5	Fr triple lumen, 8–12 cm
+            </td>
+          </tr>
+            <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              &gt;5 y
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              7 fr, triple lumen, 15 cm
+            </td>
+          </tr>
+    </table>
+          <br>
+      <table style="background-color: #f5f5f5;""> 
+      <thead>
+      <tr>
+        <th colspan="2" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+         Central venous access - Internal jugular
+        </th>
+      </tr>
+    </thead>        
+  <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              &lt;15 kg
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              	5 cm		
+            </td>
+          </tr>
+
+    <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              16–40 kg
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              8 cm
+            </td>
+          </tr>
+            <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              &gt;40 kg
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              13 cm
+            </td>
+          </tr>
+    </table>
+       <br>
+
+      <table style="background-color: #f5f5f5;"> 
+      <thead>
+      <tr>
+        <th colspan="2" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+         EZ-IO
+        </th>
+      </tr>
+    </thead>        
+  <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              &lt;---
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              	---	
+            </td>
+          </tr>
+
+    <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              ---
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              ---
+            </td>
+          </tr>
+            <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              &gt;---
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              ---
+            </td>
+          </tr>
+    </table>
+      
+               <br>
+      <table style="background-color: #f5f5f5;"> 
+      <thead>
+      <tr>
+        <th colspan="2" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+         Suction catheters
+        </th>
+      </tr>
+    </thead>        
+  <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              &lt;---
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              	---		
+            </td>
+          </tr>
+
+    <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              ---
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              ---
+            </td>
+          </tr>
+            <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              &gt;---
+            </td>
+            <td style="padding: 8px; border: 1px solid #ccc;">
+              ---
+            </td>
+          </tr>
+    </table>
+              
+  </div>
+  </div>
+    </div>
+  </div>
+    
+     <div class="accordion-item">
+
+    <div class="accordion-header">
+
+      <span class="accordion-title">
+
+        <i class="fa-solid fa-book"></i> Useful Links and Guidelines
+
+      </span>
+
+      <span>
+
+        <i class="fas fa-plus"></i>
+
+        <i class="fas fa-minus"></i>
+
+      </span>
+
+    </div>
+
+    <div class="accordion-content">
+
+      <div class="accordion-content-inner general-section">      
+        
+                <p><strong>Other calculators</strong></p>
+        <p><a href="https://www.paedspro.com/">Paeds Prescribing Pro Drug Calculator</a></p>
+        <p>Paediatric Emergency Tools: <a href="https://apps.apple.com/gb/app/paediatric-emergency-tools/id415663345">Apple</a> / <a href="https://play.google.com/store/apps/details?id=com.ubqo.paedscalc&hl=en_GB&pli=1">Android</a></p>
+        <br>
+        <p><strong>Retrieval Teams</strong></p>
+                <p><a href="https://www.evelinalondon.nhs.uk/our-services/hospital/south-thames-retrieval-service/clinical-guidelines.aspx">South Thames Retrieval Service (STRS) Clinical Guidelines</a></p>
+        <p><a href="https://cats.nhs.uk/clinical-guidelines/">Children’s Acute Transport Service (CATS) Clinical Guidelines</a></p>
+        <p><a href="https://www.sort.nhs.uk/home.aspx">Southampton Oxford Retrieval Team (SORT) Clinical Guidelines</a></p>
+        <br>
+        <p><strong>Specific Emergency Guidelines</strong></p>
+        <p><a href="/guidelines/paediatrics/strs-intubation-guideline.pdf">STRS Intubation Guideline and Checklist</a></p>
+        <p><a href="/guidelines/paediatrics/cats-intubation-checklist.pdf">CATS Intubation Checklist</a></p>
+        <p><a href="/guidelines/paediatrics/apls-emergency-drug-chart-2021.pdf">APLS Emergency Drug Chart</a></p>
+        <p><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/Severe-bronchiolitis.pdf">STRS Bronchiolitis</a></p>
+        <p><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/Sepsis.pdf">STRS Sepsis</a></p>
+        <p><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/peripheral-inotropes.pdf">STRS Peripheral inotropes</a></p>
+        <p><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/neonatal-collapse.pdf">STRS Neonatal collapse</a></p>
+        <br>
+                <p><strong>Airway Guidelines</strong></p>
+        <p><a href="https://cats.nhs.uk/das-paediatric-difficult-bmv.pdf/">DAS Difficult mask ventilation during routine induction of anaesthesia in a child aged 1–8 years guideline</a></p>
+        <p><a href="/guidelines/paediatrics/das-paediatric-difficult-intubation.pdf">DAS Difficult intubation during routine induction of anaesthesia in a child aged 1–8 years guideline</a></p>
+        <p><a href="/guidelines/paediatrics/das-paediatric-cicv.pdf">DAS Cannot Intubate and Cannot Ventilate (CICV) in a paralysed anaesthetised child aged 1–8 years</a></p>
+        <br>
+        <p><strong>Anaphylaxis Guidelines</strong></p>
+        <p><a href="/guidelines/paediatrics/apls-perioperative-anaphylaxis-2021.pdf">APLS Perioperative Anaphylaxis algorithm</a></p>
+        <p><a href="/guidelines/paediatrics/apls-anaphylaxis-2021.pdf">APLS Anaphylaxis algorithm</a></p>
+        <p><a href="/guidelines/paediatrics/apls-refractory-anaphylaxis-2021.pdf">APLS Refractory Anaphylaxis algorithm</a></p>
+        <br>
+        <p><strong>Advanced Paediatric Life Support (APLS) 2021 Resources</strong></p>
+           <p><a href="/guidelines/paediatrics/apls-algorithm-2021.pdf">APLS Algorithm</a></p>
+        <p><a href="/guidelines/paediatrics/nls-algorithm-2021.pdf">Neonatal Life Support Algorithm</a></p>
+        <p><a href="/guidelines/paediatrics/apls-cardiac-arrhythmias-2021.pdf">APLS Paediatric Cardiac Arrhythmias Algorithm</a></p>
+       <p><a href="/guidelines/paediatrics/apls-algorithms-resources-2021.pdf">APLS Paediatric Emergency Algorithms and Resources</a></p>
+        <p></p>
+        <p><a href="https://www.resus.org.uk/library/2021-resuscitation-guidelines/paediatric-advanced-life-support-guidelines">Paediatric Advanced Life Support Guidelines (Resuscitation Council UK)</a></p>
+        <br>
+      
+  </div>
+    </div>
+  </div>
+    
+     <div class="accordion-item">
+
+    <div class="accordion-header">
+
+      <span class="accordion-title">
+       <i class="fa-solid fa-calculator"></i> Calculations and tables
+      </span>
+      <span>
+        <i class="fas fa-plus"></i>
+        <i class="fas fa-minus"></i>
+      </span>
+    </div>
+    <div class="accordion-content">
+      <div class="accordion-content-inner general-section"> 
+       <table>
+    <thead>
+      <tr>
+        <th colspan="2"; border:1px solid #ccc; padding:8px;">
+         Weight (kg)
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th style="border:1px solid #ccc; padding:8px; text-align:center;">Age 1-12 months</th>
+        <td style="border:1px solid #ccc; padding:8px; text-align:center;">
+          <p>0.5 x Age (months) + 4</p> 
+        </td>
+      </tr>
+         <tr>
+        <th style="border:1px solid #ccc; padding:8px; text-align:center;">Age 1-5 years</th>
+        <td style="border:1px solid #ccc; padding:8px; text-align:center;">
+          <p>2 x Age (years) + 8</p> 
+        </td>
+      </tr>
+          <tr>
+        <th style="border:1px solid #ccc; padding:8px; text-align:center;">Age 6-14 years</th>
+        <td style="border:1px solid #ccc; padding:8px; text-align:center;">
+          <p>2 x Age (years) + 8</p> 
+          <p>3 x Age (years) + 7</p>
+        </td>
+      </tr>
+    </tbody>
+  </table>        
+        <br>
+        <table>
+    <thead>
+      <tr>
+        <th colspan="2" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+         Airway and Ventilation
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+           <tr>
+        <th style="border:1px solid #ccc; padding:8px; text-align:center;">ETT size</th>
+        <td style="border:1px solid #ccc; padding:8px; text-align:center;">
+          <p>Uncuffed ETT size = (Age/4) + 4 [Cole formula]</p>
+          <p>Cuffed ETT size = (Age/4) + 3.5 [Modified Cole]</p>
+        </td>
+      </tr>
+      <tr>
+        <th style="border:1px solid #ccc; padding:8px; text-align:center;">ETT depth (oral)</th>
+        <td style="border:1px solid #ccc; padding:8px; text-align:center;">
+          <p>Above 1 year: Depth ≈ Age/2+12</p> 
+          <p>Neonates: Depth ≈ 1.17 × Birth weight (kg) + 5.58 (Tochen / “7-8-9” rule)</p>
+        </td>
+      </tr>
+            <tr>
+        <th style="border:1px solid #ccc; padding:8px; text-align:center;">ETT depth (nasal)</th>
+        <td style="border:1px solid #ccc; padding:8px; text-align:center;">
+          <p>Above 1 year: Depth ≈ Age/2+15</p>
+        </td>
+      </tr>
+    </tbody>
+  </table>  
+        <br>
+        </table>        
+        <br>
+        <table>
+    <thead>
+      <tr>
+        <th colspan="2" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+         Circulation
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+           <tr>
+        <th style="border:1px solid #ccc; padding:8px; text-align:center;">Lowest acceptable SBP</th>
+        <td style="border:1px solid #ccc; padding:8px; text-align:center;">
+          <p>&lt;1 month: &ge;60 mmHg</p>
+          <p>1 month to 1 year: &ge;70 mmHg</p>
+          <p>1–10 years: 2 x Age + 70 mmHg</p>
+        </td>
+      </tr>
+      <tr>
+        <th style="border:1px solid #ccc; padding:8px; text-align:center;">Lowest acceptable MAP</th>
+        <td style="border:1px solid #ccc; padding:8px; text-align:center;">
+          <p>Age (in years) x 1.5 + 40 mmHg</p> 
+        </td>
+      </tr>
+            <tr>
+        <th style="border:1px solid #ccc; padding:8px; text-align:center;">Premature Neonates</th>
+        <td style="border:1px solid #ccc; padding:8px; text-align:center;">
+          <p>Gestational age ≈ Mean Arterial Pressure</p>
+        </td>
+      </tr>
+    </tbody>
+  </table>  
+         </div>
+    </div>
+  </div>
+        </div> 
+<div class="main-control-buttons">
+    <button type="button" class="reset-btn" onclick="resetForm()">Reset</button>
+    <button type="button" class="home-btn" onclick="goHome()">Home</button>
+  </div>
+  
+  <footer>
+    <small> 
+      <p>These tools and calculators do not have approval by the MHRA as medical devices and clinicians need to be aware that they use them at their own risk. Results should be verified and used in conjunction with the appropriate training and professional judgement, and according to your local hospital policies and procedures.</p>
+    </small>
+      <details>
+    <summary>Notes</summary>
+  <small>
+        <p>SBP: Systolic blood pressure; HR: Heart rate; RR: Respiratory rate; LMA: Laryngeal mask airway; ARDS: Acute respiratory distress syndrome; PO: By mouth; NAS: Intranasal; TOF: Train-of-four; PTC: Post-tetanic count</p>
+        </small>  
+    </details>
+        <p>
+<details>
+<summary>References</summary>
+<small>
+<ol>
+<li>Samuels M, Wieteska S, editors.
+  <em>Advanced Paediatric Life Support: a practical approach to emergencies</em>.
+  6th ed. Chichester (UK): Wiley-Blackwell; 2016. doi:10.1002/9781119241225.</li>
+  <li>Weiner GM, editor.
+  <em>Textbook of Neonatal Resuscitation (NRP)</em>.
+  9th ed. Itasca (IL): American Academy of Pediatrics; 2025.
+</li>
+ <li>Paediatric Formulary Committee.
+  <em>BNF for Children (BNFC)</em>.
+  London: BMJ Group, Pharmaceutical Press, and RCPCH Publications.
+  Available from: <a href="https://bnfc.nice.org.uk/" target="_blank" rel="noopener noreferrer">https://bnfc.nice.org.uk/</a>
+  (accessed 20 Feb 2026).
+</li>
+      </ol>
+    </small>
+      </details></p>
+<small>        
+      <p><a href="disclaimer.html">Disclaimer</a></p>
+      <p>&copy; 2025 #OneTeam Anaesthesia. All rights reserved.</p>
+    </small>
+  </footer>
+
+<script src="paeds-bmi-data.js"></script>
+<script src="paeds-bmi-functions.js"></script>
+<script src="paeds-script.js"></script>
+    
+</body>
+</html>
