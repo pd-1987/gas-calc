@@ -276,6 +276,8 @@
 .row-orange  { background-color: #F68B2F; color: #000; }
 .row-purple  { background-color: #d3ace5; color: #000; }
 .row-grey    { background-color: #bcbdc0; color: #000; }
+.row-white   { background-color: #ffffff; color: #000; }
+.row-antiemetic { background-color: #F4B183; color: #000; }
 
 /* ===== Sub rows (info / volume rows) ===== */
 .sub-blue    { background-color: #e0effa; color: #000; }
@@ -285,6 +287,8 @@
 .sub-orange  { background-color: #fff3e0; color: #000; }
 .sub-purple  { background-color: #f2e6f7; color: #000; }
 .sub-grey    { background-color: #e8e6e4; color: #000; }
+.sub-white   { background-color: #f5f5f5; color: #000; }
+.sub-antiemetic { background-color: #FCE5CD; color: #000; }
 
 .row-blue,
 .row-yellow,
@@ -293,6 +297,8 @@
 .row-grey,
 .row-orange,
 .row-purple,
+.row-white,
+.row-antiemetic,
 .result-table tr[style*="background-color"] {
   color: #000 !important;
 }
@@ -302,8 +308,10 @@
 .row-red td,
 .row-green td,
 .row-grey td,
-.row-orange,
-.row-purple,
+.row-orange td,
+.row-purple td,
+.row-white td,
+.row-antiemetic td,
 .result-table tr[style*="background-color"] td {
   color: #000 !important;
 }
@@ -314,10 +322,11 @@
 .sub-green,
 .sub-orange,
 .sub-purple,
-.sub-grey {
+.sub-grey, 
+.sub-white,
+.sub-antiemetic {
   color: #000 !important;
 }
-
 .sub-blue td,
 .sub-yellow td,
 .sub-red td,
@@ -331,13 +340,14 @@
 .sub-green small,
 .sub-orange small,
 .sub-purple small,
-.sub-grey small {
+.sub-grey small, 
+.sub-white small, 
+.sub-antiemetic small {
   color: #000 !important;
 }
     /* Force units + dynamic spans to follow row colour */
 .result-table td span,
-.result-table td .unit,
-.result-table td small {
+.result-table td .unit {
   color: inherit !important;
 }
  .result-table td span:not(.unit) {
@@ -347,8 +357,9 @@
   font-weight: 600;
   background: var(--btn-bg);
   color: var(--text-main);
-  text-align: left;
-  width: 35%;
+  text-align: center;
+  width: 40px;
+  white-space: nowrap;
   border-right: 2px solid var(--border-light);
 }
   </style>
@@ -703,7 +714,6 @@
   </tr>
 </table>
 
-<br>
  <table class="result-table">
    <thead>
       <tr>
@@ -755,9 +765,7 @@
     </td>
   </tr>
         </table>
-        <br>
-          
-
+        
     <table class="result-table">
    <thead>
       <tr>
@@ -927,58 +935,58 @@
  
   <div class="result">
     
-    <table>
+    <table class="result-table">
 
-          <tr style="background-color: rgba(250, 119, 10, 0.8);">
-            <td style="padding: 8px; border: 1px solid #ccc;">
+          <tr class="row-orange">
+            <td>
               Midazolam - PO
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               0.5 mg/kg
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+            <td>
               <span id="premed-midaz"></span>
               <span class="static unit">mg</span>
             </td>
           </tr>
-          <tr style="background-color: #fff3e0;">
-            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+          <tr class="sub-orange">
+            <td colspan="3">
               <small>Max 20 mg per dose; 6 months - 14 years. Peak effect at 20-30 mins.</small>
             </td>
           </tr>
       
-      <tr style="background-color: rgba(250, 119, 10, 0.8);">
-            <td style="padding: 8px; border: 1px solid #ccc;">
+      <tr class="row-orange">
+            <td>
               Midazolam - NAS
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               0.2 mg/kg
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+            <td>
               <span id="premed-midaz-intranasal"></span>
               <span class="static unit">mg</span>
             </td>
           </tr>
-          <tr style="background-color: #fff3e0;">
-            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+          <tr class="sub-orange">
+            <td colspan="3">
               <small>Max 10 mg. Given via short atomiser: 0.1 ml dead space. Peak effect at 10 mins.</small>
             </td>
           </tr>
       
-      <tr>
-            <td style="background-color: #f5f5f5; padding: 8px; border: 1px solid #ccc;">
+      <tr class="row-white">
+            <td>
               Dexmedetomidine - NAS
             </td>
-            <td style="background-color: #f5f5f5; padding: 8px; border: 1px solid #ccc;">
+            <td>
               2–4 mcg/kg
             </td>
-            <td style="background-color: #f5f5f5; padding: 8px; border: 1px solid #ccc; text-align: right;">
+            <td>
               <span id="premed-dexmed"></span>
               <span class="static unit">mcg</span>
             </td>
           </tr>
-          <tr style="background-color: #f5f5f5;">
-            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+          <tr class="sub-white">
+            <td colspan="3">
               <small>Max 200 mcg per dose. Given 30 mins before intervention.</small>
             </td>
           </tr>
@@ -1016,133 +1024,133 @@
  
   <div class="result">
     
-    <table>
+    <table class="result-table">
 <thead>
       <tr>
-        <th colspan="3" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+        <th colspan="3">
           Induction
         </th>
       </tr>
     </thead>
           <!-- Fentanyl GA -->
-          <tr style="background-color: #98c9ee;">
-            <td style="padding: 8px; border: 1px solid #ccc;">
+          <tr class="row-blue">
+            <td>
               Fentanyl
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               1–2 mcg/kg
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+            <td>
               <span id="fentanyl-ga"></span>
               <span class="static unit">mcg</span>
             </td>
           </tr>
-          <tr style="background-color: #e0f0ff;">
-            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+          <tr class="sub-blue">
+            <td colspan="3">
               <small id="fentanyl-ga-extra"></small>
             </td>
           </tr>
 
           <!-- Propofol GA -->
-          <tr style="background-color: #ffe733;">
-            <td style="padding: 8px; border: 1px solid #ccc;">
+          <tr class="row-yellow">
+            <td>
               Propofol
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               3–5 mg/kg
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+            <td>
               <span id="propofol"></span>
               <span class="static unit">mg</span>
             </td>
           </tr>
-          <tr style="background-color: #fff8cc;">
-            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+          <tr class="sub-yellow">
+            <td colspan="3">
               <small id="propofol-ga-extra"></small>
             </td>
           </tr>
 
           <!-- Rocuronium GA -->
-          <tr style="background-color: #ec6f73;">
-            <td style="padding: 8px; border: 1px solid #ccc;">
+          <tr class="row-red">
+            <td>
               Rocuronium
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               0.6 mg/kg
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+            <td>
               <span id="rocuronium-ga"></span>
               <span class="static unit">mg</span>
             </td>
           </tr>
-          <tr style="background-color: #ffdada;">
-            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+          <tr class="sub-red">
+            <td colspan="3">
               <small id="rocuronium-ga-extra"></small>
             </td>
           </tr>
     </table>
 <br>
-      <table>
+      <table class="result-table">
         <thead>
       <tr>
-        <th colspan="3" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+        <th colspan="3">
           Antiemetics
         </th>
       </tr>
     </thead>  
      
           <!-- Dexamethasone GA -->
-          <tr style="background-color: #ffffff;">
-            <td style="padding: 8px; border: 1px solid #ccc;">
+          <tr class="row-white">
+            <td>
               Dexamethasone
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               0.15 mg/kg
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+            <td>
               <span id="dexamethasone"></span>
               <span class="static unit">mg</span>
             </td>
           </tr>
-          <tr style="background-color: #f5f5f5;">
-            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+          <tr class="sub-white">
+            <td colspan="3">
               <small id="dexamethasone-ga-extra"></small>
             </td>
           </tr>
         
          <!-- Ondansetron GA -->
-          <tr style="background-color: #fdd7a0;">
-            <td style="padding: 8px; border: 1px solid #ccc;">
+          <tr class="row-antiemetic">
+            <td>
               Ondansetron
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               0.15 mg/kg
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+            <td>
               <span id="ondansetron"></span>
               <span class="static unit">mg</span>
             </td>
           </tr>
-          <tr style="background-color: #fff3e0;">
-            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+          <tr class="sub-antiemetic">
+            <td colspan="3">
               <small id="ondansetron-ga-extra"></small>
             </td>
           </tr>
         
-        <tr style="background-color: #fdd7a0;">
-            <td style="padding: 8px; border: 1px solid #ccc;">
+        <tr class="row-antiemetic">
+            <td>
               Cyclizine
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               0.5–1 mg/kg
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+            <td>
               <span id="cyclizine"></span>
               <span class="static unit">mg</span>
             </td>
           </tr>
-          <tr style="background-color: #fff3e0;">
-            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+          <tr class="sub-antiemetic">
+            <td colspan="3">
               <small id="cyclizine-ga-extra"></small>
             </td>
           </tr>
