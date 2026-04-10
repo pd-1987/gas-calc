@@ -1936,25 +1936,28 @@ function expandOpenAccordion() {
 // Gender Toggle Button
 // =========================
 
-const genderBtn = document.getElementById("GenderBtn");
+const genderContainer = document.getElementById("GenderBtn");
 
-let gender = "male"; // default
+genderContainer.addEventListener("click", (e) => {
+  const btn = e.target.closest("button");
+  if (!btn) return;
 
-genderBtn.addEventListener("click", () => {
+  // remove active from both
+  genderContainer.querySelectorAll("button").forEach(b =>
+    b.classList.remove("active")
+  );
 
-  if (gender === "male") {
-    gender = "female";
-    genderBtn.textContent = "Female";
-    genderBtn.dataset.gender = "female";
-  } else {
-    gender = "male";
-    genderBtn.textContent = "Male";
-    genderBtn.dataset.gender = "male";
+  // set active
+  btn.classList.add("active");
+
+  // store value (so your BMI logic still works)
+  genderContainer.dataset.gender = btn.dataset.value;
+
+  // trigger recalculation if needed
+  if (typeof calculateBMI === "function") {
+    calculateBMI();
   }
-
-  calculateBMI(); // recalc if needed later for centiles
 });
-
 
 // =========================
 // BMI Calculation
