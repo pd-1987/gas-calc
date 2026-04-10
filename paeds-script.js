@@ -359,22 +359,26 @@ function updateReversal(w) {
 // — PARACETAMOL dosing & note —
 
   // 1) Calculate IV dose & note
-  let paraIVDose, paraIVNote;
-  if (w > 0 && w <= 10) {
-    paraIVDose = 10 * w;
-    const maxDailyLowIV = stripZeros((30 * w).toFixed(2));
-    paraIVNote = `10 mg/kg every 4–6 h; max 30 mg/kg/day = ${maxDailyLowIV} mg`;
-  } else if (w <= 50) {
-    paraIVDose = 15 * w;
-    const maxDailyHighIV = stripZeros((60 * w).toFixed(2));
-    paraIVNote = `15 mg/kg every 4–6 h; max 60 mg/kg/day = ${maxDailyHighIV} mg`;
-  } else if (w > 50) {
-    paraIVDose = 1000;
-    paraIVNote = `1 g every 4–6 h; max 4 g/day`;
-  } else {
-    paraIVDose = 0;
-    paraIVNote = '';
-  }
+  let paraIVDose, paraIVNote, paraIVInline;
+ if (w > 0 && w <= 10) {
+  paraIVDose = 10 * w;
+  const maxDailyLowIV = stripZeros((30 * w).toFixed(2));
+  paraIVInline = '10 mg/kg';
+  paraIVNote = `Every 4–6 h; max 30 mg/kg/day = ${maxDailyLowIV} mg`;
+} else if (w <= 50) {
+  paraIVDose = 15 * w;
+  const maxDailyHighIV = stripZeros((60 * w).toFixed(2));
+  paraIVInline = '15 mg/kg';
+  paraIVNote = `Every 4–6 h; max 60 mg/kg/day = ${maxDailyHighIV} mg`;
+} else if (w > 50) {
+  paraIVDose = 1000;
+  paraIVInline = '1 g';
+  paraIVNote = `Every 4–6 h; max 4 g/day`;
+} else {
+  paraIVDose = 0;
+  paraIVInline = '';
+  paraIVNote = '';
+}
 
   // 2) Calculate PO dose & note
   let paraPODose, paraPONote;
@@ -398,22 +402,32 @@ function updateReversal(w) {
   const pIvEl     = document.getElementById('paracetamol-iv');
   const pIvUnit   = pIvEl.nextElementSibling; // the “ mg” span
   const pIvNoteEl = document.getElementById('paracetamol-iv-note');
+  const pIvInlineEl = document.getElementById('paracetamol-iv-inline');
 
   if (paraIVDose > 0) {
-    pIvEl.textContent   = stripZeros(paraIVDose.toFixed(2));
-    pIvEl.style.display = 'inline';
-    if (pIvUnit) pIvUnit.style.display = 'inline';
+  pIvEl.textContent   = stripZeros(paraIVDose.toFixed(2));
+  pIvEl.style.display = 'inline';
+  if (pIvUnit) pIvUnit.style.display = 'inline';
 
-    pIvNoteEl.innerHTML     = `${paraIVNote}`;
-    pIvNoteEl.style.display = 'inline';
-  } else {
-    pIvEl.textContent     = '';
-    pIvEl.style.display   = 'none';
-    if (pIvUnit) pIvUnit.style.display = 'none';
+  // ✅ NEW inline note
+  pIvInlineEl.textContent = paraIVInline;
+  pIvInlineEl.style.display = 'inline';
 
-    pIvNoteEl.textContent     = '';
-    pIvNoteEl.style.display   = 'none';
-  }
+  // existing lower note
+  pIvNoteEl.innerHTML = paraIVNote;
+  pIvNoteEl.style.display = 'inline';
+
+} else {
+  pIvEl.textContent   = '';
+  pIvEl.style.display = 'none';
+  if (pIvUnit) pIvUnit.style.display = 'none';
+
+  pIvInlineEl.textContent = '';
+  pIvInlineEl.style.display = 'none';
+
+  pIvNoteEl.textContent = '';
+  pIvNoteEl.style.display = 'none';
+}
 
   // 4) Update PO span & note for Paracetamol
   const pPoEl     = document.getElementById('paracetamol-po');
