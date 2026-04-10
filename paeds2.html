@@ -362,6 +362,64 @@
   white-space: nowrap;
   border-right: 2px solid var(--border-light);
 }
+    /* ===== Reversal agents (striped like syringe labels) ===== */
+.row-reversal {
+  background: repeating-linear-gradient(
+    135deg,
+    #f8a8c2 0px,
+    #f8a8c2 8px,
+    #fafafa 8px,
+    #fafafa 16px
+  );
+  color: #000;
+}
+
+/* Sub-row (solid matching tone) */
+.sub-reversal {
+  background-color: #fff5f7;
+  color: #000;
+}
+
+/* Ensure text always readable */
+.row-reversal td,
+.sub-reversal td,
+.sub-reversal small {
+  color: #000 !important;
+}
+    .link-section {
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-light);
+}
+.link-section h4 {
+  margin: 0 0 6px;
+  font-size: 0.95em;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.link-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.link-section li {
+  margin: 4px 0;
+  line-height: 1.4;
+}
+
+.link-section a {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+.link-section a:hover {
+  text-decoration: underline;
+}
+.link-section:last-child {
+  border-bottom: none;
+}
   </style>
 </head>
   
@@ -1089,7 +1147,7 @@
             </td>
           </tr>
     </table>
-<br>
+
       <table class="result-table">
         <thead>
       <tr>
@@ -1154,294 +1212,271 @@
               <small id="cyclizine-ga-extra"></small>
             </td>
           </tr>
-    </table>
-<br>
-        <table>
+    </table>       
+    
+<table class="result-table">
           <thead>
       <tr>
-        <th colspan="3" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+        <th colspan="3">
           Intraoperative analgesia
         </th>
       </tr>
     </thead>
-          <tr style="background-color: #ffffff;">
-  <td style="padding: 8px; border: 1px solid #ccc;">
+          <tr class="row-white">
+  <td>
    Paracetamol IV
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc;">
-   
+  <td>
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+  <td>
     <span id="paracetamol-iv"></span><span class="static unit">mg</span>
   </td>
 </tr>
-<tr style="background-color: #f5f5f5;">
-  <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+<tr class="sub-white">
+  <td colspan="3">
     <small id="paracetamol-iv-note"></small>
   </td>
 </tr>
 
 <!-- Ibuprofen IV -->
-<tr style="background-color: #ffffff;">
-  <td style="padding: 8px; border: 1px solid #ccc;">
+<tr class="row-white">
+  <td>
    Ibuprofen IV
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc;">
+  <td>
    
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+  <td>
     <span id="ibuprofeniv"></span><span class="static unit">mg</span>
   </td>
 </tr>
-<tr style="background-color: #f5f5f5;">
-  <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+<tr class="sub-white">
+  <td colspan="3">
     <small id="ibuprofeniv-note"></small>
   </td>
 </tr>
           <!-- Ketorolac -->
-<tr style="background-color: #ffffff;">
-  <td style="padding: 8px; border: 1px solid #ccc;">
+<tr class="row-white">
+  <td>
     Ketorolac
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc;">
+  <td>
     0.5–1 mg/kg
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+  <td>
     <span id="ketorolac"></span><span class="static unit">mg</span>
   </td>
 </tr>
-<tr style="background-color: #f5f5f5;">
-  <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+<tr class="sub-white">
+  <td colspan="3">
     <small id="ketorolac-extra"></small>
   </td>
 </tr>
            <!-- Morphine IV -->
-<tr style="background-color: #98c9ee;">
-  <td style="padding: 8px; border: 1px solid #ccc;">
+<tr class="row-blue">
+  <td>
     Morphine
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc;">
+  <td>
     0.05–0.1 mg/kg
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+  <td>
     <span id="morphineiv"></span><span class="static unit">mg</span>
   </td>
 </tr>
-<tr style="background-color: #e0f0ff;">
-  <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+<tr class="sub-white">
+  <td colspan="3">
     <small id="morphine-iv-extra"></small>
   </td>
 </tr>
     </table>
-  
-    <br>
-    <table>
+
+    <table class="result-table">
       <thead>
       <tr>
-        <th colspan="3" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+        <th colspan="3">
           Reversal of neuromuscular blockade
         </th>
       </tr>
     </thead>     
-       <tr style="background: repeating-linear-gradient(
-  135deg,
-  #f8a8c2 0px,
-  #f8a8c2 8px,
-  #fafafa 8px,
-  #fafafa 16px
-);">
-  <td style="padding: 8px; border: 1px solid #ccc;">
-      Neostigmine &<br> Glycopyrulate
+       <tr class="row-reversal">
+  <td>
+      Neostigmine & Glycopyrulate
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc;">
+  <td>
     
       <span class="neo-dose">0.02 mL/kg</span>
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+  <td>
    <span class="neos-dose"></span><span class="static unit">ml</span>
   </td>
 </tr>
-<tr style="background-color: #fff5f7;">
-  <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+<tr class="sub-reversal">
+  <td colspan="3">
     <small class="neos-extra"></small>
   </td>
 </tr> 
-       <tr style="background: repeating-linear-gradient(
-  135deg,
-  #f8a8c2 0px,
-  #f8a8c2 8px,
-  #fafafa 8px,
-  #fafafa 16px
-);">
-        <td style="padding: 8px; border: 1px solid #ccc;">
+       <tr class="row-reversal">
+        <td>
    Sugammadex
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc;">
+  <td>
     2 mg/kg
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+  <td>
     <span class="sug-2-dose"></span><span class="static unit">mg</span>
   </td>
 </tr>
-<tr style="background-color: #fff5f7;">
-  <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+<tr class="sub-reversal">
+  <td colspan="3">
     <small class="sug-2-extra"></small>
     <br><small>Moderate block: Return of T<sub>2</sub> in response to TOF.</small>
   </td>
 </tr> 
       
-      <tr style="background: repeating-linear-gradient(
-  135deg,
-  #f8a8c2 0px,
-  #f8a8c2 8px,
-  #fafafa 8px,
-  #fafafa 16px
-);">
+      <tr class="row-reversal">
   <td style="padding: 8px; border: 1px solid #ccc;">
    Sugammadex
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc;">
+  <td>
     4 mg/kg
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+  <td>
     
     <span class="sug-4-dose"></span><span class="static unit">mg</span>
   </td>
 </tr>
-<tr style="background-color: #fff5f7;">
-  <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+<tr class="sub-reversal">
+  <td colspan="3">
     <small class="sug-4-extra"></small>
     <br><small>Deep block: 1-2 PTCs, no twitch responses to TOF.</small>
   </td>
 </tr>
         </table>
-    
-    <br>
-    <table>
+
+    <table class="result-table">
       <thead>
       <tr>
-        <th colspan="3" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+        <th colspan="3">
           Postoperative analgesia
         </th>
       </tr>
     </thead>     
-      <tr style="background-color: #ffffff;">
-  <td style="padding: 8px; border: 1px solid #ccc;">
+      <tr class="row-white">
+  <td>
     Paracetamol PO
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc;">
+  <td>
     
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+  <td>
     <span id="paracetamol-po"></span><span class="static unit">mg</span>
   </td>
 </tr>
-<tr style="background-color: #f5f5f5;">
-  <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+<tr class="sub-white">
+  <td colspan="3">
     <small id="paracetamol-po-note"></small>
   </td>
 </tr>
           
 <!-- Ibuprofen PO -->
-<tr style="background-color: #ffffff;">
-  <td style="padding: 8px; border: 1px solid #ccc;">
+<tr class="row-white">
+  <td>
     Ibuprofen PO
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc;">
+  <td>
     5–10 mg/kg
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+  <td>
     <span id="ibuprofenpo"></span><span class="static unit">mg</span>
   </td>
 </tr>
-<tr style="background-color: #f5f5f5;">
-  <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+<tr class="sub-white">
+  <td colspan="3">
     <small id="ibuprofenpo-note"></small>
   </td>
 </tr>
           
           <!-- Morphine PO -->
-<tr style="background-color: #98c9ee;">
-  <td style="padding: 8px; border: 1px solid #ccc;">
+<tr class="row-blue">
+  <td>
     Morphine PO
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc;">
-    
+  <td> 
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+  <td>
     <span id="morphinepo"></span><span class="static unit">mg</span>
   </td>
 </tr>
-<tr style="background-color: #e0f0ff;">
-            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+<tr class="sub-blue">
+            <td colspan="3">
               <small id="morphine-po-extra"></small>
   </td>
 </tr>
     </table>
-    <br>
-<table>
+
+<table class="result-table">
       <thead>
       <tr>
-        <th colspan="3" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+        <th colspan="3">
           Emergency Drugs
         </th>
       </tr>
     </thead>     
-      <tr style="background-color: #a3ce6f;">
-  <td style="padding: 8px; border: 1px solid #ccc;">
+      <tr class="row-green">
+  <td>
     Atropine
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc;">
+  <td>
     20 mcg/kg
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+  <td>
     <span class="atropine-dose"></span><span class="static unit">mcg</span>
   </td>
 </tr>
-<tr style="background-color: #e3f0d4;">
-  <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+<tr class="sub-green">
+  <td colspan="3">
     <small class="atropine-extra"></small>
   </td>
 </tr>
           
-<tr style="background-color: #ec6f73;">
+<tr class="row-red">
   <td style="padding: 8px; border: 1px solid #ccc;">
     Suxamethonium IV
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc;">
+  <td>
   <span id="sux-ga-range">1–2</span> <span class="unit">mg/kg</span>
 </td>
-  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+  <td>
     <span class="sux-iv-dose"></span><span class="static unit">mg</span>
   </td>
 </tr>
-<tr style="background-color: #ffdada;">
-  <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+<tr class="sub-red">
+  <td colspan="3">
     <small class="sux-iv-extra"></small>
   </td>
 </tr>
           
-<tr style="background-color: #ec6f73;">
-  <td style="padding: 8px; border: 1px solid #ccc;">
+<tr class="row-red">
+  <td>
     Suxamethonium IM
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc;">
+  <td>
     4 mg/kg<br>(Max 150 mg)
   </td>
-  <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+  <td>
     <span class="sux-im-dose"></span><span class="static unit">mg</span>
   </td>
 </tr>
-<tr style="background-color: #ffdada;">
-            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+<tr class="sub-red">
+            <td colspan="3">
               <small class="sux-im-extra"></small>
   </td>
 </tr>
     </table>    
-    
   </div>
   </div>
-    </div>
+  </div>
   </div>
     
         <div class="accordion-item">
@@ -1470,170 +1505,167 @@
  
   <div class="result">
     
-<table style="background-color: #f5f5f5;"> 
-          <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+<table class="result-table"> 
+          <tr class="row-white">
+            <td>
               Amoxicillin
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               30 mg/kg (Max 1 g)
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+            <td>
               <span id="amoxicillin"></span>
               <span class="static unit">mg</span>
             </td>
           </tr>
-          <tr style="background-color: #f5f5f5;">
-            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+          <tr class="sub-white">
+            <td colspan="3">
               <small></small>
             </td>
           </tr>
-          <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+          <tr class="row-white">
+            <td>
               Cefuroxime
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               50 mg/kg (Max 1.5g)
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+            <td>
               <span id="cefuroxime"></span>
               <span class="static unit">mg</span>
             </td>
           </tr>
-          <tr style="background-color: #f5f5f5;">
-            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+          <tr class="sub-white">
+            <td colspan="3">
               <small></small>
             </td>
           </tr>
 
-          <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+          <tr class="row-white">
+            <td>
               Co-Amoxiclav
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               30 mg/kg (Max 1.2 g)
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+            <td>
               <span id="co-amoxiclav"></span>
               <span class="static unit">mg</span>
             </td>
           </tr>
-          <tr style="background-color: #f5f5f5;">
-            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+          <tr class="sub-white">
+            <td colspan="3">
               <small></small>
             </td>
           </tr>
-  <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+  <tr class="row-white">
+            <td>
               Flucloxacillin (Soft tissue)
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               25 mg/kg (Max 1 g)
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+            <td>
               <span id="flucloxacillin"></span>
               <span class="static unit">mg</span>
             </td>
           </tr>
-   <tr style="background-color: #f5f5f5;">
-            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+   <tr class="sub-white">
+            <td colspan="3">
               <small></small>
             </td>
   
-  <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+  <tr class="row-white">
+            <td>
               Flucloxacillin (Open orthopaedic surgery)
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               50 mg/kg (Max 2 g)
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+            <td>
               <span id="flucloxacillin-bone"></span>
               <span class="static unit">mg</span>
             </td>
           </tr>
   
-          <tr style="background-color: #f5f5f5;">
-            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+          <tr class="sub-white">
+            <td colspan="3">
               <small></small>
             </td>
           </tr>
     
-   <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+   <tr class="row-white">
+            <td>
               Metronidazole
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               30 mg/kg (Max 500 mg)
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+            <td>
               <span id="metronidazole"></span>
               <span class="static unit">mg</span>
             </td>
           </tr>
-            <tr style="background-color: #f5f5f5;">
-            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+            <tr class="sub-white">
+            <td colspan="3">
               <small></small>
             </td>
           </tr>
-  <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+  <tr class="row-white">
+            <td>
               Teicoplanin
             </td>
-            <td id="teicoplanin-dosing" style="padding: 8px; border: 1px solid #ccc;"></td>
-            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+            <td id="teicoplanin-dosing"></td>
+            <td>
               <span id="teicoplanin"></span>
               <span class="static unit">mg</span>
             </td>
           </tr>
-          <tr style="background-color: #f5f5f5;">
-            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
+          <tr class="sub-white">
+            <td colspan="3">
               <small id="teicoplanin-note"></small>
             </td>
           </tr>
   
-  <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+  <tr class="row-white">
+            <td>
               Gentamicin
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               2.5 mg/kg (Max 160 mg)
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+            <td>
               <span id="gentamicin"></span>
               <span class="static unit">mg</span>
             </td>
           </tr>
-          <tr style="background-color: #f5f5f5;">
-            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
-              <small>In obesity, doses should be calculated based on adjusted body weight.</small>
+          <tr class="sub-white">
+            <td colspan="3">
+              <small>In obesity doses should be calculated based on adjusted body weight.</small>
             </td>
           </tr>
-  
-  <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+  <tr class="row-white">
+            <td>
               Gentamicin (high-dose)
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               5 mg/kg (Max 480 mg)
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc; text-align: right;">
+            <td>
               <span id="gentamicin-high"></span>
               <span class="static unit">mg</span>
             </td>
           </tr>
-          <tr style="background-color: #f5f5f5;">
-            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">
-              <small>In obesity, doses should be calculated based on adjusted body weight.</small>
+          <tr class="sub-white">
+            <td colspan="3">
+              <small>In obesity doses should be calculated based on adjusted body weight.</small>
             </td>
           </tr>
-  
     </table>
   </div>
   </div>
     </div>
-  </div>
-   
+  </div> 
      <div class="accordion-item">
     <div class="accordion-header">
       <span class="accordion-title">
@@ -1647,215 +1679,212 @@
      <div class="accordion-content">
       <div class="accordion-content-inner general-section">     
   <div class="result">    
-<table> 
+<table class="result-table"> 
       <thead>
       <tr>
-        <th colspan="2" style="border:1px solid #ccc; padding:8px;">
+        <th colspan="2">
          Arterial lines - Radial
         </th>
       </tr>
     </thead>        
   <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               Neonates/Infants &lt;10 kg
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               24 G<br>Pressure transducer: 150 mmHg (generates a flow rate of 1.5 mL/hr)
             </td>
           </tr>
    
           <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               Children &gt;10 kg
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               22 G<br>Pressure transducer: 300 mmHg (generates a flow rate of 3 mL/hr)
             </td>
           </tr>
 
           <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               Children &gt;50 kg
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               20 G
             </td>
 
           </tr>
     </table>
-  <br>
-      <table style="background-color: #f5f5f5;"> 
+
+      <table class="result-table"> 
       <thead>
       <tr>
-        <th colspan="2" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+        <th colspan="2">
          Arterial lines - Femoral
         </th>
       </tr>
     </thead>        
   <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               Neonates
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               22 G, 8cm
             </td>
           </tr>
 
     <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               Children
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               20 G, 8cm
             </td>
           </tr>
     </table>
-      <br>
-      <table style="background-color: #f5f5f5;"> 
+
+      <table class="result-table"> 
       <thead>
       <tr>
-        <th colspan="2" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+        <th colspan="2">
          Central venous access - Femoral (preferred)
         </th>
       </tr>
     </thead>        
   <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               &lt;6 months
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               4–5	Fr, triple lumen, 6–8cm lines	
             </td>
           </tr>
 
     <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               6 m–5 y
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               5	Fr triple lumen, 8–12 cm
             </td>
           </tr>
             <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               &gt;5 y
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               7 fr, triple lumen, 15 cm
             </td>
           </tr>
     </table>
           <br>
-      <table style="background-color: #f5f5f5;""> 
+      <table class="result-table"> 
       <thead>
       <tr>
-        <th colspan="2" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+        <th colspan="2">
          Central venous access - Internal jugular
         </th>
       </tr>
     </thead>        
   <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               &lt;15 kg
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               	5 cm		
             </td>
           </tr>
 
     <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               16–40 kg
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               8 cm
             </td>
           </tr>
             <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               &gt;40 kg
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               13 cm
             </td>
           </tr>
     </table>
-       <br>
 
-      <table style="background-color: #f5f5f5;"> 
+      <table class="result-table"> 
       <thead>
       <tr>
-        <th colspan="2" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+        <th colspan="2">
          EZ-IO
         </th>
       </tr>
     </thead>        
   <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               &lt;---
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               	---	
             </td>
           </tr>
 
     <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               ---
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               ---
             </td>
           </tr>
             <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               &gt;---
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               ---
             </td>
           </tr>
     </table>
       
-               <br>
-      <table style="background-color: #f5f5f5;"> 
+      <table class="result-table"> 
       <thead>
       <tr>
-        <th colspan="2" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+        <th colspan="2">
          Suction catheters
         </th>
       </tr>
     </thead>        
   <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               &lt;---
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               	---		
             </td>
           </tr>
 
     <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               ---
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               ---
             </td>
           </tr>
             <tr>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               &gt;---
             </td>
-            <td style="padding: 8px; border: 1px solid #ccc;">
+            <td>
               ---
             </td>
           </tr>
-    </table>
-              
+    </table>              
   </div>
   </div>
-    </div>
+  </div>
   </div>
     
      <div class="accordion-item">
@@ -1881,46 +1910,56 @@
     <div class="accordion-content">
 
       <div class="accordion-content-inner general-section">      
+ <div class="link-section">
+  <h4>Other calculators</h4>
+  <ul>
+    <li><a href="https://www.paedspro.com/">Paeds Prescribing Pro Drug Calculator</a></li>
+    <li>
+      Paediatric Emergency Tools:
+      <a href="https://apps.apple.com/gb/app/paediatric-emergency-tools/id415663345">Apple</a> /
+      <a href="https://play.google.com/store/apps/details?id=com.ubqo.paedscalc&hl=en_GB&pli=1">Android</a>
+    </li>
+  </ul>
+</div>       
+     
+<div class="link-section">
+  <h4>Retrieval teams</h4>
+  <ul>
+    <li><a href="https://www.evelinalondon.nhs.uk/our-services/hospital/south-thames-retrieval-service/clinical-guidelines.aspx">South Thames Retrieval Service (STRS) Clinical Guidelines</a></li>
+    <li><a href="https://cats.nhs.uk/clinical-guidelines/">Children’s Acute Transport Service (CATS) Clinical Guidelines</a></li>
+    <li><a href="https://www.sort.nhs.uk/home.aspx">Southampton Oxford Retrieval Team (SORT) Clinical Guidelines</a>
+    </li>
+  </ul>
+</div>        
         
-                <p><strong>Other calculators</strong></p>
-        <p><a href="https://www.paedspro.com/">Paeds Prescribing Pro Drug Calculator</a></p>
-        <p>Paediatric Emergency Tools: <a href="https://apps.apple.com/gb/app/paediatric-emergency-tools/id415663345">Apple</a> / <a href="https://play.google.com/store/apps/details?id=com.ubqo.paedscalc&hl=en_GB&pli=1">Android</a></p>
-        <br>
-        <p><strong>Retrieval Teams</strong></p>
-                <p><a href="https://www.evelinalondon.nhs.uk/our-services/hospital/south-thames-retrieval-service/clinical-guidelines.aspx">South Thames Retrieval Service (STRS) Clinical Guidelines</a></p>
-        <p><a href="https://cats.nhs.uk/clinical-guidelines/">Children’s Acute Transport Service (CATS) Clinical Guidelines</a></p>
-        <p><a href="https://www.sort.nhs.uk/home.aspx">Southampton Oxford Retrieval Team (SORT) Clinical Guidelines</a></p>
-        <br>
-        <p><strong>Specific Emergency Guidelines</strong></p>
-        <p><a href="/guidelines/paediatrics/strs-intubation-guideline.pdf">STRS Intubation Guideline and Checklist</a></p>
-        <p><a href="/guidelines/paediatrics/cats-intubation-checklist.pdf">CATS Intubation Checklist</a></p>
-        <p><a href="/guidelines/paediatrics/apls-emergency-drug-chart-2021.pdf">APLS Emergency Drug Chart</a></p>
-        <p><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/Severe-bronchiolitis.pdf">STRS Bronchiolitis</a></p>
-        <p><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/Sepsis.pdf">STRS Sepsis</a></p>
-        <p><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/peripheral-inotropes.pdf">STRS Peripheral inotropes</a></p>
-        <p><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/neonatal-collapse.pdf">STRS Neonatal collapse</a></p>
-        <br>
-                <p><strong>Airway Guidelines</strong></p>
-        <p><a href="https://cats.nhs.uk/das-paediatric-difficult-bmv.pdf/">DAS Difficult mask ventilation during routine induction of anaesthesia in a child aged 1–8 years guideline</a></p>
-        <p><a href="/guidelines/paediatrics/das-paediatric-difficult-intubation.pdf">DAS Difficult intubation during routine induction of anaesthesia in a child aged 1–8 years guideline</a></p>
-        <p><a href="/guidelines/paediatrics/das-paediatric-cicv.pdf">DAS Cannot Intubate and Cannot Ventilate (CICV) in a paralysed anaesthetised child aged 1–8 years</a></p>
-        <br>
-        <p><strong>Anaphylaxis Guidelines</strong></p>
-        <p><a href="/guidelines/paediatrics/apls-perioperative-anaphylaxis-2021.pdf">APLS Perioperative Anaphylaxis algorithm</a></p>
-        <p><a href="/guidelines/paediatrics/apls-anaphylaxis-2021.pdf">APLS Anaphylaxis algorithm</a></p>
-        <p><a href="/guidelines/paediatrics/apls-refractory-anaphylaxis-2021.pdf">APLS Refractory Anaphylaxis algorithm</a></p>
-        <br>
-        <p><strong>Advanced Paediatric Life Support (APLS) 2021 Resources</strong></p>
-           <p><a href="/guidelines/paediatrics/apls-algorithm-2021.pdf">APLS Algorithm</a></p>
-        <p><a href="/guidelines/paediatrics/nls-algorithm-2021.pdf">Neonatal Life Support Algorithm</a></p>
-        <p><a href="/guidelines/paediatrics/apls-cardiac-arrhythmias-2021.pdf">APLS Paediatric Cardiac Arrhythmias Algorithm</a></p>
-       <p><a href="/guidelines/paediatrics/apls-algorithms-resources-2021.pdf">APLS Paediatric Emergency Algorithms and Resources</a></p>
-        <p></p>
-        <p><a href="https://www.resus.org.uk/library/2021-resuscitation-guidelines/paediatric-advanced-life-support-guidelines">Paediatric Advanced Life Support Guidelines (Resuscitation Council UK)</a></p>
-        <br>
-      
+ <div class="link-section">
+  <h4>Specific Emergency Guidelines</h4>
+  <ul>
+    <li><a href="/guidelines/paediatrics/strs-intubation-guideline.pdf">STRS Intubation Guideline and Checklist</a></li>
+    <li><a href="/guidelines/paediatrics/cats-intubation-checklist.pdf">CATS Intubation Checklist</a></li>
+    <li><a href="/guidelines/paediatrics/apls-emergency-drug-chart-2021.pdf">APLS Emergency Drug Chart</a>
+    </li>
+        <li><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/Severe-bronchiolitis.pdf">STRS Bronchiolitis</a>
+    </li>
+        <li><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/Sepsis.pdf">STRS Sepsis</a>
+    </li>
+        <li><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/peripheral-inotropes.pdf">STRS Peripheral inotropes</a>
+    </li>
+        <li><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/neonatal-collapse.pdf">STRS Neonatal collapse</a></li>
+  </ul>
+</div>           
+
+ <div class="link-section">
+  <h4>Airway Guidelines</h4>
+  <ul>
+    <li><a href="https://cats.nhs.uk/das-paediatric-difficult-bmv.pdf/">DAS Difficult mask ventilation during routine induction of anaesthesia in a child aged 1–8 years guideline</a></li>
+    <li><a href="/guidelines/paediatrics/das-paediatric-difficult-intubation.pdf">DAS Difficult intubation during routine induction of anaesthesia in a child aged 1–8 years guideline</a></li>
+    <li><a href="/guidelines/paediatrics/das-paediatric-cicv.pdf">DAS Cannot Intubate and Cannot Ventilate (CICV) in a paralysed anaesthetised child aged 1–8 years</a>
+    </li>
+  </ul>
+</div>                 
   </div>
-    </div>
+  </div>
   </div>
     
      <div class="accordion-item">
@@ -1937,97 +1976,95 @@
     </div>
     <div class="accordion-content">
       <div class="accordion-content-inner general-section"> 
-       <table>
+       <table class="result-table">
     <thead>
       <tr>
-        <th colspan="2"; border:1px solid #ccc; padding:8px;">
+        <th colspan="2">
          Weight (kg)
         </th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <th style="border:1px solid #ccc; padding:8px; text-align:center;">Age 1-12 months</th>
-        <td style="border:1px solid #ccc; padding:8px; text-align:center;">
+        <th>Age 1-12 months</th>
+        <td>
           <p>0.5 x Age (months) + 4</p> 
         </td>
       </tr>
          <tr>
-        <th style="border:1px solid #ccc; padding:8px; text-align:center;">Age 1-5 years</th>
-        <td style="border:1px solid #ccc; padding:8px; text-align:center;">
+        <th>Age 1-5 years</th>
+        <td>
           <p>2 x Age (years) + 8</p> 
         </td>
       </tr>
           <tr>
-        <th style="border:1px solid #ccc; padding:8px; text-align:center;">Age 6-14 years</th>
-        <td style="border:1px solid #ccc; padding:8px; text-align:center;">
+        <th>Age 6-14 years</th>
+        <td>
           <p>2 x Age (years) + 8</p> 
           <p>3 x Age (years) + 7</p>
         </td>
       </tr>
     </tbody>
   </table>        
-        <br>
-        <table>
+
+        <table class="result-table">
     <thead>
       <tr>
-        <th colspan="2" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+        <th colspan="2">
          Airway and Ventilation
         </th>
       </tr>
     </thead>
     <tbody>
            <tr>
-        <th style="border:1px solid #ccc; padding:8px; text-align:center;">ETT size</th>
-        <td style="border:1px solid #ccc; padding:8px; text-align:center;">
+        <th>ETT size</th>
+        <td>
           <p>Uncuffed ETT size = (Age/4) + 4 [Cole formula]</p>
           <p>Cuffed ETT size = (Age/4) + 3.5 [Modified Cole]</p>
         </td>
       </tr>
       <tr>
-        <th style="border:1px solid #ccc; padding:8px; text-align:center;">ETT depth (oral)</th>
-        <td style="border:1px solid #ccc; padding:8px; text-align:center;">
+        <th>ETT depth (oral)</th>
+        <td>
           <p>Above 1 year: Depth ≈ Age/2+12</p> 
           <p>Neonates: Depth ≈ 1.17 × Birth weight (kg) + 5.58 (Tochen / “7-8-9” rule)</p>
         </td>
       </tr>
             <tr>
-        <th style="border:1px solid #ccc; padding:8px; text-align:center;">ETT depth (nasal)</th>
-        <td style="border:1px solid #ccc; padding:8px; text-align:center;">
+        <th>ETT depth (nasal)</th>
+        <td>
           <p>Above 1 year: Depth ≈ Age/2+15</p>
         </td>
       </tr>
     </tbody>
   </table>  
-        <br>
-        </table>        
-        <br>
-        <table>
+         
+        <table class="result-table">
     <thead>
       <tr>
-        <th colspan="2" style="background-color: #f5f5f5; border:1px solid #ccc; padding:8px;">
+        <th>
          Circulation
         </th>
       </tr>
     </thead>
     <tbody>
            <tr>
-        <th style="border:1px solid #ccc; padding:8px; text-align:center;">Lowest acceptable SBP</th>
-        <td style="border:1px solid #ccc; padding:8px; text-align:center;">
+        <th>Lowest acceptable SBP</th>
+        <td>
           <p>&lt;1 month: &ge;60 mmHg</p>
           <p>1 month to 1 year: &ge;70 mmHg</p>
           <p>1–10 years: 2 x Age + 70 mmHg</p>
         </td>
       </tr>
       <tr>
-        <th style="border:1px solid #ccc; padding:8px; text-align:center;">Lowest acceptable MAP</th>
-        <td style="border:1px solid #ccc; padding:8px; text-align:center;">
+        <th>Lowest acceptable MAP</th>
+        <td>
           <p>Age (in years) x 1.5 + 40 mmHg</p> 
         </td>
       </tr>
             <tr>
-        <th style="border:1px solid #ccc; padding:8px; text-align:center;">Premature Neonates</th>
-        <td style="border:1px solid #ccc; padding:8px; text-align:center;">
+        <th>Premature Neonates</th>
+        <td>
           <p>Gestational age ≈ Mean Arterial Pressure</p>
         </td>
       </tr>
