@@ -84,12 +84,14 @@
     margin: 0px auto;
   }
   .accordion-item {
-  border-left: 3px solid #E37383;
   background: var(--bg-card);
   margin-bottom: 6px;
   border-radius: 10px;
   box-shadow: none;
   overflow: hidden;
+  border: 1px solid var(--border-light);
+  border-left: 3px solid #E37383; /* re-apply after border */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
   }
   .accordion-header {
   background: var(--bg-card);
