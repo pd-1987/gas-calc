@@ -437,7 +437,11 @@
 }
     .neo-dose {
   font-size: 0.7em !important;    
-  line-height: 1.0;
+  line-height: 1.0 !important;
+}
+    .neo-dose span {
+  display: block;
+  line-height: 1.3;
 }
   </style>
 </head>
@@ -1336,11 +1340,14 @@
     </thead>     
        <tr class="row-reversal">
   <td>
-    Neostigmine & <br>Glycopyrulate<br><span class="neo-dose">2.5 mg/1mL & 500 mcg/1 mL</span>
+    Neostigmine & <br>Glycopyrulate<br><span class="neo-dose"><span>2.5 mg/1mL & </span><span>500 mcg/1 mL</span>
   </td>
   <td>
-    
-      <span class="neo-dose">0.02 mL/kg<br>0.05 mg/kg & 10 mcg/kg</span>
+  <span>0.02 mL/kg</span>
+    <span class="neo-dose">
+      <span>0.05 mg/kg &</span> 
+    <span>10 mcg/kg</span>
+</span>
   </td>
   <td>
    <span class="neos-dose"></span><span class="static unit">ml</span>
