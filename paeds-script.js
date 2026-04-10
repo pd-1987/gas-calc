@@ -1977,6 +1977,13 @@ function calculateBMI() {
   const rawAge = parseFloat(ageInput.value) || 0;
   const ageYears = ageUnit === 'months' ? rawAge / 12 : rawAge;
 
+  const genderContainer = document.getElementById("GenderBtn");
+
+  const gender =
+  genderContainer.dataset.gender ||
+  genderContainer.querySelector("button.active")?.dataset.value ||
+  "male";
+  
   // ── Do not show BMI / IBW under 2 years ──
   if (ageYears < 2) {
     bmiOutput.textContent = "—";
