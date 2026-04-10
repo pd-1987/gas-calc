@@ -100,7 +100,7 @@ function stripZeros(str) {
   // 7) hide GA drug values + units
   [
     'propofol','fentanyl-ga','rocuronium-ga',
-    'dexamethasone','ondansetron','paracetamol-iv','paracetamol-po','ibuprofeniv','ibuprofenpo','ketorolac','morphineiv','morphinepo'
+    'dexamethasone','ondansetron','paracetamol-iv','paracetamol-po','ibuprofeniv','ibuprofenpo','ketorolac','morphineiv','morphinepo','diclofenaciv'
   ].forEach(id => {
     const el   = document.getElementById(id);
     const unit = el.nextElementSibling;
@@ -344,17 +344,31 @@ function updateReversal(w) {
 }
   
   function updateAnalgesics(w) {
-  // 2) Clear out the “-note” cells for Paracetamol & Ibuprofen
-  [
-    'paracetamol-po-note',
-    'paracetamol-iv-note',
-    'ibuprofeniv-note',
-    'ibuprofenpo-note',
-    'ketorolac-extra'
-  ].forEach(extraId => {
-    const el = document.getElementById(extraId);
-    if (el) el.textContent = '';
-  });
+
+const rawAge = parseFloat(ageInput.value) || 0;
+const ageMonths = ageUnit === 'months' ? rawAge : rawAge * 12;
+const ageY = ageMonths / 12;
+    
+[
+  'paracetamol-iv-note',
+  'paracetamol-po-note',
+  'ibuprofeniv-note',
+  'ibuprofenpo-note',
+  'ketorolac-extra',
+  'diclofenaciv-note',
+  'morphine-iv-extra',
+  'morphine-po-extra',
+  'paracetamol-iv-inline',
+  'paracetamol-po-inline'
+].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.textContent = '';
+});
+    
+if (!w || isNaN(w)) {
+  // hide all outputs and STOP
+  return;
+}
 
 // — PARACETAMOL dosing & note —
 
@@ -381,22 +395,30 @@ function updateReversal(w) {
 }
 
   // 2) Calculate PO dose & note
-  let paraPODose, paraPONote;
-  if (w > 0 && w <= 10) {
-    paraPODose = 10 * w;
-    const maxDailyLowPO = stripZeros((30 * w).toFixed(2));
-    paraPONote = `10 mg/kg every 4–6 h; max 30 mg/kg/day = ${maxDailyLowPO} mg`;
-  } else if (w <= 50) {
-    paraPODose = 15 * w;
-    const maxDailyHighPO = stripZeros((60 * w).toFixed(2));
-    paraPONote = `15 mg/kg every 4–6 h; max 60 mg/kg/day = ${maxDailyHighPO} mg`;
-  } else if (w > 50) {
-    paraPODose = 1000;
-    paraPONote = `1 g every 4–6 h; max 4 g/day`;
-  } else {
-    paraPODose = 0;
-    paraPONote = '';
-  }
+let paraPODose, paraPONote, paraPOInline;
+
+if (w > 0 && w <= 10) {
+  paraPODose = 10 * w;
+  const maxDailyLowPO = stripZeros((30 * w).toFixed(2));
+  paraPOInline = '10 mg/kg';
+  paraPONote = `Every 4–6 h; max 30 mg/kg/day = ${maxDailyLowPO} mg`;
+
+} else if (w <= 50) {
+  paraPODose = 15 * w;
+  const maxDailyHighPO = stripZeros((60 * w).toFixed(2));
+  paraPOInline = '15 mg/kg';
+  paraPONote = `Every 4–6 h; max 60 mg/kg/day = ${maxDailyHighPO} mg`;
+
+} else if (w > 50) {
+  paraPODose = 1000;
+  paraPOInline = '1 g';
+  paraPONote = `Every 4–6 h; max 4 g/day`;
+
+} else {
+  paraPODose = 0;
+  paraPOInline = '';
+  paraPONote = '';
+}
 
   // 3) Update IV span & note for Paracetamol
   const pIvEl     = document.getElementById('paracetamol-iv');
@@ -430,91 +452,100 @@ function updateReversal(w) {
 }
 
   // 4) Update PO span & note for Paracetamol
-  const pPoEl     = document.getElementById('paracetamol-po');
-  const pPoUnit   = pPoEl.nextElementSibling; // the “ mg” span
-  const pPoNoteEl = document.getElementById('paracetamol-po-note');
+ const pPoEl       = document.getElementById('paracetamol-po');
+const pPoUnit     = pPoEl.nextElementSibling;
+const pPoNoteEl   = document.getElementById('paracetamol-po-note');
+const pPoInlineEl = document.getElementById('paracetamol-po-inline');
 
-  if (paraPODose > 0) {
-    pPoEl.textContent   = stripZeros(paraPODose.toFixed(2));
-    pPoEl.style.display = 'inline';
-    if (pPoUnit) pPoUnit.style.display = 'inline';
+if (paraPODose > 0) {
+  pPoEl.textContent   = stripZeros(paraPODose.toFixed(2));
+  pPoEl.style.display = 'inline';
+  if (pPoUnit) pPoUnit.style.display = 'inline';
 
-    pPoNoteEl.innerHTML     = `${paraPONote}`;
-    pPoNoteEl.style.display = 'inline';
-  } else {
-    pPoEl.textContent     = '';
-    pPoEl.style.display   = 'none';
-    if (pPoUnit) pPoUnit.style.display = 'none';
+  // ✅ NEW inline dose (middle cell)
+  pPoInlineEl.textContent = paraPOInline;
+  pPoInlineEl.style.display = 'inline';
 
-    pPoNoteEl.textContent     = '';
-    pPoNoteEl.style.display   = 'none';
-  }
+  // ✅ cleaned note (no mg/kg repetition)
+  pPoNoteEl.innerHTML = paraPONote;
+  pPoNoteEl.style.display = 'inline';
+
+} else {
+  pPoEl.textContent   = '';
+  pPoEl.style.display = 'none';
+  if (pPoUnit) pPoUnit.style.display = 'none';
+
+  pPoInlineEl.textContent = '';
+  pPoInlineEl.style.display = 'none';
+
+  pPoNoteEl.textContent = '';
+  pPoNoteEl.style.display = 'none';
+}
   
-  // — IBUPROFEN IV dosing & note —
-  const iEl   = document.getElementById('ibuprofeniv');
-  const iUnit = iEl.nextElementSibling; // “ mg”
-  let ibuText = '', ibuNote = '';
+// — IBUPROFEN IV dosing & note —
+const iEl   = document.getElementById('ibuprofeniv');
+const iUnit = iEl.nextElementSibling;
 
-  const rawAge = parseFloat(ageInput.value) || 0;
-  const ageY   = ageUnit === 'months' ? rawAge/12 : rawAge;
+let ibuText = '', ibuNote = '';
 
-  if (ageY < 6 || w < 20) {
-    // Not recommended under 20 kg or below 6 years
-    ibuNote = 'Not recommended for children under 20 kg or below 6 years of age.';
-    ibuText = ''; 
-  } else if (ageY < 18) {
-    if (w <= 29) {
-      ibuText = '200';
-      ibuNote = '200 mg TDS, 6–8 h; max 600 mg/day';
-    } else if (w <= 39) {
-      ibuText = '200';
-      ibuNote = '200 mg QDS, 6 h; max 800 mg/day';
-    } else {
-      ibuText = '200–400';
-      ibuNote = '200–400 mg TDS, 6–8 h; max 1200 mg/day';
-    }
-  }
+if (ageMonths < 3 || w < 5) {
+  ibuNote = 'Not recommended under 3 months or <5 kg.';
+  ibuText = '';
+} else if (w > 0) {
+  // ✅ 5–10 mg/kg dosing (same logic as PO)
+  const dMin = Math.min(5 * w, 400);
+  const dMax = Math.min(10 * w, 400);
 
-  if (ibuText) {
-    iEl.textContent   = ibuText;
-    iEl.style.display = 'inline';
-    if (iUnit) iUnit.style.display = 'inline';
-  } else {
-    iEl.textContent   = '';
-    iEl.style.display = 'none';
-    if (iUnit) iUnit.style.display = 'none';
-  }
+  ibuText = `${stripZeros(dMin.toFixed(0))}–${stripZeros(dMax.toFixed(0))}`;
+  ibuNote = 'Every 6–8 hours; max 30 mg/kg/day';
+}
 
-  // Write the Ibuprofen IV note into its colspan cell:
-  const ibuivCell = document.getElementById('ibuprofeniv-note');
-  ibuivCell.innerHTML = ibuNote ? `${ibuNote}` : '';
+// Output
+if (ibuText) {
+  iEl.textContent   = ibuText;
+  iEl.style.display = 'inline';
+  if (iUnit) iUnit.style.display = 'inline';
+} else {
+  iEl.textContent   = '';
+  iEl.style.display = 'none';
+  if (iUnit) iUnit.style.display = 'none';
+}
 
-  // — IBUPROFEN PO dosing & note —
-  const poEl   = document.getElementById('ibuprofenpo');
-  const poUnit = poEl.nextElementSibling; // “ mg”
-  let poText = '', poNote = '';
+// Note
+const ibuivCell = document.getElementById('ibuprofeniv-note');
+ibuivCell.innerHTML = ibuNote ? ibuNote : '';
 
-  const ageMonths = ageUnit === 'months' ? rawAge : rawAge * 12;
-  if (ageMonths > 3 && w > 0) {
-    const dMin = Math.min(5 * w, 400);
-    const dMax = Math.min(10 * w, 400);
-    poText = `${dMin.toFixed(0)}–${dMax.toFixed(0)}`;
-    poNote = 'Maximum 30 mg/kg/day in 3–4 divided doses';
-  }
+// — IBUPROFEN PO dosing & note —
+const poEl   = document.getElementById('ibuprofenpo');
+const poUnit = poEl.nextElementSibling;
 
-  if (poText) {
-    poEl.textContent   = poText;
-    poEl.style.display = 'inline';
-    if (poUnit) poUnit.style.display = 'inline';
-  } else {
-    poEl.textContent   = '';
-    poEl.style.display = 'none';
-    if (poUnit) poUnit.style.display = 'none';
-  }
+let poText = '', poNote = '';
 
-  // Write the Ibuprofen PO note into its colspan cell:
-  const ibupopc = document.getElementById('ibuprofenpo-note');
-  ibupopc.innerHTML = poNote ? `${poNote}` : '';
+if (ageMonths < 3 || w < 5) {
+  poNote = 'Not recommended under 3 months or <5 kg.';
+  poText = '';
+} else if (w > 0) {
+  const dMin = Math.min(5 * w, 400);
+  const dMax = Math.min(10 * w, 400);
+
+  poText = `${stripZeros(dMin.toFixed(0))}–${stripZeros(dMax.toFixed(0))}`;
+  poNote = 'Every 6–8 hours; max 30 mg/kg/day';
+}
+
+// Output
+if (poText) {
+  poEl.textContent   = poText;
+  poEl.style.display = 'inline';
+  if (poUnit) poUnit.style.display = 'inline';
+} else {
+  poEl.textContent   = '';
+  poEl.style.display = 'none';
+  if (poUnit) poUnit.style.display = 'none';
+}
+
+// Note
+const ibupopc = document.getElementById('ibuprofenpo-note');
+ibupopc.innerHTML = poNote ? poNote : '';
     
 // — KETOROLAC dosing & volume (30 mg/mL) —
   //
@@ -522,13 +553,12 @@ function updateReversal(w) {
   const kUnit    = kEl.nextElementSibling;     // “ mg”
   const extraEl  = document.getElementById('ketorolac-extra');
 
-  // If age < 0.5 yrs → “Not licensed”
+  // If age < 0.5 yrs
   if (ageY < 0.5) {
-    kEl.textContent   = 'Not licensed';
-    kEl.style.display = 'inline';
+    kEl.textContent   = '';
+    kEl.style.display = 'none';
     if (kUnit) kUnit.style.display = 'none';
-    extraEl.textContent = '';
-    return;
+    extraEl.textContent = 'BNF: 6 months–15 years';
   }
 
   // If age ≥ 16 yrs → flat 30 mg (adults)
@@ -595,15 +625,42 @@ function updateReversal(w) {
     if (kUnit) kUnit.style.display = 'none';
     extraEl.textContent = '';
   }
+    
+// — DICLOFENAC IV (1 mg/kg, max 75 mg) —
+const dEl   = document.getElementById('diclofenaciv');
+const dUnit = dEl.nextElementSibling;
+const dNote = document.getElementById('diclofenaciv-note');
+
+if (w > 0 && !isNaN(w)) {
+  const dDose = Math.min(1 * w, 75);
+
+  dEl.textContent   = stripZeros(dDose.toFixed(1));
+  dEl.style.display = 'inline';
+  if (dUnit) dUnit.style.display = 'inline';
+
+  // ✅ Only show note under 2 years
+  if (ageY < 2) {
+    dNote.textContent = 'BNF: 2–17 years';
+    dNote.style.display = 'inline';
+  } else {
+    dNote.textContent = '';
+    dNote.style.display = 'inline';
+  }
+
+} else {
+  dEl.textContent   = '';
+  dEl.style.display = 'none';
+  if (dUnit) dUnit.style.display = 'none';
+
+  dNote.textContent = '';
+} 
+    
    // — MORPHINE IV (0.05–0.1 mg/kg up to 12 y; ≥12 y → 5 mg) —
   const mIvEl   = document.getElementById('morphineiv');
   const mIvUnit = mIvEl.nextElementSibling; // “ mg”
   const mNoteEl = document.getElementById('morphine-iv-extra');
 
   if (w > 0 && !isNaN(w)) {
-    // calculate age in years
-    const rawAge = parseFloat(ageInput.value) || 0;
-    const ageY   = (ageUnit === 'months') ? (rawAge / 12) : rawAge;
 
     let doseText;
     if (ageY < 12) {
@@ -640,11 +697,6 @@ function updateReversal(w) {
   const mPoNote  = document.getElementById('morphine-po-extra');
 
   if (w > 0 && !isNaN(w)) {
-    const rawAge = parseFloat(ageInput.value) || 0;
-    // convert age to months
-    const ageMonths = ageUnit === 'months' ? rawAge : rawAge * 12;
-    // convert age to years (decimal)
-    const ageY = ageMonths / 12;
 
     let doseMinMg = 0, doseMaxMg = 0;
     let noteText = '';
@@ -1324,15 +1376,19 @@ if (ageY < 1) {
     defibEl.style.display   = 'inline';
     defibEl.nextElementSibling.style.display = 'inline'; // “ J”
 
-    // — ADRENALINE IV 1:10,000 is 0.1 mg/mL; dose = 0.1 mL/kg × w —
-    const adrVol = (0.1 * w).toFixed(2), // mL
-          adrMg  = (adrVol * 0.1).toFixed(2); // mg
+    // — ADRENALINE IV 1:10,000 (100 mcg/mL) —
 
-    adrenalineEl.textContent   = stripZeros(adrVol); 
-    adrenalineEl.style.display = 'inline';
-    adrenalineEl.nextElementSibling.style.display = 'inline'; // “ mL”
+const adrMcg = 10 * w;                 // mcg/kg dose
+const adrVol = adrMcg / 100;           // mL (100 mcg/mL)
 
-    adrenalineExtra.innerHTML = `${stripZeros(adrVol)} mL of 0.1 mg/mL`;
+// main result (mcg)
+adrenalineEl.textContent = stripZeros(adrMcg.toFixed(0));
+adrenalineEl.style.display = 'inline';
+adrenalineEl.nextElementSibling.style.display = 'inline'; // shows "mcg"
+
+// sub row
+const adrenalineExtra = document.getElementById('adrenaline-vol-extra');
+adrenalineExtra.innerHTML = `${stripZeros(adrVol.toFixed(2))} mL of 100 mcg/mL`;
 
 // — FLUID BOLUS 10–20 mL/kg —
     const bolusEl   = document.getElementById('fluidbolus'),
@@ -1464,15 +1520,6 @@ function updateSedation(w) {
       extraId:      'rocuronium-ga-extra'
     },
     {
-      id:           'ondansetron',
-      minDose:      0.15, // mg/kg
-      maxDose:      0.15, // same
-      conc:         2,    // mg per mL
-      unitLabel:    'mg',
-      extraId:      'ondansetron-ga-extra',
-      cap:          4
-    },
-    {
       id:           'dexamethasone',
       minDose:      0.15, // mg/kg
       maxDose:      0.15, // same
@@ -1482,10 +1529,7 @@ function updateSedation(w) {
       cap:          6.6
     }
   ];      
-      
-// if <6 months, don’t even include ondansetron in the list
-  const filteredDrugs = drugs.filter(d => !(d.id === 'ondansetron' && ageY < 0.5));      
-      
+              
  // ATROPINE
 document.querySelectorAll('.atropine-dose').forEach(el => {
   // 20 mcg/kg @ 600 mcg/mL
@@ -1586,9 +1630,42 @@ if (ageY < 1) {
     }
     cylNote.textContent = '';
   }
+      
+ // — ONDANSETRON (0.15 mg/kg, max 4 mg; 2 mg/mL) —
+const oEl   = document.getElementById('ondansetron');
+const oUnit = oEl.nextElementSibling;
+const oNote = document.getElementById('ondansetron-ga-extra');
 
 if (w > 0 && !isNaN(w)) {
-  filteredDrugs.forEach(({ id, minDose, maxDose, conc, unitLabel, extraId, cap }) => {
+
+  if (ageY < 0.5) {
+    oEl.textContent   = '';
+    oEl.style.display = 'none';
+    if (oUnit) oUnit.style.display = 'none';
+
+    oNote.textContent = 'BNF: 6 months–17 years';
+  } 
+  else {
+    const dose = Math.min(0.15 * w, 4);
+
+    oEl.textContent   = stripZeros(dose.toFixed(2));
+    oEl.style.display = 'inline';
+    if (oUnit) oUnit.style.display = 'inline';
+
+    const vol = stripZeros((dose / 2).toFixed(2));
+    oNote.textContent = `${vol} mL of 2 mg/mL`;
+  }
+
+} else {
+  oEl.textContent   = '';
+  oEl.style.display = 'none';
+  if (oUnit) oUnit.style.display = 'none';
+
+  oNote.textContent = '';
+}     
+
+if (w > 0 && !isNaN(w)) {
+  drugs.forEach(({ id, minDose, maxDose, conc, unitLabel, extraId, cap }) => {
     // 1) raw doses
     let rawMin = minDose * w;
     let rawMax = maxDose * w;
@@ -1603,18 +1680,18 @@ if (w > 0 && !isNaN(w)) {
     const dMin     = stripZeros(rawMin.toFixed(1));
     const dMax     = stripZeros(rawMax.toFixed(1));
     const doseText = (rawMin === rawMax) ? dMin : `${dMin}–${dMax}`;
-
-    // 4) inject into the DOM exactly as you did before
     const spanEl  = document.getElementById(id);
-    spanEl.textContent = doseText;
-    spanEl.style.display = 'inline';
     const unitSpan = spanEl.nextElementSibling;
-    if (unitSpan && unitSpan.classList.contains('unit')) {
-      unitSpan.style.display = 'inline';
-    }
+    const extraEl = document.getElementById(extraId);
+
+// ✅ normal drugs continue below
+spanEl.textContent = doseText;
+spanEl.style.display = 'inline';
+if (unitSpan && unitSpan.classList.contains('unit')) {
+  unitSpan.style.display = 'inline';
+}
 
     // 5) compute & inject the “extra” volume note
-    const extraEl = document.getElementById(extraId);
     const vMin    = stripZeros((rawMin / conc).toFixed(2));
     const vMax    = stripZeros((rawMax / conc).toFixed(2));
     const volText = (rawMin === rawMax) ? `${vMin}` : `${vMin}–${vMax}`;
@@ -1885,14 +1962,29 @@ function resetForm() {
   // 1) clear the inputs
   ageInput.value = '';
   weightIn.value = '';
+    // clear height
+  const heightEl = document.getElementById('height');
+  if (heightEl) heightEl.value = '';
   // 2) reset the toggle back to years
   ageUnit = 'years';
   unitBtn.textContent = 'years';
+   // reset gender to default (male)
+  document.querySelectorAll('#GenderBtn button').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  const defaultGender = document.querySelector('#GenderBtn button[data-value="male"]');
+  if (defaultGender) defaultGender.classList.add('active');
   // 3) hide all existing outputs
   clearWeight();
   
-   updateAntibiotics(0);
+    // clear BMI-related outputs
+  document.getElementById('bmi-value').textContent = '';
+  document.getElementById('ibw-value').textContent = '';
+  document.getElementById('adjbw-value').textContent = '';
+  
+  updateAntibiotics(0);
   updateSedation(0);
+  updateAnalgesics(0);
   
 // 4) collapse any open accordion panels
   document.querySelectorAll('.accordion-header.active').forEach(header => {
@@ -1904,7 +1996,6 @@ function resetForm() {
   
 }
 
-// Optional: home button handler if you want
 function goHome() {
   window.location.href = '/'; // or 'index.html'
 }
