@@ -336,9 +336,8 @@ function updateReversal(w) {
       const neo   = vol * 2.5;
       const gly   = vol * 0.5;
       el.textContent =
-        `${stripZeros(vol.toFixed(2))} mL ` +
-        `(contains ${stripZeros(neo.toFixed(2))} mg neostigmine + ` +
-         `${stripZeros(gly.toFixed(2))} mg glycopyrulate)`;
+         `${stripZeros(neo.toFixed(2))} mg neostigmine + ` +
+         `${stripZeros(gly.toFixed(2))} mg glycopyrulate`;
     });
   }
 }
