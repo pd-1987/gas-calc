@@ -568,7 +568,6 @@ ibupopc.innerHTML = poNote ? poNote : '';
 
     // 30 mg at 30 mg/mL = 1 mL
     extraEl.innerHTML = `1.00 mL of 30 mg/mL`;
-    return;
   }
 
   // Otherwise (age 0.5 – 15 yrs): calculate 0.5–1 mg/kg, cap at 15 mg
@@ -1321,8 +1320,9 @@ function updateEmergencyDrugs(w) {
     rocuroniumExtra.innerHTML = `${stripZeros(rVol)} mL of 10 mg/mL`;
 
     // — ATROPINE: 20 mcg/kg @ 600 mcg/mL —
-    const aDose    = 20  * w,                   // mcg
-          aVol     = (aDose / 600).toFixed(2);    // mL
+    const rawDose = 20 * w;                     // mcg/kg
+const aDose   = Math.min(rawDose, 600);     // 👈 apply cap
+const aVol    = (aDose / 600).toFixed(2);   // mL
 
     atropineEl.textContent   = stripZeros(aDose.toFixed(1));
     atropineEl.style.display = 'inline';
@@ -1530,20 +1530,22 @@ function updateSedation(w) {
   ];      
               
  // ATROPINE
+const rawDose = 20 * w;                 // mcg
+const doseMcg = Math.min(rawDose, 600); // 👈 apply cap
+
 document.querySelectorAll('.atropine-dose').forEach(el => {
-  // 20 mcg/kg @ 600 mcg/mL
-  const doseMcg = 20 * w;                 // in mcg
   const doseText = stripZeros(doseMcg.toFixed(1));
-  el.textContent   = doseText;
+  el.textContent = doseText;
   el.style.display = 'inline';
+
   const unit = el.nextElementSibling;
   if (unit && unit.classList.contains('unit')) {
     unit.style.display = 'inline';
   }
 });
+
 document.querySelectorAll('.atropine-extra').forEach(el => {
-  // volume in mL
-  const vol = stripZeros(((20 * w) / 600).toFixed(2));
+  const vol = stripZeros((doseMcg / 600).toFixed(2)); // 👈 use capped dose
   el.textContent = `${vol} mL of 600 mcg/mL`;
 });
 
