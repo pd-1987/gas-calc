@@ -1730,18 +1730,18 @@ function updateAntibiotics(w) {
 
   if (w > 0 && ageMonths >= 2) {
     if (ageYears < 11) {
-      doseText  = '10 mg/kg (Max 400 mg)';
+      doseText  = '10 mg/kg <span class="small-dose"><span>Max 400 mg</span></span>';
       noteText  = 'Children aged 2 months – 11 years';
       numericMg = Math.min(10 * w, 400);
     } else if (ageYears < 18) {
-      doseText  = '6 mg/kg (Max 400 mg)';
+      doseText  = '6 mg/kg <span class="small-dose"><span>Max 400 mg</span></span>';
       noteText  = 'Children aged 12 – 17 years';
       numericMg = Math.min(6 * w, 400);
     }
   }
 
   // always keep the cell but toggle its contents
-  dosingEl.textContent      = doseText;
+  dosingEl.innerHTML      = doseText;
   dosingEl.style.display    = 'table-cell';         // leave empty cell when blank
 
   // show or hide the number + unit
@@ -1754,7 +1754,7 @@ function updateAntibiotics(w) {
 
   // show or hide
   if (doseText) {
-    dosingEl.textContent    = doseText;
+    dosingEl.innerHTML   = doseText;
     dosingEl.style.display  = 'table-cell';
 
     teiEl.textContent       = stripZeros(numericMg.toFixed(2));
