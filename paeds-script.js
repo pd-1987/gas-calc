@@ -215,7 +215,22 @@ document.querySelectorAll(
 });
 document.querySelectorAll(
   '.sug-2-extra, .sug-4-extra, .neos-extra'
-).forEach(el => el.textContent = '');    
+).forEach(el => el.textContent = '');
+    
+    // Blood volume clear
+const bvEl = document.getElementById('blood-volume');
+const bvRange = document.getElementById('blood-volume-range');
+
+if (bvEl) {
+  bvEl.textContent = '';
+  bvEl.style.display = 'none';
+  const unit = bvEl.nextElementSibling;
+  if (unit && unit.classList.contains('unit')) {
+    unit.style.display = 'none';
+  }
+}
+
+if (bvRange) bvRange.textContent = '';
 }
 
 function updatePremedication(w) {
@@ -1467,6 +1482,58 @@ adrenalineExtra.innerHTML = `${stripZeros(adrVol.toFixed(2))} mL of 100 mcg/mL`;
       glucoseUnit.style.display = 'none';
     }
   }
+  // — BLOOD VOLUME (age-based mL/kg) —
+const rawAge = parseFloat(ageInput.value) || 0;
+const ageMonths = ageUnit === 'months' ? rawAge : rawAge * 12;
+
+const bvEl    = document.getElementById('blood-volume');
+const bvUnit  = bvEl.nextElementSibling; // " mL"
+const bvRange = document.getElementById('blood-volume-range');
+
+if (w > 0 && !isNaN(w)) {
+
+  let minPerKg, maxPerKg;
+
+if (ageMonths < 3) {
+  minPerKg = 80;
+  maxPerKg = 90;
+} else {
+  minPerKg = 70;
+  maxPerKg = 70;
+}
+
+  // middle cell
+  bvRange.textContent =
+    (minPerKg === maxPerKg)
+      ? `${minPerKg} mL/kg`
+      : `${minPerKg}–${maxPerKg} mL/kg`;
+
+  // calculated volume
+  const bvMin = minPerKg * w;
+  const bvMax = maxPerKg * w;
+
+  const bvText =
+    Math.abs(bvMin - bvMax) < 0.001
+      ? stripZeros(bvMin.toFixed(0))
+      : `${stripZeros(bvMin.toFixed(0))}–${stripZeros(bvMax.toFixed(0))}`;
+
+  bvEl.textContent   = bvText;
+  bvEl.style.display = 'inline';
+
+  if (bvUnit && bvUnit.classList.contains('unit')) {
+    bvUnit.style.display = 'inline';
+  }
+
+} else {
+  bvEl.textContent   = '';
+  bvEl.style.display = 'none';
+
+  if (bvUnit && bvUnit.classList.contains('unit')) {
+    bvUnit.style.display = 'none';
+  }
+
+  bvRange.textContent = '';
+}
 }
   
 function updateSedation(w) {
