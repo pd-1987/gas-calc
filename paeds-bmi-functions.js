@@ -1,4 +1,4 @@
-console.log("BMI centile functions loaded 2");
+console.log("BMI centile functions loaded");
 
 function interpolateLMS(data, age) {
   if (!data || data.length === 0) return null;
@@ -21,19 +21,7 @@ function interpolateLMS(data, age) {
     }
   }
 
-  // ✅ NEW: fallback to nearest valid point
-  let closest = data[0];
-  let minDiff = Math.abs(age - data[0].age);
-
-  for (let i = 1; i < data.length; i++) {
-    const diff = Math.abs(age - data[i].age);
-    if (diff < minDiff) {
-      minDiff = diff;
-      closest = data[i];
-    }
-  }
-
-  return closest;
+  return null;
 }
 
 function lmsZ(bmi, L, M, S) {
@@ -68,8 +56,6 @@ function zToCentile(z) {
 
 function classifyBMI(centile) {
 
-  if (centile == null || isNaN(centile)) return "";
-
   if (centile < 0.4) return "Severely underweight";
   if (centile < 2) return "Underweight";
   if (centile < 91) return "Healthy weight";
@@ -80,37 +66,19 @@ function classifyBMI(centile) {
 }
 
 function getBMILMS(ageYears, gender) {
+
   if (!ageYears || ageYears < 2) return null;
-  if (!growthData) return null;
 
-  const dataset = gender === "female"
-    ? growthData.girls
-    : growthData.boys;
+  const dataset =
+    gender === "female"
+      ? paedsBMIData.girls
+      : paedsBMIData.boys;
 
-  const cleaned = dataset
-    .filter(d =>
-      d.bmi &&
-      !isNaN(d.bmi.L) &&
-      !isNaN(d.bmi.M) &&
-      !isNaN(d.bmi.S)
-    )
-    .map(d => ({ age: d.age, ...d.bmi }));
-
-  console.log("Cleaned LMS length:", cleaned.length);
-  
-  const lms = interpolateLMS(cleaned, ageYears);
-
-if (!lms || isNaN(lms.L) || isNaN(lms.M) || isNaN(lms.S)) {
-  return null;
-}
-
-return lms;
+  return interpolateLMS(dataset, ageYears);
 }
 
 function formatCentile(c) {
-  if (c == null || isNaN(c)) return "";
-
-  const rounded = c < 1 || c > 99 ? c.toFixed(1) : Math.round(c);
+  const rounded = Math.round(c);
 
   const suffix =
     rounded % 10 === 1 && rounded % 100 !== 11 ? "st" :
