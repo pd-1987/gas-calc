@@ -1,3 +1,5 @@
+console.log("weight data loaded");
+
 const paedsWeightData =
   {
   "boys": [
@@ -2896,4 +2898,4 @@ const paedsWeightData =
       "S": 0.14117
     }
   ]
-}
+};
