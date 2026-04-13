@@ -374,25 +374,22 @@
   white-space: nowrap;
   border-right: 2px solid var(--border-light);
 }
-    /* ===== Reversal agents (striped like syringe labels) ===== */
+
 .row-reversal {
   background: repeating-linear-gradient(
     135deg,
-    #f8a8c2 0px,
-    #f8a8c2 8px,
-    #fafafa 8px,
-    #fafafa 16px
+    #fcd6e3 0px,
+    #fcd6e3 10px,
+    #fff7fa 10px,
+    #fff7fa 20px
   );
   color: #000;
 }
-
-/* Sub-row (solid matching tone) */
 .sub-reversal {
   background-color: #fff5f7;
   color: #000;
 }
 
-/* Ensure text always readable */
 .row-reversal td,
 .sub-reversal td,
 .sub-reversal small {
@@ -1186,7 +1183,8 @@
               Dexamethasone
             </td>
             <td>
-              0.15 mg/kg
+              <span>0.15 mg/kg</span>
+              <span class="small-dose"><span>Max 6.6 mg</span></span>
             </td>
             <td>
               <span id="dexamethasone"></span>
@@ -1205,7 +1203,8 @@
               Ondansetron
             </td>
             <td>
-              0.15 mg/kg
+              <span>0.15 mg/kg</span>
+              <span class="small-dose"><span>Max 4 mg</span></span>
             </td>
             <td>
               <span id="ondansetron"></span>
@@ -1223,7 +1222,8 @@
               Cyclizine
             </td>
             <td>
-              0.5–1 mg/kg
+              <span>0.5–1 mg/kg</span>
+<span class="small-dose"><span id="cyclizine-max"></span></span>
             </td>
             <td>
               <span id="cyclizine"></span>
@@ -1284,7 +1284,8 @@
     Ketorolac IV
   </td>
   <td>
-    0.5–1 mg/kg
+    <span>0.5–1 mg/kg</span>
+<span class="small-dose"><span>Max 15 mg</span></span>
   </td>
   <td>
     <span id="ketorolac"></span><span class="static unit">mg</span>
@@ -1301,7 +1302,8 @@
     Diclofenac IV
   </td>
   <td>
-    1 mg/kg
+    <span>1 mg/kg</span>
+    <span class="small-dose"><span>Max 75 mg</span></span>
   </td>
   <td>
     <span id="diclofenaciv"></span><span class="static unit">mg</span>
@@ -1441,19 +1443,20 @@
 </tr>
           
           <!-- Morphine PO -->
+<!-- Morphine PO -->
 <tr class="row-blue">
   <td>
     Morphine PO
   </td>
-  <td> 
+  <td id="morphine-po-inline">
   </td>
   <td>
     <span id="morphinepo"></span><span class="static unit">mg</span>
   </td>
 </tr>
 <tr class="sub-blue">
-            <td colspan="3">
-              <small id="morphine-po-extra"></small>
+  <td colspan="3">
+    <small id="morphine-po-extra"></small>
   </td>
 </tr>
     </table>
