@@ -1,10 +1,7 @@
-console.log("weight functions loaded");
 // ===============================
 // Paediatric Weight Estimate (LMS)
 // Uses 50th centile (M)
 // ===============================
-
-// Map UI gender → data keys
 function getGenderKey() {
   const genderContainer = document.getElementById("GenderBtn");
 
@@ -19,40 +16,15 @@ function getGenderKey() {
 // Get weight from LMS (nearest age)
 function getWeightEstimateFromLMS(ageYears) {
 
-  const genderKey = getGenderKey();
+  const lms = getWeightLMS(ageYears);
+  if (!lms) return null;
 
-  if (!paedsWeightData || !paedsWeightData[genderKey]) return null;
-
-  const dataset = paedsWeightData[genderKey];
-
-  let closest = dataset[0];
-
-  for (let i = 1; i < dataset.length; i++) {
-    if (Math.abs(dataset[i].age - ageYears) < Math.abs(closest.age - ageYears)) {
-      closest = dataset[i];
-    }
-  }
-
-  return closest.M; // 50th centile
-}
-
-// ===============================
-// LMS Z-score
-// ===============================
-function lmsZ(x, L, M, S) {
-  if (L === 0) {
-    return Math.log(x / M) / S;
-  }
-  return (Math.pow(x / M, L) - 1) / (L * S);
+  return lms.M;
 }
 
 // ===============================
 // Z → Centile
 // ===============================
-function zToCentile(z) {
-  return 100 * (0.5 * (1 + erf(z / Math.sqrt(2))));
-}
-
 // Error function approximation
 function erf(x) {
   const sign = x >= 0 ? 1 : -1;
@@ -77,17 +49,12 @@ function erf(x) {
 function getWeightLMS(ageYears) {
 
   const genderKey = getGenderKey();
+
+  if (!paedsWeightData || !paedsWeightData[genderKey]) return null;
+
   const dataset = paedsWeightData[genderKey];
 
-  let closest = dataset[0];
-
-  for (let i = 1; i < dataset.length; i++) {
-    if (Math.abs(dataset[i].age - ageYears) < Math.abs(closest.age - ageYears)) {
-      closest = dataset[i];
-    }
-  }
-
-  return closest;
+  return interpolateLMS(dataset, ageYears); // ✅ smooth interpolation
 }
 
 // ===============================
@@ -114,9 +81,10 @@ function formatCentile(c) {
   const rounded = Math.round(c);
 
   const suffix =
-    rounded % 10 === 1 && rounded !== 11 ? "st" :
-    rounded % 10 === 2 && rounded !== 12 ? "nd" :
-    rounded % 10 === 3 && rounded !== 13 ? "rd" : "th";
+    rounded % 10 === 1 && rounded % 100 !== 11 ? "st" :
+    rounded % 10 === 2 && rounded % 100 !== 12 ? "nd" :
+    rounded % 10 === 3 && rounded % 100 !== 13 ? "rd" :
+    "th";
 
   return `${rounded}${suffix}`;
 }
@@ -131,12 +99,10 @@ function updateWeightCentileDisplay() {
 
     if (centile !== null) {
       calcDiv.innerHTML =
-        `<p><small>${formatCentile(centile)} centile</small></p>`;
+  `<small class="centile-text">${formatCentile(centile)} centile</small>`;
     }
   }
 }
-
-console.log("BMI centile functions loadeded");
 
 function interpolateLMS(data, age) {
   if (!data || data.length === 0) return null;
@@ -167,27 +133,6 @@ function lmsZ(bmi, L, M, S) {
   return (Math.pow(bmi / M, L) - 1) / (L * S);
 }
 
-function erf(x) {
-  const sign = x >= 0 ? 1 : -1;
-  x = Math.abs(x);
-
-  const a1 = 0.254829592;
-  const a2 = -0.284496736;
-  const a3 = 1.421413741;
-  const a4 = -1.453152027;
-  const a5 = 1.061405429;
-  const p = 0.3275911;
-
-  const t = 1 / (1 + p * x);
-  const y =
-    1 -
-    (((((a5 * t + a4) * t + a3) * t + a2) * t + a1) *
-      t *
-      Math.exp(-x * x));
-
-  return sign * y;
-}
-
 function zToCentile(z) {
   return 0.5 * (1 + erf(z / Math.sqrt(2))) * 100;
 }
@@ -215,17 +160,80 @@ function getBMILMS(ageYears, gender) {
   return interpolateLMS(dataset, ageYears);
 }
 
-function formatCentile(c) {
-  const rounded = Math.round(c);
+function getHeightLMS(ageYears) {
+  const genderKey = getGenderKey();
 
-  const suffix =
-    rounded % 10 === 1 && rounded % 100 !== 11 ? "st" :
-    rounded % 10 === 2 && rounded % 100 !== 12 ? "nd" :
-    rounded % 10 === 3 && rounded % 100 !== 13 ? "rd" :
-    "th";
+  if (!paedsHeightData || !paedsHeightData[genderKey]) return null;
 
-  return `${rounded}${suffix}`;
+  const dataset = paedsHeightData[genderKey];
+
+  return interpolateLMS(dataset, ageYears); // ✅ better than nearest
 }
+
+function getHeightCentile(height, ageYears) {
+
+  const lms = getHeightLMS(ageYears);
+  if (!lms) return null;
+
+  const z = lmsZ(height, lms.L, lms.M, lms.S);
+  return zToCentile(z);
+}
+
+function estimateHeight() {
+
+  if (!autoEstimate) return;
+  
+  const heightInput = document.getElementById("height");
+
+  const a = parseFloat(ageInput.value);
+
+  if (isNaN(a) || a < 0) return;
+
+  const ageY = (ageUnit === 'months') ? (a / 12) : a;
+
+  // Optional upper limit (match weight logic)
+  if (ageY > 20) return;
+
+  const lms = getHeightLMS(ageY);
+  if (!lms) return;
+
+  const estimatedHeight = lms.M;
+
+  heightInput.value = stripZeros(estimatedHeight.toFixed(1));
+
+  // Optional display (you can style this later)
+  const heightCentileDisplay = document.getElementById("height-calculations");
+  if (heightCentileDisplay) {
+  }
+  updateHeightCentileDisplay();
+}
+
+function updateHeightCentileDisplay() {
+
+  const heightInput = document.getElementById("height");
+  const heightVal = parseFloat(heightInput.value);
+  const ageVal = parseFloat(ageInput.value);
+
+  const el = document.getElementById("height-calculations");
+
+  if (isNaN(heightVal) || isNaN(ageVal)) {
+    if (el) el.innerHTML = '';
+    return;
+  }
+
+  const ageY = ageUnit === 'months' ? ageVal / 12 : ageVal;
+
+  const centile = getHeightCentile(heightVal, ageY);
+
+if (centile !== null && hCalc) {
+  hCalc.innerHTML =
+  `<small class="centile-text">${formatCentile(centile)} centile</small>`;
+} else if (hCalc) {
+  hCalc.innerHTML = '';
+}
+}
+
+// MAIN FUNCTIONS //
 
 function stripZeros(str) {
     return str
@@ -239,9 +247,17 @@ function stripZeros(str) {
   // grab your nodes once
   const ageInput = document.getElementById('age');
   const weightIn = document.getElementById('weight');
+  const heightIn = document.getElementById('height');
   const unitBtn  = document.getElementById('AgeUnitBtn');
   const estToggle = document.getElementById('EstimateToggle');
   const calcDiv  = document.getElementById('weight-calculations');
+  const hCalc = document.getElementById('height-calculations');
+  if (hCalc) hCalc.innerHTML = '';
+
+function updateEstimateLock() {
+  weightIn.disabled = autoEstimate;
+  heightIn.disabled = autoEstimate;
+}
 
   // clear everything and hide all outputs
   function clearWeight() {
@@ -263,8 +279,9 @@ function stripZeros(str) {
   if (el) el.textContent = '';
 });
     
-  // 2) clear the weight-calculation formulas
+  // 2) clear the weight and height-calculation formulas
   calcDiv.innerHTML = '';
+  if (hCalc) hCalc.innerHTML = '';
     
     [
     'fentanyl-ga-extra',
@@ -1095,9 +1112,8 @@ function estimateWeight() {
 
   const w = stripZeros(estimatedWeight.toFixed(2));
   weightIn.value = w;
-
-calcDiv.innerHTML =
-  `<p><small>50th centile</small></p>`;
+  
+updateWeightCentileDisplay();  
 
   if (autoEstimate) {
     const normals = getNormalValues(a, ageUnit);
@@ -2086,17 +2102,16 @@ function updateAntibiotics(w) {
  estToggle.addEventListener('change', () => {
    autoEstimate = estToggle.checked;
 
+   updateEstimateLock();
+   
   if (autoEstimate) {
-  weightIn.disabled = true;
-
   const n = parseFloat(ageInput.value);
   if (!isNaN(n) && n >= 0) {
     estimateWeight();
+    estimateHeight();   
   }
 
-  calculateBMI();   // ← ADD THIS LINE
-} else {
-  weightIn.disabled = false;
+  calculateBMI();
 }
  });
 
@@ -2121,6 +2136,7 @@ function updateAntibiotics(w) {
     const n = parseFloat(rawAge);
     if (!isNaN(n) && n >= 0) {
       estimateWeight();
+      estimateHeight();
     } else {
       clearWeight();
     }
@@ -2202,8 +2218,9 @@ expandOpenAccordion();
 
 document.addEventListener('DOMContentLoaded', () => {
   clearWeight();
-  weightIn.disabled = true;
   estToggle.checked = true;
+  autoEstimate = true;
+  updateEstimateLock();
   updateAntibiotics(0);    // ← this will hide all antibiotics on load
 });
   
@@ -2442,6 +2459,7 @@ function updateAll() {
 
   if (autoEstimate) {
     estimateWeight();
+    estimateHeight();
   }
 
   updateAirwayCalculations(y);
@@ -2456,5 +2474,8 @@ function updateAll() {
 }
 
 weightInput.addEventListener("input", calculateBMI);
-heightInput.addEventListener("input", calculateBMI);
+heightInput.addEventListener("input", () => {
+  calculateBMI();
+  updateHeightCentileDisplay();
+});
 ageInput.addEventListener("input", calculateBMI);
