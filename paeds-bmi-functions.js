@@ -1,5 +1,4 @@
 console.log("BMI centile functions loaded");
-console.log("heightCm:", heightCm, "heightM:", heightM);
 
 function interpolateLMS(data, age) {
   if (!data || data.length === 0) return null;
@@ -11,7 +10,11 @@ function interpolateLMS(data, age) {
     const a = data[i];
     const b = data[i + 1];
 
-    if (age >= a.age && age <= b.age) {
+   if (
+  age >= a.age && age <= b.age &&
+  !isNaN(a.L) && !isNaN(a.M) && !isNaN(a.S) &&
+  !isNaN(b.L) && !isNaN(b.M) && !isNaN(b.S)
+) {
       const t = (age - a.age) / (b.age - a.age);
 
       return {
@@ -76,15 +79,21 @@ function getBMILMS(ageYears, gender) {
     ? growthData.girls
     : growthData.boys;
 
-  const lms = interpolateLMS(
-    dataset.map(d => ({ age: d.age, ...d.bmi })),
-    ageYears
-  );
+  const cleaned = dataset
+    .filter(d =>
+      d.bmi &&
+      !isNaN(d.bmi.L) &&
+      !isNaN(d.bmi.M) &&
+      !isNaN(d.bmi.S)
+    )
+    .map(d => ({ age: d.age, ...d.bmi }));
 
-  return lms;
+  return interpolateLMS(cleaned, ageYears);
 }
 
 function formatCentile(c) {
+  if (c == null || isNaN(c)) return "";
+
   const rounded = c < 1 || c > 99 ? c.toFixed(1) : Math.round(c);
 
   const suffix =
