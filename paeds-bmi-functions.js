@@ -56,6 +56,8 @@ function zToCentile(z) {
 
 function classifyBMI(centile) {
 
+  if (centile == null || isNaN(centile)) return "";
+
   if (centile < 0.4) return "Severely underweight";
   if (centile < 2) return "Underweight";
   if (centile < 91) return "Healthy weight";
@@ -66,19 +68,23 @@ function classifyBMI(centile) {
 }
 
 function getBMILMS(ageYears, gender) {
-
   if (!ageYears || ageYears < 2) return null;
+  if (!growthData) return null;
 
-  const dataset =
-    gender === "female"
-      ? paedsBMIData.girls
-      : paedsBMIData.boys;
+  const dataset = gender === "female"
+    ? growthData.girls
+    : growthData.boys;
 
-  return interpolateLMS(dataset, ageYears);
+  const lms = interpolateLMS(
+    dataset.map(d => ({ age: d.age, ...d.bmi })),
+    ageYears
+  );
+
+  return lms;
 }
 
 function formatCentile(c) {
-  const rounded = Math.round(c);
+  const rounded = c < 1 || c > 99 ? c.toFixed(1) : Math.round(c);
 
   const suffix =
     rounded % 10 === 1 && rounded % 100 !== 11 ? "st" :
