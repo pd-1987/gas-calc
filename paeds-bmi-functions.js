@@ -67,7 +67,7 @@ function classifyBMI(centile) {
 
 function getBMILMS(ageYears, gender) {
 
-  if (!ageYears || ageYears < 2) return null;
+  if (ageYears < (1/12)) return null;
 
   const dataset =
     gender === "female"
