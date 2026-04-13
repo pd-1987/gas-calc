@@ -1,3 +1,5 @@
+console.log("BMI data loaded");
+
 const paedsBMIData =
 {
   "girls": [
