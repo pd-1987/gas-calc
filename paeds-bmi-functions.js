@@ -10,11 +10,7 @@ function interpolateLMS(data, age) {
     const a = data[i];
     const b = data[i + 1];
 
-   if (
-  age >= a.age && age <= b.age &&
-  !isNaN(a.L) && !isNaN(a.M) && !isNaN(a.S) &&
-  !isNaN(b.L) && !isNaN(b.M) && !isNaN(b.S)
-) {
+    if (age >= a.age && age <= b.age) {
       const t = (age - a.age) / (b.age - a.age);
 
       return {
@@ -25,7 +21,19 @@ function interpolateLMS(data, age) {
     }
   }
 
-  return null;
+  // ✅ NEW: fallback to nearest valid point
+  let closest = data[0];
+  let minDiff = Math.abs(age - data[0].age);
+
+  for (let i = 1; i < data.length; i++) {
+    const diff = Math.abs(age - data[i].age);
+    if (diff < minDiff) {
+      minDiff = diff;
+      closest = data[i];
+    }
+  }
+
+  return closest;
 }
 
 function lmsZ(bmi, L, M, S) {
@@ -88,7 +96,15 @@ function getBMILMS(ageYears, gender) {
     )
     .map(d => ({ age: d.age, ...d.bmi }));
 
-  return interpolateLMS(cleaned, ageYears);
+  console.log("Cleaned LMS length:", cleaned.length);
+  
+  const lms = interpolateLMS(cleaned, ageYears);
+
+if (!lms || isNaN(lms.L) || isNaN(lms.M) || isNaN(lms.S)) {
+  return null;
+}
+
+return lms;
 }
 
 function formatCentile(c) {
