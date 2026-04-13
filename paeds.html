@@ -28,15 +28,7 @@
       border: 1px solid var(--border-light);
       color: var(--text-main);
     }
-    #weight-calculations {
-      margin: 8px 5px;
-      font-family: inherit;
-      line-height: 1.4;
-      font-size: 12px;
-    }
-    #weight-calculations p {
-      margin: 2px 0;
-    }
+
     .unit {
       color: var(--text-secondary);
     }
@@ -210,9 +202,6 @@
   font-size: 14px;
   color: var(--text-main);
   margin-left: -8px;
-}
-    #weight {
-  margin-right: 12px;
 }
     .reversal-text {
   background-color: #fff;      /* text on solid white so it’s readable */
@@ -437,6 +426,12 @@
   display: block;
   line-height: 1.3;
 }
+ .centile-text {
+  font-size: 0.8em;
+  color: #666;
+  display: inline-block;
+  margin-left: 6px;
+}   
   </style>
 </head>
   
@@ -444,11 +439,11 @@
 <header class="calc-header paeds">Paediatric anaesthesia</header>
   <div class="calc-wrapper">
   <div class="section">
-     <div class="input-group">
+
   <div class="gender-buttons" id="GenderBtn">
     <button class="active" data-value="male">Male</button>
     <button data-value="female">Female</button>
-  </div>
+
 </div>        
   <div class="input-group">
     <label for="age">Age:</label>
@@ -461,6 +456,12 @@
   <input type="number" id="weight" min="0" placeholder="0" />
   <div id="weight-calculations"></div>
 </div>
+        <!-- Height input -->
+  <div class="input-group">
+    <label for="height">Height (cm):</label>
+    <input type="number" id="height" min="0" placeholder="0" />
+    <div id="height-calculations"></div>
+  </div>    
 
 <label class="estimate-toggle">
   <input type="checkbox" id="EstimateToggle" checked>
@@ -499,12 +500,6 @@
 
       <div class="accordion-content-inner">
       
-    <!-- Height input -->
-  <div class="input-group">
-    <label for="height">Height (cm):</label>
-    <input type="number" id="height" min="0" placeholder="0" />
-  </div>      
-
   <!-- BMI display -->
 <div class="input-group">
   <label>BMI:</label>
@@ -2236,6 +2231,7 @@
 
 <script src="paeds-bmi-data.js"></script>
 <script src="paeds-weight-data.js"></script>
+ <script src="paeds-height-data.js"></script>
 <script src="paeds-script.js"></script>
     
 </body>
