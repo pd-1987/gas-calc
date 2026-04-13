@@ -1,6 +1,5 @@
 const paedsNewBMIData =
 {
-  {
   "boys": [
     {
       "age": 0.0833333333333333,
