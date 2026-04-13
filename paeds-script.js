@@ -1,3 +1,232 @@
+console.log("weight functions loaded");
+// ===============================
+// Paediatric Weight Estimate (LMS)
+// Uses 50th centile (M)
+// ===============================
+
+// Map UI gender → data keys
+function getGenderKey() {
+  const genderContainer = document.getElementById("GenderBtn");
+
+  const gender =
+    genderContainer.dataset.gender ||
+    genderContainer.querySelector("button.active")?.dataset.value ||
+    "male";
+
+  return gender === "female" ? "girls" : "boys";
+}
+
+// Get weight from LMS (nearest age)
+function getWeightEstimateFromLMS(ageYears) {
+
+  const genderKey = getGenderKey();
+
+  if (!paedsWeightData || !paedsWeightData[genderKey]) return null;
+
+  const dataset = paedsWeightData[genderKey];
+
+  let closest = dataset[0];
+
+  for (let i = 1; i < dataset.length; i++) {
+    if (Math.abs(dataset[i].age - ageYears) < Math.abs(closest.age - ageYears)) {
+      closest = dataset[i];
+    }
+  }
+
+  return closest.M; // 50th centile
+}
+
+// ===============================
+// LMS Z-score
+// ===============================
+function lmsZ(x, L, M, S) {
+  if (L === 0) {
+    return Math.log(x / M) / S;
+  }
+  return (Math.pow(x / M, L) - 1) / (L * S);
+}
+
+// ===============================
+// Z → Centile
+// ===============================
+function zToCentile(z) {
+  return 100 * (0.5 * (1 + erf(z / Math.sqrt(2))));
+}
+
+// Error function approximation
+function erf(x) {
+  const sign = x >= 0 ? 1 : -1;
+  x = Math.abs(x);
+
+  const a1 = 0.254829592,
+        a2 = -0.284496736,
+        a3 = 1.421413741,
+        a4 = -1.453152027,
+        a5 = 1.061405429,
+        p  = 0.3275911;
+
+  const t = 1 / (1 + p * x);
+  const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+
+  return sign * y;
+}
+
+// ===============================
+// Get LMS for age
+// ===============================
+function getWeightLMS(ageYears) {
+
+  const genderKey = getGenderKey();
+  const dataset = paedsWeightData[genderKey];
+
+  let closest = dataset[0];
+
+  for (let i = 1; i < dataset.length; i++) {
+    if (Math.abs(dataset[i].age - ageYears) < Math.abs(closest.age - ageYears)) {
+      closest = dataset[i];
+    }
+  }
+
+  return closest;
+}
+
+// ===============================
+// Get centile from weight
+// ===============================
+function getWeightCentile(weight, ageYears) {
+
+  const lms = getWeightLMS(ageYears);
+  if (!lms) return null;
+
+  const z = lmsZ(weight, lms.L, lms.M, lms.S);
+  const centile = zToCentile(z);
+
+  return centile;
+}
+
+// ===============================
+// Format centile nicely
+// ===============================
+function formatCentile(c) {
+  if (c < 0.4) return "<0.4th";
+  if (c > 99.6) return ">99.6th";
+
+  const rounded = Math.round(c);
+
+  const suffix =
+    rounded % 10 === 1 && rounded !== 11 ? "st" :
+    rounded % 10 === 2 && rounded !== 12 ? "nd" :
+    rounded % 10 === 3 && rounded !== 13 ? "rd" : "th";
+
+  return `${rounded}${suffix}`;
+}
+
+function updateWeightCentileDisplay() {
+  const ageVal = parseFloat(ageInput.value);
+  const weightVal = parseFloat(weightIn.value);
+
+  if (!isNaN(ageVal) && !isNaN(weightVal)) {
+    const ageY = ageUnit === 'months' ? ageVal / 12 : ageVal;
+    const centile = getWeightCentile(weightVal, ageY);
+
+    if (centile !== null) {
+      calcDiv.innerHTML =
+        `<p><small>${formatCentile(centile)} centile</small></p>`;
+    }
+  }
+}
+
+console.log("BMI centile functions loadeded");
+
+function interpolateLMS(data, age) {
+  if (!data || data.length === 0) return null;
+
+  if (age <= data[0].age) return data[0];
+  if (age >= data[data.length - 1].age) return data[data.length - 1];
+
+  for (let i = 0; i < data.length - 1; i++) {
+    const a = data[i];
+    const b = data[i + 1];
+
+    if (age >= a.age && age <= b.age) {
+      const t = (age - a.age) / (b.age - a.age);
+
+      return {
+        L: a.L + t * (b.L - a.L),
+        M: a.M + t * (b.M - a.M),
+        S: a.S + t * (b.S - a.S)
+      };
+    }
+  }
+
+  return null;
+}
+
+function lmsZ(bmi, L, M, S) {
+  if (L === 0) return Math.log(bmi / M) / S;
+  return (Math.pow(bmi / M, L) - 1) / (L * S);
+}
+
+function erf(x) {
+  const sign = x >= 0 ? 1 : -1;
+  x = Math.abs(x);
+
+  const a1 = 0.254829592;
+  const a2 = -0.284496736;
+  const a3 = 1.421413741;
+  const a4 = -1.453152027;
+  const a5 = 1.061405429;
+  const p = 0.3275911;
+
+  const t = 1 / (1 + p * x);
+  const y =
+    1 -
+    (((((a5 * t + a4) * t + a3) * t + a2) * t + a1) *
+      t *
+      Math.exp(-x * x));
+
+  return sign * y;
+}
+
+function zToCentile(z) {
+  return 0.5 * (1 + erf(z / Math.sqrt(2))) * 100;
+}
+
+function classifyBMI(centile) {
+
+  if (centile < 0.4) return "Severely underweight";
+  if (centile < 2) return "Underweight";
+  if (centile < 91) return "Healthy weight";
+  if (centile < 98) return "Overweight";
+  if (centile < 99.6) return "Obese";
+
+  return "Severely obese";
+}
+
+function getBMILMS(ageYears, gender) {
+
+  if (ageYears < (1/12)) return null;
+
+  const dataset =
+    gender === "female"
+      ? paedsBMIData.girls
+      : paedsBMIData.boys;
+
+  return interpolateLMS(dataset, ageYears);
+}
+
+function formatCentile(c) {
+  const rounded = Math.round(c);
+
+  const suffix =
+    rounded % 10 === 1 && rounded % 100 !== 11 ? "st" :
+    rounded % 10 === 2 && rounded % 100 !== 12 ? "nd" :
+    rounded % 10 === 3 && rounded % 100 !== 13 ? "rd" :
+    "th";
+
+  return `${rounded}${suffix}`;
+}
+
 function stripZeros(str) {
     return str
       .replace(/(\.\d*?[1-9])0+$/ , '$1')   // drop extra zeroes after a significant decimal
@@ -830,117 +1059,52 @@ mPoNote.innerHTML = `Every 4 hours, adjusted to response`;
     unitBtn.textContent = 'years';
     ageInput.value = (raw !== '' && !isNaN(n)) ? Math.round((n / 12) * 10) / 10 : '';
   }
-
-  // 3) trigger your existing listeners to recalc everything
-  //    - the age-input listener will either re-estimate (if autoEstimate)
-  //      or clearWeight()/updateAirwayCalculations/updateNormalCentiles
-  ageInput.dispatchEvent(new Event('input'));
-
-  // if you want to make extra sure weight-based bits also rerun:
-  weightIn.dispatchEvent(new Event('input'));
+    updateAll();
 }
 
 function estimateWeight() {
   clearWeight();
+
   const a = parseFloat(ageInput.value);
-
-  const ageY = (ageUnit === 'months') ? (a / 12) : a;
-
-  // ── Stop auto-estimating above 16 years ──
-  if (ageY > 14) {
-    estToggle.checked    = false;
-    autoEstimate         = false;
-    weightIn.disabled    = false;
-    weightIn.value       = '';
-    weightIn.placeholder = '0';
-    clearWeight();
-    return;
-  }
 
   if (isNaN(a) || a < 0) {
     alert('Please enter a valid age.');
     return;
   }
 
-  // ────────────────────────────────────────────────
-  // 0) NEWBORN
-  // ────────────────────────────────────────────────
-  if (a === 0) {
-    const w = 3.5;
-    weightIn.value = w;
-    calcDiv.innerHTML =
-      `<p>Estimated weight for a neonate = ${w} <span class="unit">kg</span></p>`;
+  const ageY = (ageUnit === 'months') ? (a / 12) : a;
 
-    if (autoEstimate) {
-      const normals = getNormalValues(a, ageUnit);
-      if (normals) updateNormalCentiles(normals);
-      updateAirwayCalculations(0);
-      expandOpenAccordion();
-    }
+  // Stop above your existing cutoff
+  if (ageY > 20) {
+    estToggle.checked = false;
+    autoEstimate = false;
+    weightIn.disabled = false;
+    weightIn.value = '';
+    weightIn.placeholder = '0';
+    clearWeight();
     return;
   }
 
-  // Convert to months if needed
-  const m = ageUnit === 'months' ? a : a * 12;
+  // 🔥 LMS-based estimate
+  const estimatedWeight = getWeightEstimateFromLMS(ageY);
 
-  // ────────────────────────────────────────────────
-  // 1) INFANTS <12 MONTHS
-  // ────────────────────────────────────────────────
-  if (m < 12) {
-    const w = 0.5 * m + 4;
-    const wDisp = stripZeros(w.toFixed(2));
-
-    weightIn.value = wDisp;
-    calcDiv.innerHTML =
-      `<p>(0.5 × Age in months) + 4 = ${wDisp} <span class="unit">kg</span></p>`;
-
-    if (autoEstimate) {
-      const y = m / 12;
-      const normals = getNormalValues(a, ageUnit);
-      if (normals) updateNormalCentiles(normals);
-      updateAirwayCalculations(y);
-      expandOpenAccordion();
-    }
+  if (!estimatedWeight) {
+    clearWeight();
     return;
   }
 
-  // ────────────────────────────────────────────────
-  // ≥1 year
-  // ────────────────────────────────────────────────
-  const y = m / 12;
+  const w = stripZeros(estimatedWeight.toFixed(2));
+  weightIn.value = w;
 
-  const w2 = Math.round((2 * y + 8) * 10) / 10; // 2A+8
-  const w3 = Math.round((3 * y + 7) * 10) / 10; // 3A+7
+calcDiv.innerHTML =
+  `<p><small>50th centile</small></p>`;
 
-  let mainW, mainFormula, noteFormula, noteW;
-
-  if (y >= 1 && y <= 5) {
-    // Primary: 2A+8
-    mainW = w2;
-    mainFormula = `(2 × Age) + 8 = ${w2} kg`;
-    noteFormula = `(3 × Age) + 7 = ${w3} kg`;
-    noteW = w3;
-  } else if (y > 5 && y <= 14) {
-    // Primary: 3A+7
-    mainW = w3;
-    mainFormula = `(3 × Age) + 7 = ${w3} kg`;
-    noteFormula = `(2 × Age) + 8 = ${w2} kg`;
-    noteW = w2;
-  }
-
-  weightIn.value = mainW;
-
-  // Output main + small note
-  calcDiv.innerHTML = `
-    <p><small>${mainFormula}</small></p>
-    <p><small>${noteFormula}</small></p>
-  `;
-
-  // Auto-update linked systems
   if (autoEstimate) {
     const normals = getNormalValues(a, ageUnit);
     if (normals) updateNormalCentiles(normals);
-    updateAirwayCalculations(y);
+
+    calculateBMI();
+    updateAirwayCalculations(ageY);
     expandOpenAccordion();
   }
 }
@@ -1943,7 +2107,7 @@ function updateAntibiotics(w) {
   const ageY   = (ageUnit === 'months') ? (n / 12) : n;
 
   // — IF age > 14: disable auto-estimate, clear weight, and bail out —
-  if (!isNaN(ageY) && ageY > 14) {
+  if (!isNaN(ageY) && ageY > 20) {
     estToggle.checked    = false;
     autoEstimate         = false;
     weightIn.disabled    = false;
@@ -2031,21 +2195,9 @@ function updateAntibiotics(w) {
     updateAirwayCalculations(y);
     const normals = getNormalValues(a, ageUnit);
     if(normals) updateNormalCentiles(normals);
-
-    let disp = '', m = ageUnit==='months'? a : a*12;
-    if(m<12) {
-      const e = 0.5*m+4;
-      if(Math.abs(e-w)<0.2) disp = `<p>(0.5 × Age in months) + 4 = ${stripZeros(w.toFixed(1))} <span class="unit">kg</span></p>`;
-    } else {
-      const e1 = 2*y+8;
-      if(Math.abs(e1-w)<0.2) disp = `<p>(2 × Age) + 8 = ${stripZeros(w.toFixed(1))} <span class="unit">kg</span></p>`;
-      else if(y>=6) {
-        const e2 = 3*y+7;
-        if(Math.abs(e2-w)<0.2) disp = `<p>(3 × Age) + 7 = ${stripZeros(w.toFixed(1))} <span class="unit">kg</span></p>`;
-      }
-    }
-    calcDiv.innerHTML = disp;
-     expandOpenAccordion();
+   
+updateWeightCentileDisplay();
+expandOpenAccordion();
   });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -2145,21 +2297,15 @@ genderContainer.addEventListener("click", (e) => {
   const btn = e.target.closest("button");
   if (!btn) return;
 
-  // remove active from both
   genderContainer.querySelectorAll("button").forEach(b =>
     b.classList.remove("active")
   );
 
-  // set active
   btn.classList.add("active");
 
-  // store value (so your BMI logic still works)
   genderContainer.dataset.gender = btn.dataset.value;
 
-  // trigger recalculation if needed
-  if (typeof calculateBMI === "function") {
-    calculateBMI();
-  }
+  updateAll();   // ✅ clean + centralised
 });
 
 // =========================
@@ -2187,13 +2333,13 @@ function calculateBMI() {
   genderContainer.querySelector("button.active")?.dataset.value ||
   "male";
   
-  // ── Do not show BMI / IBW under 2 years ──
-  if (ageYears < 2) {
-    bmiOutput.textContent = "—";
-    ibwOutput.textContent = "Not applicable <2y";
-    adjbwOutput.textContent = "";
-    return;
-  }
+// ── Allow BMI from 1 month, but flag under 2 years ──
+if (ageYears < (1/12)) {
+  bmiOutput.textContent = "";
+  ibwOutput.textContent = "";
+  adjbwOutput.textContent = "";
+  return;
+}
 
   if (!weight || !heightCm) {
     bmiOutput.textContent = "";
@@ -2214,8 +2360,13 @@ function calculateBMI() {
 
    const centileText = formatCentile(result.centile);
 
-   bmiOutput.textContent =
-  `${bmiRounded} kg/m² (${centileText} centile – ${result.category})`;
+if (ageYears < 2) {
+  bmiOutput.textContent =
+    `${bmiRounded} kg/m² (${centileText} centile – ${result.category})*`;
+} else {
+  bmiOutput.textContent =
+    `${bmiRounded} kg/m² (${centileText} centile – ${result.category})`;
+}
 
   } else {
 
@@ -2232,23 +2383,30 @@ const lms = getBMILMS(ageYears, gender);
 let ibw = null;
 
 if (lms) {
-  const bmi50 = lms.M;   // 50th centile BMI from LMS
+  const bmi50 = lms.M;
   ibw = bmi50 * heightM * heightM;
 
-  const ibwRounded = ibw.toFixed(1);
-  ibwOutput.textContent = `${ibwRounded} kg`;
+  const adjbw = ibw + 0.35 * (weight - ibw);
+
+  if (ageYears < 2) {
+    ibwOutput.textContent = `${ibw.toFixed(1)} kg*`;
+    adjbwOutput.textContent = `${adjbw.toFixed(1)} kg*`;
+  } else {
+    ibwOutput.textContent = `${ibw.toFixed(1)} kg`;
+    adjbwOutput.textContent = `${adjbw.toFixed(1)} kg`;
+  }
+
 } else {
   ibwOutput.textContent = "";
+  adjbwOutput.textContent = "";
 }
+  const warning = document.getElementById("bmi-warning");
 
-  // =========================
-  // ADJUSTED BODY WEIGHT
-  // =========================
-
-  const adjbw = ibw + 0.35 * (weight - ibw);
-  const adjbwRounded = adjbw.toFixed(1);
-
-  adjbwOutput.textContent = `${adjbwRounded} kg`;
+if (ageYears < 2) {
+  warning.textContent = "*Not validated under 2 years";
+} else {
+  warning.textContent = "";
+}
 }
 
 // ===============================
@@ -2275,6 +2433,27 @@ function getBMICentile(bmi, ageYears, gender) {
 // =========================
 // Event Listeners
 // =========================
+
+function updateAll() {
+  const a = parseFloat(ageInput.value);
+  if (isNaN(a)) return;
+
+  const y = ageUnit === 'months' ? a / 12 : a;
+
+  if (autoEstimate) {
+    estimateWeight();
+  }
+
+  updateAirwayCalculations(y);
+
+  const normals = getNormalValues(a, ageUnit);
+  if (normals) updateNormalCentiles(normals);
+
+  if (typeof calculateBMI === "function") {
+    calculateBMI();
+  }
+  updateWeightCentileDisplay();
+}
 
 weightInput.addEventListener("input", calculateBMI);
 heightInput.addEventListener("input", calculateBMI);
