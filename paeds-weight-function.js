@@ -1,3 +1,4 @@
+console.log("weight functions loaded");
 // ===============================
 // Paediatric Weight Estimate (LMS)
 // Uses 50th centile (M)
