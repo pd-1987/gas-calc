@@ -120,6 +120,9 @@ if (mIvNote) mIvNote.textContent = '';
     const mPoNote = document.getElementById('morphine-po-extra');
 if (mPoNote) mPoNote.textContent = '';
     
+    const mPoInline = document.getElementById('morphine-po-inline');
+if (mPoInline) mPoInline.textContent = '';
+    
 ['paracetamol-iv-note','paracetamol-po-note'].forEach(id => {
   const noteEl = document.getElementById(id);
   if (noteEl) {
@@ -377,16 +380,16 @@ if (!w || isNaN(w)) {
   paraIVDose = 10 * w;
   const maxDailyLowIV = stripZeros((30 * w).toFixed(2));
   paraIVInline = '10 mg/kg';
-  paraIVNote = `Every 4–6 h; max 30 mg/kg/day = ${maxDailyLowIV} mg`;
+  paraIVNote = `Every 4–6 h, max 30 mg/kg/day = ${maxDailyLowIV} mg`;
 } else if (w <= 50) {
   paraIVDose = 15 * w;
   const maxDailyHighIV = stripZeros((60 * w).toFixed(2));
   paraIVInline = '15 mg/kg';
-  paraIVNote = `Every 4–6 h; max 60 mg/kg/day = ${maxDailyHighIV} mg`;
+  paraIVNote = `Every 4–6 h, max 60 mg/kg/day = ${maxDailyHighIV} mg`;
 } else if (w > 50) {
   paraIVDose = 1000;
   paraIVInline = '1 g';
-  paraIVNote = `Every 4–6 h; max 4 g/day`;
+  paraIVNote = `Every 4–6 h, max 4 g/day`;
 } else {
   paraIVDose = 0;
   paraIVInline = '';
@@ -400,18 +403,18 @@ if (w > 0 && w <= 10) {
   paraPODose = 10 * w;
   const maxDailyLowPO = stripZeros((30 * w).toFixed(2));
   paraPOInline = '10 mg/kg';
-  paraPONote = `Every 4–6 h; max 30 mg/kg/day = ${maxDailyLowPO} mg`;
+  paraPONote = `Every 4–6 h, max 30 mg/kg/day = ${maxDailyLowPO} mg`;
 
 } else if (w <= 50) {
   paraPODose = 15 * w;
   const maxDailyHighPO = stripZeros((60 * w).toFixed(2));
   paraPOInline = '15 mg/kg';
-  paraPONote = `Every 4–6 h; max 60 mg/kg/day = ${maxDailyHighPO} mg`;
+  paraPONote = `Every 4–6 h, max 60 mg/kg/day = ${maxDailyHighPO} mg`;
 
 } else if (w > 50) {
   paraPODose = 1000;
   paraPOInline = '1 g';
-  paraPONote = `Every 4–6 h; max 4 g/day`;
+  paraPONote = `Every 4–6 h, max 4 g/day`;
 
 } else {
   paraPODose = 0;
@@ -496,7 +499,7 @@ if (ageMonths < 3 || w < 5) {
   const dMax = Math.min(10 * w, 400);
 
   ibuText = `${stripZeros(dMin.toFixed(0))}–${stripZeros(dMax.toFixed(0))}`;
-  ibuNote = 'Every 6–8 hours; max 30 mg/kg/day';
+  ibuNote = 'Every 6–8 hours, max 30 mg/kg/day';
 }
 
 // Output
@@ -528,7 +531,7 @@ if (ageMonths < 3 || w < 5) {
   const dMax = Math.min(10 * w, 400);
 
   poText = `${stripZeros(dMin.toFixed(0))}–${stripZeros(dMax.toFixed(0))}`;
-  poNote = 'Every 6–8 hours; max 30 mg/kg/day';
+  poNote = 'Every 6–8 hours, max 30 mg/kg/day';
 }
 
 // Output
@@ -584,23 +587,16 @@ ibupopc.innerHTML = poNote ? poNote : '';
     }
 
     // Build dose text (if min === max, show “15 (max)”)
-    let doseText;
-    if (Math.abs(kDoseMin - kDoseMax) < 0.001) {
-  // capped exactly at 15 mg → show "15" in kEl and "mg (max)" in kUnit
-  kEl.textContent = stripZeros(kDoseMin.toFixed(2));
-  kEl.style.display = 'inline';
-  if (kUnit) {
-    kUnit.textContent = ' mg (max)';
-    kUnit.style.display = 'inline';
-  }
-} else {
-  // normal 0.5–1 mg/kg without cap
-  kEl.textContent   = `${stripZeros(kDoseMin.toFixed(2))}–${stripZeros(kDoseMax.toFixed(2))}`;
-  kEl.style.display = 'inline';
-  if (kUnit) {
-    kUnit.textContent = ' mg';
-    kUnit.style.display = 'inline';
-  }
+    const doseText = Math.abs(kDoseMin - kDoseMax) < 0.001
+  ? stripZeros(kDoseMin.toFixed(2))
+  : `${stripZeros(kDoseMin.toFixed(2))}–${stripZeros(kDoseMax.toFixed(2))}`;
+
+kEl.textContent   = doseText;
+kEl.style.display = 'inline';
+
+if (kUnit) {
+  kUnit.textContent = ' mg';
+  kUnit.style.display = 'inline';
 }
 
     // Compute volume at 30 mg/mL
@@ -679,7 +675,7 @@ if (w > 0 && !isNaN(w)) {
     }
 
     // Put the note into the <small id="morphine-iv-extra"> cell:
-    mNoteEl.innerHTML = `Every 4 hours, adjusted according to response`;
+    mNoteEl.innerHTML = `Every 4 hours, adjusted to response`;
   } else {
     // hide Morphine IV span & unit, clear note
     mIvEl.textContent   = '';
@@ -689,7 +685,7 @@ if (w > 0 && !isNaN(w)) {
     }
     mNoteEl.textContent = '';
   }
-// — MORPHINE PO (age-stratified µg/kg → mg) —
+// — MORPHINE PO (age-stratified mcg/kg → mg) —
   const mPoEl    = document.getElementById('morphinepo');
   const mPoUnit  = mPoEl.nextElementSibling; // “ mg”
   const mPoNote  = document.getElementById('morphine-po-extra');
@@ -700,42 +696,42 @@ if (w > 0 && !isNaN(w)) {
     let noteText = '';
 
     if (ageMonths >= 1 && ageMonths <= 2) {
-      // 50–100 µg/kg → (50/1000)–(100/1000) mg/kg
+      // 50–100 mcg/kg → (50/1000)–(100/1000) mg/kg
       doseMinMg  = (50  * w) / 1000;
       doseMaxMg  = (100 * w) / 1000;
-      noteText   = 'Initially 50–100 µg/kg every 4 hours, adjust per response';
+      noteText   = 'Initially 50–100 mcg/kg every 4 hours, adjusted to response';
     }
     else if (ageMonths > 2 && ageMonths <= 5) {
-      // 100–150 µg/kg
+      // 100–150 mcg/kg
       doseMinMg  = (100 * w) / 1000;
       doseMaxMg  = (150 * w) / 1000;
-      noteText   = '100–150 µg/kg every 4 hours, adjust per response';
+      noteText   = '100–150 mcg/kg every 4 hours, adjusted to response';
     }
     else if (ageMonths > 5 && ageMonths < 12) {
-      // 200 µg/kg exactly
+      // 200 mcg/kg exactly
       doseMinMg  = (200 * w) / 1000;
       doseMaxMg  = doseMinMg;
-      noteText   = '200 µg/kg every 4 hours, adjust per response';
+      noteText   = '200 mcg/kg every 4 hours, adjusted to response';
     }
     else if (Math.floor(ageY) === 1) {
-      // exactly 1 year → 200–300 µg/kg
+      // exactly 1 year → 200–300 mcg/kg
       doseMinMg  = (200 * w) / 1000;
       doseMaxMg  = (300 * w) / 1000;
-      noteText   = '200–300 µg/kg every 4 hours, adjust per response';
+      noteText   = '200–300 mcg/kg, every 4 hours, adjusted to response';
     }
     else if (ageY >= 2 && ageY < 12) {
-      // 2–11 years → 200–300 µg/kg, max per dose 10 mg
+      // 2–11 years → 200–300 mcg/kg, max per dose 10 mg
       const rawMin = (200 * w) / 1000;
       const rawMax = (300 * w) / 1000;
       doseMinMg    = Math.min(rawMin, 10);
       doseMaxMg    = Math.min(rawMax, 10);
-      noteText     = '200–300 µg/kg every 4 hours (max 10 mg/dose), adjust per response';
+      noteText     = '200–300 mcg/kg, every 4 hours (max 10 mg/dose), adjusted to response';
     }
     else if (ageY >= 12 && ageY < 18) {
       // 12–17 years → 5–10 mg every 4 hours
       doseMinMg  = 5;
       doseMaxMg  = 10;
-      noteText   = '5–10 mg every 4 hours, adjust per response';
+      noteText   = '5–10 mg every 4 hours, adjusted to response';
     }
     else {
       // if <1 month or ≥18 years, hide
@@ -754,7 +750,35 @@ if (w > 0 && !isNaN(w)) {
       if (mPoUnit && mPoUnit.classList.contains('unit')) {
         mPoUnit.style.display = 'inline';
       }
-      mPoNote.innerHTML = `${noteText}`;
+      // middle cell = mg/kg range (or flat dose)
+const mPoInline = document.getElementById('morphine-po-inline');
+
+// Extract just the dose part (before "every...")
+let inlineText = '';
+if (ageMonths >= 1 && ageMonths <= 2) {
+  inlineText = '50–100 mcg/kg';
+}
+else if (ageMonths > 2 && ageMonths <= 5) {
+  inlineText = '100–150 mcg/kg';
+}
+else if (ageMonths > 5 && ageMonths < 12) {
+  inlineText = '200 mcg/kg';
+}
+else if (Math.floor(ageY) === 1) {
+  inlineText = '200–300 mcg/kg';
+}
+else if (ageY >= 2 && ageY < 12) {
+  inlineText = '200–300 mcg/kg';
+}
+else if (ageY >= 12 && ageY < 18) {
+  inlineText = '5–10 mg';
+}
+
+// set middle cell
+mPoInline.textContent = inlineText;
+
+// sub row = frequency etc
+mPoNote.innerHTML = `Every 4 hours, adjusted to response`;
     } else {
       mPoEl.textContent   = '';
       mPoEl.style.display = 'none';
@@ -1598,6 +1622,7 @@ if (ageY < 1) {
   const cylEl    = document.getElementById('cyclizine');
   const cylUnit  = cylEl.nextElementSibling;     // “mg”
   const cylNote  = document.getElementById('cyclizine-ga-extra');
+  const cylMaxEl = document.getElementById('cyclizine-max');    
   if (w > 0 && !isNaN(w)) {
     // compute uncapped range
     let minD = 0.5 * w;
@@ -1631,6 +1656,11 @@ if (ageY < 1) {
     }
     cylNote.textContent = '';
   }
+      if (ageY < 12) {
+  cylMaxEl.textContent = 'Max 25 mg';
+} else {
+  cylMaxEl.textContent = 'Max 50 mg';
+}
       
  // — ONDANSETRON (0.15 mg/kg, max 4 mg; 2 mg/mL) —
 const oEl   = document.getElementById('ondansetron');
