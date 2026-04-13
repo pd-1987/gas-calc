@@ -1,3 +1,4 @@
+console.log("height data loaded");
 const paedsHeightData =
 {
   "boys": [
