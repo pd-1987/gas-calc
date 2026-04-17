@@ -1,3 +1,42 @@
+function clearText(id) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = '';
+}
+
+function hideEl(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  el.textContent = '';
+  el.style.display = 'none';
+
+  const unit = el.nextElementSibling;
+  if (unit && unit.classList.contains('unit')) {
+    unit.style.display = 'none';
+  }
+}
+
+function showEl(id, text) {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  el.textContent = text;
+  el.style.display = 'inline';
+
+  const unit = el.nextElementSibling;
+  if (unit && unit.classList.contains('unit')) {
+    unit.style.display = 'inline';
+  }
+}
+
+function clearGroup(ids) {
+  ids.forEach(id => clearText(id));
+}
+
+function hideGroup(ids) {
+  ids.forEach(id => hideEl(id));
+}
+
 // ===============================
 // Paediatric Weight Estimate (LMS)
 // Uses 50th centile (M)
@@ -167,7 +206,7 @@ function getHeightLMS(ageYears) {
 
   const dataset = paedsHeightData[genderKey];
 
-  return interpolateLMS(dataset, ageYears); // ✅ better than nearest
+  return interpolateLMS(dataset, ageYears);
 }
 
 function getHeightCentile(height, ageYears) {
@@ -259,229 +298,113 @@ function updateEstimateLock() {
   heightIn.disabled = autoEstimate;
 }
 
-  // clear everything and hide all outputs
-  function clearWeight() {
-  // 1) remove any old small notes (EM, calc, analgesic)
-  document
-    .querySelectorAll('.airway-note')
-    .forEach(el => el.remove());
+function clearWeight() {
 
-    [
-  'fentanyl-vol-extra',
-  'ketamine-vol-extra',
-  'rocuronium-vol-extra',
-  'atropine-vol-extra',
-  'adrenalineiv-vol-extra',
-  'sux-iv-vol-extra',
-  'sux-im-vol-extra'
-].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) el.textContent = '';
-});
-    
-  // 2) clear the weight and height-calculation formulas
+  // =========================
+  // Notes / extras
+  // =========================
+  document.querySelectorAll('.airway-note').forEach(el => el.remove());
+
+  clearGroup([
+    'fentanyl-vol-extra','ketamine-vol-extra','rocuronium-vol-extra',
+    'atropine-vol-extra','adrenalineiv-vol-extra','sux-iv-vol-extra','sux-im-vol-extra',
+    'fentanyl-ga-extra','propofol-ga-extra','rocuronium-ga-extra',
+    'ondansetron-ga-extra','dexamethasone-ga-extra',
+    'ketorolac-extra','morphine-iv-extra','morphine-po-extra','morphine-po-inline',
+    'paracetamol-iv-note','paracetamol-po-note',
+    'cyclizine-ga-extra',
+    'blood-volume-range'
+  ]);
+
+  // =========================
+  // Calculations display
+  // =========================
   calcDiv.innerHTML = '';
   if (hCalc) hCalc.innerHTML = '';
-    
-    [
-    'fentanyl-ga-extra',
-    'propofol-ga-extra',
-    'rocuronium-ga-extra',
-    'ondansetron-ga-extra',
-    'dexamethasone-ga-extra'
-  ].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = '';
-  });
 
-  // 3) hide uncuffed/cuffed ETT
-  ['ett-uncuffed', 'ett-cuffed']
-    .forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.style.display = 'none';
-    });
-    
-// 3a) hide old depth values
- ['ett-depth-lips'].forEach(id => {
-  const el = document.getElementById(id);
-   if (!el) return;
-   el.textContent = '';
-   el.style.display = 'none';
-   const unit = el.nextElementSibling;
-   if (unit && unit.classList.contains('unit')) {
-     unit.style.display = 'none';
-   }
-  });    
+  // =========================
+  // Airway
+  // =========================
+  hideGroup(['ett-uncuffed','ett-cuffed','ett-depth-lips']);
+  clearText('laryngoscope');
+  document.getElementById('laryngoscope').style.display = 'none';
 
-  // 4) clear laryngoscope
-  const laryngoscopeEl = document.getElementById('laryngoscope');
-  laryngoscopeEl.textContent = '';
-  laryngoscopeEl.style.display = 'none';
-
-  // 5) clear normal/airway numeric spans (just text)
-  [
-    'sbp-5','sbp-50','sbp-95',
-    'hr-5','hr-95','rr-5','rr-95',
-    'ett-uncuffed','ett-cuffed',
-    'lma','fentanyl','ketamine','rocuronium'
-  ].forEach(id => {
-    document.getElementById(id).textContent = '';
-  });
-
-  // 6) hide emergency drug values + units
-  [
+  // =========================
+  // Emergency drugs
+  // =========================
+  hideGroup([
     'fentanyl','ketamine','rocuronium',
     'atropine','sux-iv','sux-im',
     'defib','adrenalineiv','fluidbolus','glucose10'
-  ].forEach(id => {
-    const el   = document.getElementById(id);
-    const unit = el.nextElementSibling;
-    el.textContent     = '';
-    el.style.display   = 'none';
-    if (unit && unit.classList.contains('unit')) {
-      unit.style.display = 'none';
-    }
-  });
+  ]);
 
-  // 7) hide GA drug values + units
-  [
+  // =========================
+  // GA drugs
+  // =========================
+  hideGroup([
     'propofol','fentanyl-ga','rocuronium-ga',
-    'dexamethasone','ondansetron','paracetamol-iv','paracetamol-po','ibuprofeniv','ibuprofenpo','ketorolac','morphineiv','morphinepo','diclofenaciv'
-  ].forEach(id => {
-    const el   = document.getElementById(id);
+    'dexamethasone','ondansetron',
+    'paracetamol-iv','paracetamol-po',
+    'ibuprofeniv','ibuprofenpo',
+    'ketorolac','morphineiv','morphinepo','diclofenaciv'
+  ]);
+
+  // =========================
+  // Premed
+  // =========================
+  hideGroup([
+    'premed-midaz','premed-midaz-intranasal','premed-dexmed'
+  ]);
+
+  // =========================
+  // Reversal
+  // =========================
+  document.querySelectorAll(
+    '.sug-2-dose, .sug-4-dose, .neos-dose'
+  ).forEach(el => {
+    el.textContent = '';
+    el.style.display = 'none';
     const unit = el.nextElementSibling;
-    el.textContent     = '';
-    el.style.display   = 'none';
     if (unit && unit.classList.contains('unit')) {
       unit.style.display = 'none';
     }
   });
-    
-    const ketExtra = document.getElementById('ketorolac-extra');
-if (ketExtra) ketExtra.textContent = '';
-    
- const mIvNote = document.getElementById('morphine-iv-extra');
-if (mIvNote) mIvNote.textContent = '';
-    
-    const mPoNote = document.getElementById('morphine-po-extra');
-if (mPoNote) mPoNote.textContent = '';
-    
-    const mPoInline = document.getElementById('morphine-po-inline');
-if (mPoInline) mPoInline.textContent = '';
-    
-['paracetamol-iv-note','paracetamol-po-note'].forEach(id => {
-  const noteEl = document.getElementById(id);
-  if (noteEl) {
-    noteEl.textContent = '';
-    noteEl.style.display = 'none';
-   }
- });
-    
-    const midazEl   = document.getElementById('premed-midaz');
-const midazUnit = midazEl.nextElementSibling; // the “ mg” span
 
-midazEl.textContent   = '';
-midazEl.style.display = 'none';
+  clearGroup(['.sug-2-extra', '.sug-4-extra', '.neos-extra']);
 
-if (midazUnit && midazUnit.classList.contains('unit')) {
-  midazUnit.style.display = 'none';
-}
-    
-    // Clear Midazolam NAS
-const nasEl   = document.getElementById('premed-midaz-intranasal');
-const nasUnit = nasEl.nextElementSibling;
-nasEl.textContent   = '';
-nasEl.style.display = 'none';
-if (nasUnit && nasUnit.classList.contains('unit')) {
-  nasUnit.style.display = 'none';
-}
-      // Clear Dexmedetomidine NAS
-  const dexEl   = document.getElementById('premed-dexmed');
-  const dexUnit = dexEl.nextElementSibling;
-  dexEl.textContent   = '';
-  dexEl.style.display = 'none';
-  if (dexUnit && dexUnit.classList.contains('unit')) {
-    dexUnit.style.display = 'none';
-  }
-  // 8) hide i-gel & tidal-volume
-  const igelEl = document.getElementById('igel');
-  igelEl.innerHTML = '';
-  igelEl.style.display = 'none';
+  // =========================
+  // Airway adjuncts
+  // =========================
+  hideEl('igel');
+  hideEl('tidalvolume');
+  hideEl('tv-neonates-ards');
 
-  const tvEl = document.getElementById('tidalvolume');
-  tvEl.textContent = '';
-  tvEl.style.display = 'none';
-    
-    const tvArdsEl = document.getElementById('tv-neonates-ards');
-if (tvArdsEl) {
-  tvArdsEl.textContent = '';
-  tvArdsEl.style.display = 'none';
-}
+  // =========================
+  // Normals
+  // =========================
+  clearGroup([
+    'sbp-5','sbp-50','sbp-95',
+    'hr-5','hr-95','rr-5','rr-95'
+  ]);
 
-  // 10) hide static text in normals
   document.querySelectorAll('.normal-values .static')
     .forEach(el => el.style.display = 'none');
-    
-    ['lma', 'igel'].forEach(id => {
-    const span = document.getElementById(id);
-    if (!span) return;
-    span.parentElement.style.display = ''; // back to table-cell
-  });
 
-// hide the GA copies of emergency drugs (class-based spans and their units)
-document.querySelectorAll('.atropine-dose, .sux-iv-dose, .sux-im-dose').forEach(el => {
-  el.textContent   = '';
-  el.style.display = 'none';
-  const unit = el.nextElementSibling;
-  if (unit && unit.classList.contains('unit')) {
-    unit.style.display = 'none';
-  }
-});
-    
-  const cyclEl = document.getElementById('cyclizine');
-  if (cyclEl) {
-    cyclEl.textContent   = '';
-    cyclEl.style.display = 'none';
-    const unit = cyclEl.nextElementSibling;
-    if (unit && unit.classList.contains('unit')) unit.style.display = 'none';
-  }
-  const cyclExtra = document.getElementById('cyclizine-ga-extra');
-  if (cyclExtra) cyclExtra.textContent = '';    
-    
-document.querySelectorAll('.atropine-extra, .sux-iv-extra, .sux-im-extra')
-  .forEach(el => el.textContent = '');
+  // =========================
+  // Blood volume
+  // =========================
+  hideEl('blood-volume');
 
-document.querySelectorAll(
-  '.sug-2-dose, .sug-4-dose, .neos-dose'
-).forEach(el => {
-  el.textContent   = '';
-  el.style.display = 'none';
-  const unit = el.nextElementSibling;
-  if (unit && unit.classList.contains('unit')) unit.style.display = 'none';
-});
-document.querySelectorAll(
-  '.sug-2-extra, .sug-4-extra, .neos-extra'
-).forEach(el => el.textContent = '');
-    
-    // Blood volume clear
-const bvEl = document.getElementById('blood-volume');
-const bvRange = document.getElementById('blood-volume-range');
+  // =========================
+  // Misc
+  // =========================
+  hideEl('cyclizine');
 
-if (bvEl) {
-  bvEl.textContent = '';
-  bvEl.style.display = 'none';
-  const unit = bvEl.nextElementSibling;
-  if (unit && unit.classList.contains('unit')) {
-    unit.style.display = 'none';
-  }
-}
-
-if (bvRange) bvRange.textContent = '';
 }
 
 function updatePremedication(w) {
-  // Midazolam PO…
-  const midazEl   = document.getElementById('premed-midaz');
+
+const midazEl   = document.getElementById('premed-midaz');
 const midazUnit = midazEl.nextElementSibling; // the “ mg” span
 if (w > 0) {
   let dose = 0.5 * w;
@@ -1060,9 +983,6 @@ mPoNote.innerHTML = `Every 4 hours, adjusted to response`;
 }
 
   function toggleAgeUnit() {
-  // 1) clear everything
-  clearWeight();
-
   // 2) flip the button and convert the value
   const raw = ageInput.value.trim();
   const n   = parseFloat(raw);
@@ -1080,12 +1000,11 @@ mPoNote.innerHTML = `Every 4 hours, adjusted to response`;
 }
 
 function estimateWeight() {
-  clearWeight();
-
+  if (!autoEstimate) return;
+  
   const a = parseFloat(ageInput.value);
 
   if (isNaN(a) || a < 0) {
-    alert('Please enter a valid age.');
     return;
   }
 
@@ -1114,15 +1033,6 @@ function estimateWeight() {
   weightIn.value = w;
   
 updateWeightCentileDisplay();  
-
-  if (autoEstimate) {
-    const normals = getNormalValues(a, ageUnit);
-    if (normals) updateNormalCentiles(normals);
-
-    calculateBMI();
-    updateAirwayCalculations(ageY);
-    expandOpenAccordion();
-  }
 }
 
   // paediatric normals table
@@ -2007,18 +1917,27 @@ function updateAntibiotics(w) {
 
   if (w > 0 && ageMonths >= 2) {
     if (ageYears < 11) {
-      doseText  = '10 mg/kg <span class="small-dose"><span>Max 400 mg</span></span>';
+ doseText = `
+  <span class="small-dose">
+    <span>10 mg/kg</span>
+    <span>Max 400 mg</span>
+  </span>
+`;
       noteText  = 'Children aged 2 months – 11 years';
       numericMg = Math.min(10 * w, 400);
     } else if (ageYears < 18) {
-      doseText  = '6 mg/kg <span class="small-dose"><span>Max 400 mg</span></span>';
+      doseText = `
+  <span class="small-dose">
+    <span>6 mg/kg</span>
+    <span>Max 400 mg</span>
+  </span>
+`;
       noteText  = 'Children aged 12 – 17 years';
       numericMg = Math.min(6 * w, 400);
     }
   }
 
   // always keep the cell but toggle its contents
-  dosingEl.innerHTML      = doseText;
   dosingEl.style.display    = 'table-cell';         // leave empty cell when blank
 
   // show or hide the number + unit
@@ -2099,122 +2018,83 @@ function updateAntibiotics(w) {
   // event wiring
   unitBtn.addEventListener('click', toggleAgeUnit);
   
- estToggle.addEventListener('change', () => {
-   autoEstimate = estToggle.checked;
+estToggle.addEventListener('change', () => {
+  autoEstimate = estToggle.checked;
 
-   updateEstimateLock();
-   
+  userDisabledEstimate = !autoEstimate;
+
+  updateEstimateLock();
+  
   if (autoEstimate) {
-  const n = parseFloat(ageInput.value);
-  if (!isNaN(n) && n >= 0) {
-    estimateWeight();
-    estimateHeight();   
-  }
-
-  calculateBMI();
-}
- });
-
- ageInput.addEventListener('input', () => {
-  const rawAge = ageInput.value.trim();
-  const rawW   = weightIn.value.trim();
-   const n      = parseFloat(rawAge);
-  const ageY   = (ageUnit === 'months') ? (n / 12) : n;
-
-  // — IF age > 14: disable auto-estimate, clear weight, and bail out —
-  if (!isNaN(ageY) && ageY > 20) {
-    estToggle.checked    = false;
-    autoEstimate         = false;
-    weightIn.disabled    = false;
-    weightIn.value       = '';
-    weightIn.placeholder = '0';
-    clearWeight();
-    return;
-  }
-
-    if (autoEstimate) {                            // ← ADD this entire if‐block
-    const n = parseFloat(rawAge);
+    const n = parseFloat(ageInput.value);
     if (!isNaN(n) && n >= 0) {
       estimateWeight();
-      estimateHeight();
-    } else {
-      clearWeight();
+      estimateHeight();   
     }
-    return;
+
+    calculateBMI();
   }
-   
-  // ── If age is entered but weight is blank → clear everything and stop ──
-  if (rawAge !== '' && rawW === '') {
-    return clearWeight();
-  }
-
-  // ── If both age and weight are blank → clear everything and stop ──
-  if (rawAge === '' && rawW === '') {
-    return clearWeight();
-  }
-
-  // At this point: either both age & weight exist, or weight exists and age blank.
-
-  // Parse age
-  const a = parseFloat(rawAge);
-  if (isNaN(a)) {
-    return clearWeight();
-  }
-
-  // Convert age to “years” for airway/centiles
-  const y = (ageUnit === 'months') ? (a / 12) : a;
-
-  updateAirwayCalculations(y);
-
-  const normals = getNormalValues(a, ageUnit);
-  if (normals) {
-    updateNormalCentiles(normals);
-  }
-
-  expandOpenAccordion();
 });
 
-  weightIn.addEventListener('input', () => {
-     if (autoEstimate) {                            // ← ADD this line
-    return;                                      // ← ADD: do nothing if Auto is ON
+ageInput.addEventListener('input', () => {
+  if (!autoEstimate) {
+    autoEstimate = true;
+    estToggle.checked = true;
+    updateEstimateLock();
   }
-    
-    // 1) if no age has been entered, treat it as zero
-  // ── NEW: if no age entered, assume age = 0 only if weight < 5kg ──
+
+  updateAll();
+});
+
+weightIn.addEventListener('input', () => {
+
+  if (autoEstimate) return;
+
   const rawAge = ageInput.value.trim();
   const rawW   = weightIn.value.trim();
 
-  if (rawW === '') {
-    // if weight is blank, nothing to show
-    return clearWeight();
-  }
+  if (rawW === '') return clearWeight();
 
-  // parse weight now that we know it's non‐blank
   const w = parseFloat(rawW);
-  if (isNaN(w)) {
-    return clearWeight();
-  }
+
+  if (isNaN(w)) return clearWeight();
 
   if (rawAge === '') {
-    // age was blank: only proceed if weight < 5 kg
     if (w < 5) {
-      ageInput.value = '0';      // ← assume neonate
+      ageInput.value = '0';
     } else {
-      // if weight ≥ 5kg and no age → show nothing
       return clearWeight();
     }
   }
-    const a    = parseFloat(ageInput.value),
-      wnum = parseFloat(weightIn.value);
-    if(isNaN(a)||isNaN(w)) return clearWeight();
-    const y = ageUnit==='months'? a/12 : a;
-    updateAirwayCalculations(y);
-    const normals = getNormalValues(a, ageUnit);
-    if(normals) updateNormalCentiles(normals);
-   
-updateWeightCentileDisplay();
-expandOpenAccordion();
-  });
+
+  updateAll();
+});
+
+heightIn.addEventListener('input', () => {
+
+  // If auto mode is on → do nothing
+  if (autoEstimate) return;
+
+  const rawH = heightIn.value.trim();
+
+  // Empty → just update dependent displays
+  if (rawH === '') {
+    updateHeightCentileDisplay();
+    calculateBMI();
+    return;
+  }
+
+  const h = parseFloat(rawH);
+
+  // Invalid → same behaviour
+  if (isNaN(h)) {
+    updateHeightCentileDisplay();
+    calculateBMI();
+    return;
+  }
+
+  updateAll();
+});
 
 document.addEventListener('DOMContentLoaded', () => {
   clearWeight();
@@ -2224,7 +2104,6 @@ document.addEventListener('DOMContentLoaded', () => {
   updateAntibiotics(0);    // ← this will hide all antibiotics on load
 });
   
-  // Reset everything back to the initial state
 function resetForm() {
   // 1) clear the inputs
   ageInput.value = '';
@@ -2232,6 +2111,12 @@ function resetForm() {
     // clear height
   const heightEl = document.getElementById('height');
   if (heightEl) heightEl.value = '';
+  
+  autoEstimate = true;
+  userDisabledEstimate = false;
+  estToggle.checked = true;
+  updateEstimateLock();
+  
   // 2) reset the toggle back to years
   ageUnit = 'years';
   unitBtn.textContent = 'years';
@@ -2373,23 +2258,32 @@ if (ageYears < (1/12)) {
 
    const result = getBMICentile(bmi, ageYears, gender);
 
-  if (result) {
+if (result) {
 
-   const centileText = formatCentile(result.centile);
+  const centileText = formatCentile(result.centile);
+  const cssClass = getBMIClass(result.centile);
 
-if (ageYears < 2) {
-  bmiOutput.textContent =
-    `${bmiRounded} kg/m² (${centileText} centile – ${result.category})*`;
-} else {
-  bmiOutput.textContent =
-    `${bmiRounded} kg/m² (${centileText} centile – ${result.category})`;
+  bmiOutput.innerHTML =
+    `${bmiRounded} kg/m² 
+     (<span class="${cssClass}">
+       ${centileText} centile – ${result.category}
+     </span>)${ageYears < 2 ? '*' : ''}`;
+
+if (result.centile < 0.4 || result.centile >= 98) {
+  openAccordionById('bmi-accordion-header');
 }
 
-  } else {
-
-    bmiOutput.textContent = `${bmiRounded} kg/m²`;
-
-  }
+} else {
+  bmiOutput.textContent = `${bmiRounded} kg/m²`;
+}
+  
+  function getBMIClass(centile) {
+  if (centile < 2) return 'bmi-underweight';
+  if (centile < 91) return 'bmi-healthy';
+  if (centile < 98) return 'bmi-overweight';
+  if (centile < 99.6) return 'bmi-obese';
+  return 'bmi-severe';
+}
 
 // =========================
 // IDEAL BODY WEIGHT
@@ -2420,7 +2314,7 @@ if (lms) {
   const warning = document.getElementById("bmi-warning");
 
 if (ageYears < 2) {
-  warning.textContent = "*Not validated under 2 years";
+  warning.textContent = "*BMI centiles not validated <2 years";
 } else {
   warning.textContent = "";
 }
@@ -2447,15 +2341,41 @@ function getBMICentile(bmi, ageYears, gender) {
   };
 }
 
+function openAccordionById(headerId) {
+  const header = document.getElementById(headerId);
+  if (!header) return;
+
+  const content = header.nextElementSibling;
+
+  if (!content.classList.contains('show')) {
+    header.classList.add('active');
+    content.classList.add('show');
+    content.style.maxHeight = content.scrollHeight + 'px';
+  }
+}
+
 // =========================
 // Event Listeners
 // =========================
 
 function updateAll() {
-  const a = parseFloat(ageInput.value);
-  if (isNaN(a)) return;
+  const rawAge = ageInput.value.trim();
+  const a = parseFloat(rawAge);
+
+  if (isNaN(a) || a < 0) {
+    clearWeight();
+    return;
+  }
 
   const y = ageUnit === 'months' ? a / 12 : a;
+
+  if (y > 20) {
+  estToggle.checked = false;
+  autoEstimate = false;
+  updateEstimateLock();
+  clearWeight();
+  return;
+}
 
   if (autoEstimate) {
     estimateWeight();
@@ -2467,15 +2387,9 @@ function updateAll() {
   const normals = getNormalValues(a, ageUnit);
   if (normals) updateNormalCentiles(normals);
 
-  if (typeof calculateBMI === "function") {
-    calculateBMI();
-  }
-  updateWeightCentileDisplay();
-}
-
-weightInput.addEventListener("input", calculateBMI);
-heightInput.addEventListener("input", () => {
   calculateBMI();
+  updateWeightCentileDisplay();
   updateHeightCentileDisplay();
-});
-ageInput.addEventListener("input", calculateBMI);
+
+  expandOpenAccordion();
+}
