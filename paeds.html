@@ -432,7 +432,12 @@
   color: #666;
   display: inline-block;
   margin-left: 6px;
-}   
+} 
+.bmi-underweight { color: #3b82f6; }     /* blue */
+.bmi-healthy     { color: #16a34a; }     /* green */
+.bmi-overweight  { color: #f59e0b; }     /* amber */
+.bmi-obese       { color: #ef4444; }     /* red */
+.bmi-severe      { color: #b91c1c; }     /* dark red */
   </style>
 </head>
   
@@ -467,7 +472,7 @@
 <label class="estimate-toggle">
   <input type="checkbox" id="EstimateToggle" checked>
   <span class="slider"></span>
-  <span class="toggle-label">Estimate</span>
+  <span class="toggle-label">Estimate <small>(UK-WHO / UK90)</small></span>
 </label>
 
   <p class="text-center">
@@ -479,11 +484,11 @@
 
   <div class="accordion-item">
 
-    <div class="accordion-header">
+    <div class="accordion-header" id="bmi-accordion-header">
 
       <span class="accordion-title">
 
-        <i class="fa-solid fa-heart-pulse"></i>Weight and BMI
+        <i class="fa-solid fa-scale-balanced"></i>Weight and BMI
 
       </span>
 
