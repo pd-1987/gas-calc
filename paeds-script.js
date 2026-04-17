@@ -246,28 +246,23 @@ function estimateHeight() {
 }
 
 function updateHeightCentileDisplay() {
-
   const heightInput = document.getElementById("height");
   const heightVal = parseFloat(heightInput.value);
   const ageVal = parseFloat(ageInput.value);
 
   const el = document.getElementById("height-calculations");
 
-  if (isNaN(heightVal) || isNaN(ageVal)) {
+  if (!el || isNaN(heightVal) || isNaN(ageVal)) {
     if (el) el.innerHTML = '';
     return;
   }
 
   const ageY = ageUnit === 'months' ? ageVal / 12 : ageVal;
-
   const centile = getHeightCentile(heightVal, ageY);
 
-if (centile !== null && hCalc) {
-  hCalc.innerHTML =
-  `<small class="centile-text">${formatCentile(centile)} centile</small>`;
-} else if (hCalc) {
-  hCalc.innerHTML = '';
-}
+  el.innerHTML = centile !== null
+    ? `<small class="centile-text">${formatCentile(centile)} centile</small>`
+    : '';
 }
 
 // MAIN FUNCTIONS //
