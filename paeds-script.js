@@ -301,7 +301,7 @@ function clearWeight() {
   clearGroup([
     'fentanyl-vol-extra','ketamine-vol-extra','rocuronium-vol-extra',
     'atropine-vol-extra','adrenalineiv-vol-extra','sux-iv-vol-extra','sux-im-vol-extra',
-    'fentanyl-ga-extra','propofol-ga-extra','rocuronium-ga-extra',
+    'fentanyl-ga-extra','propofol-ga-extra','rocuronium-ga-extra','atracurium-ga-extra',
     'ondansetron-ga-extra','dexamethasone-ga-extra',
     'ketorolac-extra','morphine-iv-extra','morphine-po-extra','morphine-po-inline',
     'paracetamol-iv-note','paracetamol-po-note',
@@ -335,7 +335,7 @@ function clearWeight() {
   // GA drugs
   // =========================
   hideGroup([
-    'propofol','fentanyl-ga','rocuronium-ga',
+    'propofol','fentanyl-ga','rocuronium-ga','atracurium-ga',
     'dexamethasone','ondansetron',
     'paracetamol-iv','paracetamol-po',
     'ibuprofeniv','ibuprofenpo',
@@ -725,77 +725,84 @@ if (poText) {
 // Note
 const ibupopc = document.getElementById('ibuprofenpo-note');
 ibupopc.innerHTML = poNote ? poNote : '';
-    
-// — KETOROLAC dosing & volume (30 mg/mL) —
-  //
-  const kEl      = document.getElementById('ketorolac');
-  const kUnit    = kEl.nextElementSibling;     // “ mg”
-  const extraEl  = document.getElementById('ketorolac-extra');
 
-  // If age < 0.5 yrs
-  if (ageY < 0.5) {
-    kEl.textContent   = '';
-    kEl.style.display = 'none';
-    if (kUnit) kUnit.style.display = 'none';
-    extraEl.textContent = 'BNF: 6 months–15 years';
-  }
+// KETOROLAC    
+const kEl      = document.getElementById('ketorolac');
+const kUnit    = kEl.nextElementSibling;
+const extraEl  = document.getElementById('ketorolac-extra');
+const kMaxEl   = document.getElementById('ketorolac-max');    
 
-  // If age ≥ 16 yrs → flat 30 mg (adults)
-  if (ageY >= 16) {
-    kEl.textContent   = '30';
-    kEl.style.display = 'inline';
-    if (kUnit) kUnit.style.display = 'inline';
-
-    // 30 mg at 30 mg/mL = 1 mL
-    extraEl.innerHTML = `1.00 mL of 30 mg/mL`;
-  }
-
-  // Otherwise (age 0.5 – 15 yrs): calculate 0.5–1 mg/kg, cap at 15 mg
-  if (w > 0 && !isNaN(w)) {
-    let kDoseMin = 0.5 * w;
-    let kDoseMax = 1.0 * w;
-
-    // Cap both min/max at 15 mg
-    if (kDoseMin > 15) {
-      kDoseMin = 15;
-      kDoseMax = 15;
-    } else if (kDoseMax > 15) {
-      kDoseMax = 15;
-    }
-
-    // Build dose text (if min === max, show “15 (max)”)
-    const doseText = Math.abs(kDoseMin - kDoseMax) < 0.001
-  ? stripZeros(kDoseMin.toFixed(2))
-  : `${stripZeros(kDoseMin.toFixed(2))}–${stripZeros(kDoseMax.toFixed(2))}`;
-
-kEl.textContent   = doseText;
-kEl.style.display = 'inline';
-
-if (kUnit) {
-  kUnit.textContent = ' mg';
-  kUnit.style.display = 'inline';
+if (!w || isNaN(w)) {
+  kEl.textContent   = '';
+  kEl.style.display = 'none';
+  if (kUnit) kUnit.style.display = 'none';
+  extraEl.textContent = '';
+  if (kMaxEl) kMaxEl.textContent = '';
+  return;
 }
 
-    // Compute volume at 30 mg/mL
-    const vMin = (Math.min(kDoseMin, 15) / 30).toFixed(2);
-    const vMax = (Math.min(kDoseMax, 15) / 30).toFixed(2);
+if (ageY < 0.5) {
+  kEl.textContent   = '';
+  kEl.style.display = 'none';
+  if (kUnit) kUnit.style.display = 'none';
+  extraEl.textContent = 'BNF: 6 months–15 years';
+  if (kMaxEl) kMaxEl.textContent = '';
+}
 
-    let volText;
-    if (Math.abs(kDoseMin - kDoseMax) < 0.001) {
-      // capped: show “0.50 mL (max) of 30 mg/mL”
-      volText = `${stripZeros(vMin)}`;
-    } else {
-      volText = `${stripZeros(vMin)}–${stripZeros(vMax)}`;
-    }
+else if (ageY >= 16) {
+  // Adult fixed dose
+  kEl.textContent   = '30';
+  kEl.style.display = 'inline';
 
-    extraEl.innerHTML = `${volText} mL of 30 mg/mL`;
-  } else {
-    // If weight is invalid or zero: hide everything
-    kEl.textContent   = '';
-    kEl.style.display = 'none';
-    if (kUnit) kUnit.style.display = 'none';
-    extraEl.textContent = '';
+  if (kUnit) {
+    kUnit.textContent = ' mg';
+    kUnit.style.display = 'inline';
   }
+
+  extraEl.textContent = '1 mL of 30 mg/mL';
+
+  // Always set max for this age group
+  if (kMaxEl) kMaxEl.textContent = 'Max 30 mg';
+}
+
+else {
+  // Paediatric dosing (0.5–1 mg/kg, max 15 mg)
+  let kDoseMin = 0.5 * w;
+  let kDoseMax = 1.0 * w;
+
+  if (kDoseMin > 15) {
+    kDoseMin = 15;
+    kDoseMax = 15;
+  } else if (kDoseMax > 15) {
+    kDoseMax = 15;
+  }
+
+  const doseText =
+    Math.abs(kDoseMin - kDoseMax) < 0.001
+      ? stripZeros(kDoseMin.toFixed(2))
+      : `${stripZeros(kDoseMin.toFixed(2))}–${stripZeros(kDoseMax.toFixed(2))}`;
+
+  kEl.textContent   = doseText;
+  kEl.style.display = 'inline';
+
+  if (kUnit) {
+    kUnit.textContent = ' mg';
+    kUnit.style.display = 'inline';
+  }
+
+  const vMin = (kDoseMin / 30).toFixed(2);
+  const vMax = (kDoseMax / 30).toFixed(2);
+
+  const volText =
+    Math.abs(kDoseMin - kDoseMax) < 0.001
+      ? stripZeros(vMin)
+      : `${stripZeros(vMin)}–${stripZeros(vMax)}`;
+
+  extraEl.textContent = `${volText} mL of 30 mg/mL`;
+
+  // Always set max for paeds
+  if (kMaxEl) kMaxEl.textContent = 'Max 15 mg';
+}
     
 // — DICLOFENAC IV (1 mg/kg, max 75 mg) —
 const dEl   = document.getElementById('diclofenaciv');
@@ -1691,6 +1698,14 @@ function updateSedation(w) {
       unitLabel:    'mg',
       extraId:      'rocuronium-ga-extra'
     },
+    {
+  id:        'atracurium-ga',
+  minDose:   0.5,
+  maxDose:   0.5,
+  conc:      10,   // mg/mL (standard UK prep)
+  unitLabel: 'mg',
+  extraId:   'atracurium-ga-extra'
+},
     {
       id:           'dexamethasone',
       minDose:      0.15, // mg/kg
