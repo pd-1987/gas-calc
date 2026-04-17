@@ -219,8 +219,6 @@ function getHeightCentile(height, ageYears) {
 }
 
 function estimateHeight() {
-
-  if (!autoEstimate) return;
   
   const heightInput = document.getElementById("height");
 
@@ -1013,7 +1011,6 @@ function estimateWeight() {
   // Stop above your existing cutoff
   if (ageY > 20) {
     estToggle.checked = false;
-    autoEstimate = false;
     weightIn.disabled = false;
     weightIn.value = '';
     weightIn.placeholder = '0';
@@ -2021,8 +2018,6 @@ function updateAntibiotics(w) {
 estToggle.addEventListener('change', () => {
   autoEstimate = estToggle.checked;
 
-  userDisabledEstimate = !autoEstimate;
-
   updateEstimateLock();
   
   if (autoEstimate) {
@@ -2037,7 +2032,9 @@ estToggle.addEventListener('change', () => {
 });
 
 ageInput.addEventListener('input', () => {
-  if (!autoEstimate) {
+  const val = parseFloat(ageInput.value);
+
+  if (!isNaN(val) && val >= 0 && !autoEstimate) {
     autoEstimate = true;
     estToggle.checked = true;
     updateEstimateLock();
@@ -2059,13 +2056,9 @@ weightIn.addEventListener('input', () => {
 
   if (isNaN(w)) return clearWeight();
 
-  if (rawAge === '') {
-    if (w < 5) {
-      ageInput.value = '0';
-    } else {
-      return clearWeight();
-    }
-  }
+if (rawAge === '') {
+  return;
+}
 
   updateAll();
 });
