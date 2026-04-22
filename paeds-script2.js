@@ -35,14 +35,13 @@ fentanyl: {
 },
   midazolam_bag: {
   type: 'infusion_bag',
-  weight: 'AdjBW',
+  weight: 'TBW',
   dosePerKgHr: 0.06, // ← example
   targetRate: 1,     // mL/hr you want
   bagVolume: 50,
   diluent: '0.9% sodium chloride',
   extraId: 'midaz-sed',
 },
-
 morphine_bag: {
   type: 'infusion_bag',
   weight: 'TBW',
@@ -2351,7 +2350,7 @@ function renderDrug(drugKey, tbw) {
 
   switch (type) {
     case 'infusion_bag':
-      return renderInfusionBag(config, weight);
+  return renderInfusionBag(config, weight, label, drugKey);
 
     case 'infusion_range':
       return renderInfusionRange(config, weight, label, drugKey);
@@ -2464,6 +2463,11 @@ function renderInfusionRange(config, weight, label, drugKey) {
 
     el.textContent = text;
     el.style.display = 'inline';
+
+      const unit = el.nextElementSibling;
+  if (unit && unit.classList.contains('unit')) {
+    unit.style.display = 'inline';
+  }                               
   });
 
   setDoseLabel(
@@ -2474,22 +2478,37 @@ function renderInfusionRange(config, weight, label, drugKey) {
   );
 }
 
-function renderInfusionBag(config, weight) {
+function renderInfusionBag(config, weight, label, drugKey) {
   const mgPerHr = config.dosePerKgHr * weight;
 
   const conc = mgPerHr / config.targetRate; // mg/mL
   const bagMg = conc * config.bagVolume;
 
-  const text =
-    `${stripZeros(bagMg.toFixed(2))} mg in ${config.bagVolume} mL ${config.diluent}`;
+  const labelText = label
+  ? ` <small class="drug-weight-label">(${label})</small>`
+  : '';
+
+const text =
+  `${stripZeros(bagMg.toFixed(2))} mg in ${config.bagVolume} mL ${config.diluent}${labelText}`;
 
   toArray(config.extraId).forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
 
-    el.textContent = text;
+    el.innerHTML = text;
     el.style.display = 'inline';
   });
+
+  if (config.dosePerKgHr) {
+    const labelText = `${config.dosePerKgHr} mg/kg/hr`;
+
+    setDoseLabel(
+      drugKey,
+      label
+        ? `${labelText} <small class="drug-weight-label">(${label})</small>`
+        : labelText
+    );
+  }
 }
 
 function updateAll() {
