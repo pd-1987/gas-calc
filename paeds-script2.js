@@ -4,6 +4,17 @@ window.weightContext = {
   isObese: false
 };
 
+const GA_DRUG_LIST = [
+  'fentanyl',
+  'propofol',
+  'rocuronium',
+  'atracurium_ga',
+  'dexamethasone',
+  'atropine',
+  'sux_im',
+  'sux_iv'
+];
+
 const DRUGS = {
 fentanyl: {
   weight: 'AdjBW',
@@ -72,6 +83,16 @@ morphine_bag: {
   extraId: ['atropine-vol-extra', 'atropine-ga-extra'],
   labelId: ['atropine-dose-text', 'atropine-ga-dose-text']
 },
+adrenaline_iv: {
+  weight: 'TBW',
+  dose: [10, 10],
+  unit: 'mcg',
+  conc: 100,
+  concLabel: '1:10,000 (100 mcg/mL)', // ✅ add this
+  outputId: 'adrenalineiv',
+  extraId: 'adrenalineiv-vol-extra',
+  labelId: 'adrenaline-dose-text'
+},  
   propofol: {
   weight: 'IBW',
   dose: [3, 5],
@@ -109,6 +130,25 @@ dexamethasone: {
   outputId: ['sux-im', 'sux-im-ga'],
   extraId: ['sux-im-vol-extra', 'sux-im-ga-extra'],
   labelId: ['sux-im-dose-text','sux-im-ga-dose-text']
+},
+  sux_iv: {
+  weight: 'TBW',
+  unit: 'mg',
+  conc: 50,
+  outputId: ['sux-iv', 'sux-iv-ga'],
+  extraId: ['sux-iv-vol-extra', 'sux-iv-ga-extra'],
+  labelId: ['sux-range', 'sux-ga-range'],
+
+  getDose: (w, ageY) => {
+    const perKg = ageY < 1 ? 2 : 1;
+    const dose = perKg * w;
+
+    return {
+      min: dose,
+      max: dose,
+      perKg
+    };
+  }
 }
 };
 function clearText(id) {
@@ -1524,56 +1564,14 @@ function updateEmergencyDrugs(w) {
   if (w > 0 && !isNaN(w)) {
 
   // UNIVERSAL DRUGS
-['fentanyl', 'ketamine', 'rocuronium', 'atropine', 'sux_im']
+['fentanyl', 'ketamine', 'rocuronium', 'atropine', 'adrenaline_iv', 'sux_im', 'sux_iv']
   .forEach(d => renderDrug(d, w));    
-    
-// — SUXAMETHONIUM IV: age-tailored dose @ 50 mg/mL —
-const rawAge = parseFloat(ageInput.value) || 0;
-const ageY   = ageUnit === 'months' ? rawAge/12 : rawAge;
-
-// neonates & infants (<1yr) get 2 mg/kg, older get 1 mg/kg
-const suxDose = (ageY < 1 ? 2 : 1) * w;
-
-// write dose
-suxIvEl.textContent   = stripZeros(suxDose.toFixed(1));
-suxIvEl.style.display = 'inline';
-suxIvEl.nextElementSibling.style.display = 'inline'; // “ mg”
-
-// and volume
-const suxVol = stripZeros((suxDose/50).toFixed(2));
-suxIvExtra.innerHTML  = `${suxVol} mL of 50 mg/mL`;
-    
-    // grab the new span
-const suxRange = document.getElementById('sux-range');
-
-// your age-based rule: for example,
-//  -- under 1 year → 2 mg/kg
-//  -- 1 year and over → 1 mg/kg
-if (ageY < 1) {
-  suxRange.textContent = '2';
-} else {
-  suxRange.textContent = '1';
-}
 
     // — DEFIBRILLATION ENERGY 4 J/kg — (no “of X” needed; it’s joules)
     const defibDose = 4 * w; // J
     defibEl.textContent     = stripZeros(defibDose.toFixed(1));
     defibEl.style.display   = 'inline';
     defibEl.nextElementSibling.style.display = 'inline'; // “ J”
-
-    // — ADRENALINE IV 1:10,000 (100 mcg/mL) —
-
-const adrMcg = 10 * w;                 // mcg/kg dose
-const adrVol = adrMcg / 100;           // mL (100 mcg/mL)
-
-// main result (mcg)
-adrenalineEl.textContent = stripZeros(adrMcg.toFixed(0));
-adrenalineEl.style.display = 'inline';
-adrenalineEl.nextElementSibling.style.display = 'inline'; // shows "mcg"
-
-// sub row
-const adrenalineExtra = document.getElementById('adrenaline-vol-extra');
-adrenalineExtra.innerHTML = `${stripZeros(adrVol.toFixed(2))} mL of 100 mcg/mL`;
 
 // — FLUID BOLUS 10–20 mL/kg —
     const bolusEl   = document.getElementById('fluidbolus'),
@@ -1705,50 +1703,12 @@ function updateSedation(w) {
   });
       
 if (w > 0 && !isNaN(w)) {
-
-  const GA_DRUG_LIST = [
-    'fentanyl',
-    'propofol',
-    'rocuronium',
-    'atracurium_ga',
-    'dexamethasone',
-    'atropine',
-    'sux_im'
-  ];
-
   GA_DRUG_LIST.forEach(d => renderDrug(d, w));
-
-}   
+} 
       
        const rawAge = parseFloat(ageInput.value) || 0;
   const ageY = ageUnit === 'months' ? rawAge/12 : rawAge;  
-           
-// SUXAMETHONIUM IV: age-tailored dose @ 50 mg/mL
-document.querySelectorAll('.sux-iv-dose').forEach(el => {
-  const suxDose = (ageY < 1 ? 2 : 1) * w;
-  el.textContent   = stripZeros(suxDose.toFixed(1));
-  el.style.display = 'inline';
-  const unit = el.nextElementSibling;
-  if (unit && unit.classList.contains('unit')) {
-    unit.style.display = 'inline';
-  }
-});
-document.querySelectorAll('.sux-iv-extra').forEach(el => {
-  const suxDose = (ageY < 1 ? 2 : 1) * w;
-  const vol     = stripZeros((suxDose/50).toFixed(2));
-  el.textContent = `${vol} mL of 50 mg/mL`;
-});
 
-// --- at top of updateGADrugs, after ageY is known ---
-const suxGaRange = document.getElementById('sux-ga-range');
-
-// decide your rule, e.g. under 1 year → 2 mg/kg, otherwise 1–2
-if (ageY < 1) {
-  suxGaRange.textContent = '2';
-} else {
-  suxGaRange.textContent = '1';
-}      
-      
        // — Cyclizine (0.5–1 mg/kg; max 25 mg <12 y; 50 mg ≥12 y; 50 mg/mL) —
   const cylEl    = document.getElementById('cyclizine');
   const cylUnit  = cylEl.nextElementSibling;     // “mg”
@@ -2350,12 +2310,24 @@ function renderDrug(drugKey, tbw) {
 }
 
 function renderBolusDrug(config, weight, label, drugKey) {
-  if (!config.dose) return;
+  if (!config.dose && !config.getDose) return;
 
+  let dMin, dMax, perKgLabel;
+
+if (config.getDose) {
+  const rawAge = parseFloat(ageInput.value) || 0;
+  const ageY = ageUnit === 'months' ? rawAge / 12 : rawAge;
+
+  const result = config.getDose(weight, ageY);
+
+  dMin = result.min;
+  dMax = result.max;
+  perKgLabel = result.perKg;
+} else {
   const [minDose, maxDose] = config.dose;
-
-  let dMin = minDose * weight;
-  let dMax = maxDose * weight;
+  dMin = minDose * weight;
+  dMax = maxDose * weight;
+}
 
   if (config.cap) {
     dMin = Math.min(dMin, config.cap);
@@ -2369,12 +2341,14 @@ function renderBolusDrug(config, weight, label, drugKey) {
     ? stripZeros(dMin.toFixed(1))
     : `${stripZeros(dMin.toFixed(1))}–${stripZeros(dMax.toFixed(1))}`;
 
-  // 🔹 Main output
   outputIds.forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
+  const el = document.getElementById(id);
+  if (!el) {
+    console.warn(`Missing element: ${id} for ${drugKey}`);
+    return;
+  }
 
-    el.textContent = doseText;
+  el.textContent = doseText;
     el.style.display = 'inline';
 
     const unit = el.nextElementSibling;
@@ -2392,25 +2366,39 @@ function renderBolusDrug(config, weight, label, drugKey) {
       ? stripZeros(vMin.toFixed(2))
       : `${stripZeros(vMin.toFixed(2))}–${stripZeros(vMax.toFixed(2))}`;
 
-    extraIds.forEach(id => {
-      const el = document.getElementById(id);
-      if (!el) return;
-
-      el.innerHTML = `${volText} mL of ${config.conc} ${config.unit}/mL`;
-    });
+  extraIds.forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) {
+    console.warn(`Missing element: ${id} for ${drugKey}`);
+    return;
   }
 
-  // 🔹 Label
-  const labelText = (minDose === maxDose)
-    ? `${minDose} ${config.unit}/kg`
-    : `${minDose}–${maxDose} ${config.unit}/kg`;
+  const concText = config.concLabel || `${config.conc} ${config.unit}/mL`;
+  el.innerHTML = `${volText} mL of ${concText}`;
+});
+  }
 
-  setDoseLabel(
-  drugKey,
-  label
-    ? `${labelText}<br><small class="drug-weight-label">${label}</small>`
-    : labelText
-);
+if (config.labelId) {
+
+  let finalLabel = '';
+
+  if (perKgLabel !== undefined) {
+    finalLabel = `${perKgLabel} ${config.unit}/kg`;
+  } else if (config.dose) {
+    const [minDose, maxDose] = config.dose;
+    finalLabel = (minDose === maxDose)
+      ? `${minDose} ${config.unit}/kg`
+      : `${minDose}–${maxDose} ${config.unit}/kg`;
+  }
+
+  if (label) {
+    finalLabel += `<br><small class="drug-weight-label">${label}</small>`;
+  }
+
+  if (finalLabel) {
+    setDoseLabel(drugKey, finalLabel);
+  }
+}
 }
 
 function renderInfusionBag(config, weight, label, drugKey) {
