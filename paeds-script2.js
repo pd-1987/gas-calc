@@ -12,10 +12,13 @@ const GA_DRUG_LIST = [
   'dexamethasone',
   'atropine',
   'sux_im',
-  'sux_iv'
+  'sux_iv',
+  'ondansetron',
+  'cyclizine'
 ];
 
 const DRUGS = {
+  // EMERGENCY DRUGS
 fentanyl: {
   weight: 'AdjBW',
   dose: [1, 2],
@@ -92,36 +95,34 @@ adrenaline_iv: {
   outputId: 'adrenalineiv',
   extraId: 'adrenalineiv-vol-extra',
   labelId: 'adrenaline-dose-text'
-},  
-  propofol: {
-  weight: 'IBW',
-  dose: [3, 5],
-  unit: 'mg',
-  conc: 10,
-  outputId: 'propofol',
-  extraId: 'propofol-ga-extra',
-  labelId: 'propofol-dose-text'
 },
-atracurium_ga: {
-  weight: 'IBW',
-  dose: [0.5, 0.5],
-  unit: 'mg',
-  conc: 10,
-  outputId: 'atracurium-ga',
-  extraId: 'atracurium-ga-extra',
-  labelId: 'atracurium-ga-dose-text'
-},
-dexamethasone: {
+ defib: {
   weight: 'TBW',
-  dose: [0.15, 0.15],
-  unit: 'mg',
-  conc: 3.3,
-  cap: 6.6,
-  outputId: 'dexamethasone',
-  extraId: 'dexamethasone-ga-extra',
-  labelId: 'dexamethasone-dose-text'
+  dose: [4, 4],
+  unit: 'J',
+  outputId: 'defib',
+  labelId: 'defib-dose-text'
 },
-  sux_im: {
+
+fluid_bolus: {
+  weight: 'TBW',
+  dose: [10, 20],
+  unit: 'mL',
+  outputId: 'fluidbolus',
+  labelId: 'fluidbolus-dose-text'
+},
+
+glucose10: {
+  weight: 'TBW',
+  dose: [2, 2],
+  unit: 'mL',
+  outputId: 'glucose10',
+  labelId: 'glucose-dose-text'
+},
+  blood_volume: {
+  weight: 'TBW'
+},
+    sux_im: {
   weight: 'TBW',
   dose: [4, 4],
   unit: 'mg',
@@ -149,6 +150,84 @@ dexamethasone: {
       perKg
     };
   }
+},
+  
+  // GA DRUGS
+  propofol: {
+  weight: 'IBW',
+  dose: [3, 5],
+  unit: 'mg',
+  conc: 10,
+  outputId: 'propofol',
+  extraId: 'propofol-ga-extra',
+  labelId: 'propofol-dose-text'
+},
+atracurium_ga: {
+  weight: 'IBW',
+  dose: [0.5, 0.5],
+  unit: 'mg',
+  conc: 10,
+  outputId: 'atracurium-ga',
+  extraId: 'atracurium-ga-extra',
+  labelId: 'atracurium-ga-dose-text'
+},
+  ondansetron: {
+  weight: 'TBW',
+  unit: 'mg',
+  conc: 2,
+  outputId: 'ondansetron',
+  extraId: 'ondansetron-ga-extra',
+  labelId: 'ondansetron-dose-text',
+
+ getDose: (w, ageY) => {
+  if (ageY < 0.5) return null;
+
+  const dose = Math.min(0.15 * w, 4);
+
+  return {
+    min: dose,
+    max: dose,
+    perKg: 0.15
+  };
+}
+},
+  cyclizine: {
+  weight: 'TBW',
+  unit: 'mg',
+  conc: 50,
+  outputId: 'cyclizine',
+  extraId: 'cyclizine-ga-extra',
+  labelId: 'cyclizine-dose-text',
+
+  capLabel: (ageY) => ageY < 12 ? 'Max 25 mg' : 'Max 50 mg',  
+    
+  getDose: (w, ageY) => {
+    if (w <= 0 || isNaN(w)) return null;
+
+    const cap = ageY < 12 ? 25 : 50;
+
+    let min = 0.5 * w;
+    let max = 1.0 * w;
+
+    if (min > cap) min = cap;
+    if (max > cap) max = cap;
+
+    return {
+  min,
+  max,
+  perKg: '0.5–1'
+};
+  }
+},
+dexamethasone: {
+  weight: 'TBW',
+  dose: [0.15, 0.15],
+  unit: 'mg',
+  conc: 3.3,
+  cap: 6.6,
+  outputId: 'dexamethasone',
+  extraId: 'dexamethasone-ga-extra',
+  labelId: 'dexamethasone-dose-text'
 }
 };
 function clearText(id) {
@@ -1523,7 +1602,7 @@ if (depth) {
 }
   
 function updateEmergencyDrugs(w) {
-  // Helper that removes any old <em>…</em> from previous runs
+  
   function clearOldLine(id) {
     const el = document.getElementById(id);
     if (el) {
@@ -1531,7 +1610,6 @@ function updateEmergencyDrugs(w) {
     }
   }
 
-  // 1) Clear out all “-vol-extra” <small> cells first
   [
     'fentanyl-vol-extra',
     'ketamine-vol-extra',
@@ -1542,7 +1620,6 @@ function updateEmergencyDrugs(w) {
     'sux-im-vol-extra'
   ].forEach(clearOldLine);
 
-  // 2) Grab all the numeric <span> elements for the emergency drugs
   const fentanylEl   = document.getElementById('fentanyl'),
         ketamineEl   = document.getElementById('ketamine'),
         rocuroniumEl = document.getElementById('rocuronium'),
@@ -1552,7 +1629,6 @@ function updateEmergencyDrugs(w) {
         defibEl      = document.getElementById('defib'),
         adrenalineEl = document.getElementById('adrenalineiv');
   
-  // 3) Grab each “vol-extra” <small> placeholder
   const fentanylExtra   = document.getElementById('fentanyl-vol-extra'),
         ketamineExtra   = document.getElementById('ketamine-vol-extra'),
         rocuroniumExtra = document.getElementById('rocuronium-vol-extra'),
@@ -1564,37 +1640,19 @@ function updateEmergencyDrugs(w) {
   if (w > 0 && !isNaN(w)) {
 
   // UNIVERSAL DRUGS
-['fentanyl', 'ketamine', 'rocuronium', 'atropine', 'adrenaline_iv', 'sux_im', 'sux_iv']
-  .forEach(d => renderDrug(d, w));    
+[
+  'fentanyl',
+  'ketamine',
+  'rocuronium',
+  'atropine',
+  'adrenaline_iv',
+  'sux_im',
+  'sux_iv',
+  'defib',
+  'fluid_bolus',
+  'glucose10'
+].forEach(d => renderDrug(d, w));
 
-    // — DEFIBRILLATION ENERGY 4 J/kg — (no “of X” needed; it’s joules)
-    const defibDose = 4 * w; // J
-    defibEl.textContent     = stripZeros(defibDose.toFixed(1));
-    defibEl.style.display   = 'inline';
-    defibEl.nextElementSibling.style.display = 'inline'; // “ J”
-
-// — FLUID BOLUS 10–20 mL/kg —
-    const bolusEl   = document.getElementById('fluidbolus'),
-          bolusUnit = bolusEl.nextElementSibling; // “ mL”
-    const bolusMin  = Math.round(10 * w),
-          bolusMax  = Math.round(20 * w);
-
-    bolusEl.textContent    = `${bolusMin}–${bolusMax}`;
-    bolusEl.style.display  = 'inline';
-    if (bolusUnit && bolusUnit.classList.contains('unit')) {
-      bolusUnit.style.display = 'inline';
-    }
-
-    // — GLUCOSE 10% 2 mL/kg —
-    const glucoseEl   = document.getElementById('glucose10'),
-          glucoseUnit = glucoseEl.nextElementSibling; // “ mL”
-    const gluDose     = stripZeros((2 * w).toFixed(1));
-
-    glucoseEl.textContent    = gluDose;
-    glucoseEl.style.display  = 'inline';
-    if (glucoseUnit && glucoseUnit.classList.contains('unit')) {
-      glucoseUnit.style.display = 'inline';
-    }
   }
   else {
     // hide fentanyl/ketamine/etc.
@@ -1635,7 +1693,9 @@ const bvEl    = document.getElementById('blood-volume');
 const bvUnit  = bvEl.nextElementSibling; // " mL"
 const bvRange = document.getElementById('blood-volume-range');
 
-if (w > 0 && !isNaN(w)) {
+const { weight, label } = getDrugWeight('blood_volume', w);
+
+if (weight > 0 && !isNaN(weight)) {
 
   let minPerKg, maxPerKg;
 
@@ -1648,14 +1708,20 @@ if (ageMonths < 3) {
 }
 
   // middle cell
-  bvRange.textContent =
-    (minPerKg === maxPerKg)
-      ? `${minPerKg} mL/kg`
-      : `${minPerKg}–${maxPerKg} mL/kg`;
+ let rangeText =
+  (minPerKg === maxPerKg)
+    ? `${minPerKg} mL/kg`
+    : `${minPerKg}–${maxPerKg} mL/kg`;
+
+if (label) {
+  rangeText += `<br><small class="drug-weight-label">${label}</small>`;
+}
+
+bvRange.innerHTML = rangeText;
 
   // calculated volume
-  const bvMin = minPerKg * w;
-  const bvMax = maxPerKg * w;
+  const bvMin = minPerKg * weight;
+  const bvMax = maxPerKg * weight;
 
   const bvText =
     Math.abs(bvMin - bvMax) < 0.001
@@ -1704,87 +1770,19 @@ function updateSedation(w) {
       
 if (w > 0 && !isNaN(w)) {
   GA_DRUG_LIST.forEach(d => renderDrug(d, w));
-} 
-      
-       const rawAge = parseFloat(ageInput.value) || 0;
-  const ageY = ageUnit === 'months' ? rawAge/12 : rawAge;  
+}
 
-       // — Cyclizine (0.5–1 mg/kg; max 25 mg <12 y; 50 mg ≥12 y; 50 mg/mL) —
-  const cylEl    = document.getElementById('cyclizine');
-  const cylUnit  = cylEl.nextElementSibling;     // “mg”
-  const cylNote  = document.getElementById('cyclizine-ga-extra');
-  const cylMaxEl = document.getElementById('cyclizine-max');    
+  const rawAge = parseFloat(ageInput.value) || 0;
+  const ageY = ageUnit === 'months' ? rawAge/12 : rawAge;      
+  const cylMaxEl = document.getElementById('cyclizine-max');
+      
+if (cylMaxEl) {
   if (w > 0 && !isNaN(w)) {
-    // compute uncapped range
-    let minD = 0.5 * w;
-    let maxD = 1.0 * w;
-    // apply the caps
-    const cap = ageY < 12 ? 25 : 50;
-    if (minD > cap) minD = cap;
-    if (maxD > cap) maxD = cap;
-    // render dose text
-    const doseText = (Math.abs(minD - maxD) < 0.01)
-      ? stripZeros(minD.toFixed(2))
-      : `${stripZeros(minD.toFixed(2))}–${stripZeros(maxD.toFixed(2))}`;
-    cylEl.textContent   = doseText;
-    cylEl.style.display = 'inline';
-    if (cylUnit && cylUnit.classList.contains('unit')) {
-      cylUnit.style.display = 'inline';
-    }
-    // volume at 50 mg/mL
-    const vMin = (minD / 50).toFixed(2);
-    const vMax = (maxD / 50).toFixed(2);
-    const volText = (minD === maxD)
-      ? `${stripZeros(vMin)} mL of 50 mg/mL`
-      : `${stripZeros(vMin)}–${stripZeros(vMax)} mL of 50 mg/mL`;
-    cylNote.textContent = volText;
+    cylMaxEl.textContent = ageY < 12 ? 'Max 25 mg' : 'Max 50 mg';
   } else {
-    // hide if no weight
-    cylEl.textContent   = '';
-    cylEl.style.display = 'none';
-    if (cylUnit && cylUnit.classList.contains('unit')) {
-      cylUnit.style.display = 'none';
-    }
-    cylNote.textContent = '';
+    cylMaxEl.textContent = '';
   }
-      if (ageY < 12) {
-  cylMaxEl.textContent = 'Max 25 mg';
-} else {
-  cylMaxEl.textContent = 'Max 50 mg';
-}
-      
- // — ONDANSETRON (0.15 mg/kg, max 4 mg; 2 mg/mL) —
-const oEl   = document.getElementById('ondansetron');
-const oUnit = oEl.nextElementSibling;
-const oNote = document.getElementById('ondansetron-ga-extra');
-
-if (w > 0 && !isNaN(w)) {
-
-  if (ageY < 0.5) {
-    oEl.textContent   = '';
-    oEl.style.display = 'none';
-    if (oUnit) oUnit.style.display = 'none';
-
-    oNote.textContent = 'BNF: 6 months–17 years';
-  } 
-  else {
-    const dose = Math.min(0.15 * w, 4);
-
-    oEl.textContent   = stripZeros(dose.toFixed(2));
-    oEl.style.display = 'inline';
-    if (oUnit) oUnit.style.display = 'inline';
-
-    const vol = stripZeros((dose / 2).toFixed(2));
-    oNote.textContent = `${vol} mL of 2 mg/mL`;
-  }
-
-} else {
-  oEl.textContent   = '';
-  oEl.style.display = 'none';
-  if (oUnit) oUnit.style.display = 'none';
-
-  oNote.textContent = '';
-}
+} 
 }
 
 function updateAntibiotics(w) {
@@ -1983,47 +1981,28 @@ document.addEventListener('DOMContentLoaded', () => {
 });
   
 function resetForm() {
-  // 1) clear the inputs
+  // Clear inputs only
   ageInput.value = '';
   weightIn.value = '';
-    // clear height
-  const heightEl = document.getElementById('height');
-  if (heightEl) heightEl.value = '';
-  
-  autoEstimate = true;
-  userDisabledEstimate = false;
-  estToggle.checked = true;
-  updateEstimateLock();
-  
-  // 2) reset the toggle back to years
+  heightIn.value = '';
+
+  // Reset UI controls
   ageUnit = 'years';
   unitBtn.textContent = 'years';
-   // reset gender to default (male)
-  document.querySelectorAll('#GenderBtn button').forEach(btn => {
-    btn.classList.remove('active');
-  });
-  const defaultGender = document.querySelector('#GenderBtn button[data-value="male"]');
-  if (defaultGender) defaultGender.classList.add('active');
-  // 3) hide all existing outputs
-  clearWeight();
-  
-    // clear BMI-related outputs
-  document.getElementById('bmi-value').textContent = '';
-  document.getElementById('ibw-value').textContent = '';
-  document.getElementById('adjbw-value').textContent = '';
-  
-  updateAntibiotics(0);
-  updateSedation(0);
-  updateAnalgesics(0);
-  
-// 4) collapse any open accordion panels
-  document.querySelectorAll('.accordion-header.active').forEach(header => {
-    header.classList.remove('active');
-    const content = header.nextElementSibling; // the .accordion-content
-    content.classList.remove('show');
-    content.style.maxHeight = null;
-  });
-  
+
+  autoEstimate = true;
+  estToggle.checked = true;
+  updateEstimateLock();
+
+  // Reset gender (optional)
+  const genderContainer = document.getElementById("GenderBtn");
+  genderContainer.dataset.gender = "male";
+  genderContainer.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+  const defaultGender = genderContainer.querySelector('[data-value="male"]');
+  if (defaultGender) defaultGender.classList.add("active");
+
+  // Let your existing logic clear everything properly
+  updateAll();
 }
 
 function goHome() {
@@ -2319,6 +2298,13 @@ if (config.getDose) {
   const ageY = ageUnit === 'months' ? rawAge / 12 : rawAge;
 
   const result = config.getDose(weight, ageY);
+  
+  if (!result) {
+    hideGroup(toArray(config.outputId));
+    clearGroup(toArray(config.extraId));
+    setDoseLabel(drugKey, ''); // optional
+    return;
+  }
 
   dMin = result.min;
   dMax = result.max;
@@ -2397,6 +2383,17 @@ if (config.labelId) {
 
   if (finalLabel) {
     setDoseLabel(drugKey, finalLabel);
+  }
+}
+  if (config.capLabel) {
+  const rawAge = parseFloat(ageInput.value) || 0;
+  const ageY = ageUnit === 'months' ? rawAge / 12 : rawAge;
+
+  const capText = config.capLabel(ageY);
+
+  const capEl = document.getElementById(`${drugKey}-max`);
+  if (capEl) {
+    capEl.textContent = capText || '';
   }
 }
 }
