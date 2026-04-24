@@ -1982,7 +1982,20 @@ document.addEventListener('DOMContentLoaded', () => {
   updateEstimateLock();
   updateAntibiotics(0);    // ← this will hide all antibiotics on load
 });
-  
+
+function closeAllAccordions() {
+  document.querySelectorAll('.accordion-header').forEach(header => {
+    const content = header.nextElementSibling;
+
+    header.classList.remove('active');
+
+    if (content) {
+      content.classList.remove('show');
+      content.style.maxHeight = null;
+    }
+  });
+}
+
 function resetForm() {
   // Clear inputs only
   ageInput.value = '';
@@ -2006,6 +2019,7 @@ function resetForm() {
 
   // Let your existing logic clear everything properly
   updateAll();
+  closeAllAccordions(); 
 }
 
 function goHome() {
