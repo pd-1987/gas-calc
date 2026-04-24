@@ -2417,11 +2417,11 @@ function renderBolusDrug(config, weight, label, drugKey) {
     : `${minDose}–${maxDose} ${config.unit}/kg`;
 
   setDoseLabel(
-    drugKey,
-    label
-      ? `${labelText} <small class="drug-weight-label">(${label})</small>`
-      : labelText
-  );
+  drugKey,
+  label
+    ? `${labelText}<br><small class="drug-weight-label">${label}</small>`
+    : labelText
+);
 }
 
 function renderInfusionRange(config, weight, label, drugKey) {
