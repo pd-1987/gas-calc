@@ -140,21 +140,13 @@
     .accordion-content-inner {
   padding: 12px 0;
   }
-    .airway-note {
-  margin: 4px 0 8px 5px;
-  font-size: 12px;
-  font-style: italic;
-  color: var(--text-secondary);
-}
 .estimate-toggle {
   display: inline-flex;
   align-items: center;
   cursor: pointer;
   user-select: none;
-  margin: 5px;             /* adjust spacing as needed */
+  margin: 5px;
 }
-
-/* Hide the native checkbox */
 .estimate-toggle input[type="checkbox"] {
   opacity: 0;
   width: 0;
@@ -446,13 +438,16 @@ small.drug-weight-label {
 small[class] {
   color: inherit;
 }
+ .result span:first-of-type {
+  font-size: 1em;
+}   
   </style>
 </head>
   
 <body>
 <header class="calc-header paeds">Paediatric anaesthesia</header>
   <div class="calc-wrapper">
-  <div class="section">
+  <div class="calc-section">
 
   <div class="gender-buttons" id="GenderBtn">
     <button class="active" data-value="male">Male</button>
