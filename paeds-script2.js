@@ -199,10 +199,13 @@ atracurium_ga: {
   extraId: 'cyclizine-ga-extra',
   labelId: 'cyclizine-dose-text',
 
-  capLabel: (ageY) => ageY < 12 ? 'Max 25 mg' : 'Max 50 mg',  
+  capLabel: (ageY) => {
+  if (ageY < 1/12) return '';
+  return ageY < 12 ? 'Max 25 mg' : 'Max 50 mg';
+},
     
   getDose: (w, ageY) => {
-    if (w <= 0 || isNaN(w)) return null;
+    if (w <= 0 || isNaN(w) || ageY < 1/12) return null;
 
     const cap = ageY < 12 ? 25 : 50;
 
