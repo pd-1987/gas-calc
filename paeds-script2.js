@@ -277,40 +277,38 @@ dexamethasone: {
     }
   ]
 },
-  diclofenaciv: {
+diclofenaciv: {
   weight: 'AdjBW',
   unit: 'mg',
-  conc: 25, // optional if you want volume later
+  conc: 25,
   outputId: 'diclofenaciv',
-  noteId: 'diclofenaciv-note',
   labelId: 'diclofenac-dose-text',
 
   getDose: (w, ageY) => {
-  if (w <= 0 || isNaN(w)) return null;
+    if (w <= 0 || isNaN(w)) return null;
 
-  if (ageY < 2) {
-    return {
-      min: 0,
-      max: 0,
-      hideDose: true   // 🔥 THIS is the key
-    };
-  }
-
-  const dose = Math.min(1 * w, 75);
-
-  return {
-    min: dose,
-    max: dose,
-    perKg: 1
-  };
-},
-
-  notes: [
-    {
-      condition: ({ ageMonths }) => ageMonths < 24,
-      text: 'BNF: 2–17 years'
+    // 🔥 <2 years → zero dose (handled by renderer)
+    if (ageY < 2) {
+      return {
+        min: 0,
+        max: 0,
+        perKg: 1
+      };
     }
-  ]
+
+    const dose = Math.min(1 * w, 75);
+
+    return {
+      min: dose,
+      max: dose,
+      perKg: 1
+    };
+  },
+
+  capLabel: (ageY) => {
+    if (ageY < 2) return 'BNFC: >2 years';
+    return 'Max 75 mg';
+  }
 },
  ketorolac: {
   weight: 'AdjBW',
