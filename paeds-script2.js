@@ -16,7 +16,8 @@ const GA_DRUG_LIST = [
   'ondansetron',
   'cyclizine',
   'ibuprofeniv',
-  'diclofenaciv'
+  'diclofenaciv',
+  'ketorolac'
 ];
 
 const DRUGS = {
@@ -310,6 +311,45 @@ dexamethasone: {
       text: 'BNF: 2–17 years'
     }
   ]
+},
+ ketorolac: {
+  weight: 'AdjBW',
+  unit: 'mg',
+  conc: 30,
+
+  outputId: 'ketorolac',
+  extraId: 'ketorolac-extra',
+  labelId: 'ketorolac-dose-text',
+
+  getDose: (w, ageY) => {
+    if (w <= 0 || isNaN(w)) return null;
+
+    // Paeds
+    if (ageY < 16) {
+      let min = 0.5 * w;
+      let max = 1.0 * w;
+
+      if (min > 15) min = 15;
+      if (max > 15) max = 15;
+
+      return {
+        min,
+        max,
+        perKg: '0.5–1'
+      };
+    }
+
+    // Adult
+    return {
+      min: 30,
+      max: 30,
+      perKg: '0.5–1'
+    };
+  },
+
+  capLabel: (ageY) => {
+    return ageY < 16 ? 'Max 15 mg' : 'Max 30 mg';
+  }
 }
 };
 
@@ -614,7 +654,7 @@ function clearWeight() {
     'atropine-vol-extra','adrenalineiv-vol-extra','sux-iv-vol-extra','sux-im-vol-extra',
     'fentanyl-ga-extra','propofol-ga-extra','rocuronium-ga-extra','atracurium-ga-extra',
     'ondansetron-ga-extra','dexamethasone-ga-extra',
-    'ketorolac-extra','morphine-iv-extra','morphine-po-extra','morphine-po-inline',
+    'ketorolac-extra','ketorolac-note','morphine-iv-extra','morphine-po-extra','morphine-po-inline',
     'paracetamol-iv-note','paracetamol-po-note',
     'cyclizine-ga-extra',
     'blood-volume-range'
@@ -843,8 +883,6 @@ const ageY = ageMonths / 12;
   'paracetamol-iv-note',
   'paracetamol-po-note',
   'ibuprofenpo-note',
-  'ketorolac-extra',
-  'diclofenaciv-note',
   'morphine-iv-extra',
   'morphine-po-extra',
   'paracetamol-iv-inline',
@@ -970,113 +1008,6 @@ if (paraPODose > 0) {
   pPoNoteEl.textContent = '';
   pPoNoteEl.style.display = 'none';
 }
-
-// KETOROLAC    
-const kEl      = document.getElementById('ketorolac');
-const kUnit    = kEl.nextElementSibling;
-const extraEl  = document.getElementById('ketorolac-extra');
-const kMaxEl   = document.getElementById('ketorolac-max');    
-
-if (!w || isNaN(w)) {
-  kEl.textContent   = '';
-  kEl.style.display = 'none';
-  if (kUnit) kUnit.style.display = 'none';
-  extraEl.textContent = '';
-  if (kMaxEl) kMaxEl.textContent = '';
-  return;
-}
-
-if (ageY < 0.5) {
-  kEl.textContent   = '';
-  kEl.style.display = 'none';
-  if (kUnit) kUnit.style.display = 'none';
-  extraEl.textContent = 'BNF: 6 months–15 years';
-  if (kMaxEl) kMaxEl.textContent = '';
-}
-
-else if (ageY >= 16) {
-  // Adult fixed dose
-  kEl.textContent   = '30';
-  kEl.style.display = 'inline';
-
-  if (kUnit) {
-    kUnit.textContent = ' mg';
-    kUnit.style.display = 'inline';
-  }
-
-  extraEl.textContent = '1 mL of 30 mg/mL';
-
-  // Always set max for this age group
-  if (kMaxEl) kMaxEl.textContent = 'Max 30 mg';
-}
-
-else {
-  // Paediatric dosing (0.5–1 mg/kg, max 15 mg)
-  let kDoseMin = 0.5 * w;
-  let kDoseMax = 1.0 * w;
-
-  if (kDoseMin > 15) {
-    kDoseMin = 15;
-    kDoseMax = 15;
-  } else if (kDoseMax > 15) {
-    kDoseMax = 15;
-  }
-
-  const doseText =
-    Math.abs(kDoseMin - kDoseMax) < 0.001
-      ? stripZeros(kDoseMin.toFixed(2))
-      : `${stripZeros(kDoseMin.toFixed(2))}–${stripZeros(kDoseMax.toFixed(2))}`;
-
-  kEl.textContent   = doseText;
-  kEl.style.display = 'inline';
-
-  if (kUnit) {
-    kUnit.textContent = ' mg';
-    kUnit.style.display = 'inline';
-  }
-
-  const vMin = (kDoseMin / 30).toFixed(2);
-  const vMax = (kDoseMax / 30).toFixed(2);
-
-  const volText =
-    Math.abs(kDoseMin - kDoseMax) < 0.001
-      ? stripZeros(vMin)
-      : `${stripZeros(vMin)}–${stripZeros(vMax)}`;
-
-  extraEl.textContent = `${volText} mL of 30 mg/mL`;
-
-  // Always set max for paeds
-  if (kMaxEl) kMaxEl.textContent = 'Max 15 mg';
-}
-    
-// — DICLOFENAC IV (1 mg/kg, max 75 mg) —
-const dEl   = document.getElementById('diclofenaciv');
-const dUnit = dEl.nextElementSibling;
-const dNote = document.getElementById('diclofenaciv-note');
-
-if (w > 0 && !isNaN(w)) {
-  const dDose = Math.min(1 * w, 75);
-
-  dEl.textContent   = stripZeros(dDose.toFixed(1));
-  dEl.style.display = 'inline';
-  if (dUnit) dUnit.style.display = 'inline';
-
-  // ✅ Only show note under 2 years
-  if (ageY < 2) {
-    dNote.textContent = 'BNF: 2–17 years';
-    dNote.style.display = 'inline';
-  } else {
-    dNote.textContent = '';
-    dNote.style.display = 'inline';
-  }
-
-} else {
-  dEl.textContent   = '';
-  dEl.style.display = 'none';
-  if (dUnit) dUnit.style.display = 'none';
-
-  dNote.textContent = '';
-} 
     
    // — MORPHINE IV (0.05–0.1 mg/kg up to 12 y; ≥12 y → 5 mg) —
   const mIvEl   = document.getElementById('morphineiv');
