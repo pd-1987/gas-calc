@@ -14,7 +14,9 @@ const GA_DRUG_LIST = [
   'sux_im',
   'sux_iv',
   'ondansetron',
-  'cyclizine'
+  'cyclizine',
+  'ibuprofeniv',
+  'diclofenaciv'
 ];
 
 const DRUGS = {
@@ -171,6 +173,8 @@ atracurium_ga: {
   extraId: 'atracurium-ga-extra',
   labelId: 'atracurium-ga-dose-text'
 },
+  
+ // ANTIEMETICS
   ondansetron: {
   weight: 'TBW',
   unit: 'mg',
@@ -231,8 +235,86 @@ dexamethasone: {
   outputId: 'dexamethasone',
   extraId: 'dexamethasone-ga-extra',
   labelId: 'dexamethasone-dose-text'
+},
+  // ANALGESIA - IV
+ ibuprofeniv: {
+  weight: 'AdjBW',
+
+  getDose: (w, ageY) => {
+    const ageMonths = ageY * 12;
+
+    if (ageMonths < 3 || w < 5) {
+      return {
+        min: 0,
+        max: 0,
+        hideDose: true
+      };
+    }
+
+    return {
+      min: 5 * w,
+      max: 10 * w,
+      perKg: '5–10'
+    };
+  },
+
+  unit: 'mg',
+  outputId: 'ibuprofeniv',
+  noteId: 'ibuprofeniv-note',
+  labelId: 'ibuprofen-dose-text',
+
+  cap: 400,
+
+  notes: [
+    {
+      condition: ({ ageMonths, weight }) => ageMonths < 3 || weight < 5,
+      text: 'Not recommended under 3 months or <5 kg'
+    },
+    {
+      condition: () => true,
+      text: 'Every 6–8 hours, max 30 mg/kg/day'
+    }
+  ]
+},
+  diclofenaciv: {
+  weight: 'AdjBW',
+  unit: 'mg',
+  conc: 25, // optional if you want volume later
+  outputId: 'diclofenaciv',
+  noteId: 'diclofenaciv-note',
+  labelId: 'diclofenac-dose-text',
+
+  getDose: (w, ageY) => {
+  if (w <= 0 || isNaN(w)) return null;
+
+  if (ageY < 2) {
+    return {
+      min: 0,
+      max: 0,
+      hideDose: true   // 🔥 THIS is the key
+    };
+  }
+
+  const dose = Math.min(1 * w, 75);
+
+  return {
+    min: dose,
+    max: dose,
+    perKg: 1
+  };
+},
+
+  notes: [
+    {
+      condition: ({ ageMonths }) => ageMonths < 24,
+      text: 'BNF: 2–17 years'
+    }
+  ]
 }
 };
+
+
+
 function clearText(id) {
   const el = document.getElementById(id);
   if (el) el.textContent = '';
@@ -527,12 +609,6 @@ function updateEstimateLock() {
 }
 
 function clearWeight() {
-
-  // =========================
-  // Notes / extras
-  // =========================
-  document.querySelectorAll('.airway-note').forEach(el => el.remove());
-
   clearGroup([
     'fentanyl-vol-extra','ketamine-vol-extra','rocuronium-vol-extra',
     'atropine-vol-extra','adrenalineiv-vol-extra','sux-iv-vol-extra','sux-im-vol-extra',
@@ -766,7 +842,6 @@ const ageY = ageMonths / 12;
 [
   'paracetamol-iv-note',
   'paracetamol-po-note',
-  'ibuprofeniv-note',
   'ibuprofenpo-note',
   'ketorolac-extra',
   'diclofenaciv-note',
@@ -895,71 +970,6 @@ if (paraPODose > 0) {
   pPoNoteEl.textContent = '';
   pPoNoteEl.style.display = 'none';
 }
-  
-// — IBUPROFEN IV dosing & note —
-const iEl   = document.getElementById('ibuprofeniv');
-const iUnit = iEl.nextElementSibling;
-
-let ibuText = '', ibuNote = '';
-
-if (ageMonths < 3 || w < 5) {
-  ibuNote = 'Not recommended under 3 months or <5 kg.';
-  ibuText = '';
-} else if (w > 0) {
-  // ✅ 5–10 mg/kg dosing (same logic as PO)
-  const dMin = Math.min(5 * w, 400);
-  const dMax = Math.min(10 * w, 400);
-
-  ibuText = `${stripZeros(dMin.toFixed(0))}–${stripZeros(dMax.toFixed(0))}`;
-  ibuNote = 'Every 6–8 hours, max 30 mg/kg/day';
-}
-
-// Output
-if (ibuText) {
-  iEl.textContent   = ibuText;
-  iEl.style.display = 'inline';
-  if (iUnit) iUnit.style.display = 'inline';
-} else {
-  iEl.textContent   = '';
-  iEl.style.display = 'none';
-  if (iUnit) iUnit.style.display = 'none';
-}
-
-// Note
-const ibuivCell = document.getElementById('ibuprofeniv-note');
-ibuivCell.innerHTML = ibuNote ? ibuNote : '';
-
-// — IBUPROFEN PO dosing & note —
-const poEl   = document.getElementById('ibuprofenpo');
-const poUnit = poEl.nextElementSibling;
-
-let poText = '', poNote = '';
-
-if (ageMonths < 3 || w < 5) {
-  poNote = 'Not recommended under 3 months or <5 kg.';
-  poText = '';
-} else if (w > 0) {
-  const dMin = Math.min(5 * w, 400);
-  const dMax = Math.min(10 * w, 400);
-
-  poText = `${stripZeros(dMin.toFixed(0))}–${stripZeros(dMax.toFixed(0))}`;
-  poNote = 'Every 6–8 hours, max 30 mg/kg/day';
-}
-
-// Output
-if (poText) {
-  poEl.textContent   = poText;
-  poEl.style.display = 'inline';
-  if (poUnit) poUnit.style.display = 'inline';
-} else {
-  poEl.textContent   = '';
-  poEl.style.display = 'none';
-  if (poUnit) poUnit.style.display = 'none';
-}
-
-// Note
-const ibupopc = document.getElementById('ibuprofenpo-note');
-ibupopc.innerHTML = poNote ? poNote : '';
 
 // KETOROLAC    
 const kEl      = document.getElementById('ketorolac');
@@ -1321,9 +1331,6 @@ updateWeightCentileDisplay();
   }
 
 function updateAirwayCalculations(ageYears, w) {
-  // 1) clear old notes
-  document.querySelectorAll('.airway-note, .depth-note-row').forEach(el => el.remove());
-    
   // normalize age to years
   const y = ageUnit === 'months'
           ? parseFloat(ageInput.value) / 12
@@ -1653,7 +1660,7 @@ function updateEmergencyDrugs(w) {
   'sux_iv',
   'defib',
   'fluid_bolus',
-  'glucose10'
+  'glucose10',
 ].forEach(d => renderDrug(d, w));
 
   }
@@ -2289,6 +2296,8 @@ function renderDrug(drugKey, tbw) {
   const { weight, label } = getDrugWeight(drugKey, tbw);
   const type = config.type || 'bolus';
 
+   renderDrugNotes(config, weight, drugKey);
+  
   switch (type) {
     case 'infusion_bag':
       return renderInfusionBag(config, weight, label, drugKey);
@@ -2310,28 +2319,32 @@ function renderBolusDrug(config, weight, label, drugKey) {
 
   let dMin, dMax, perKgLabel;
 
-if (config.getDose) {
-  const rawAge = parseFloat(ageInput.value) || 0;
-  const ageY = ageUnit === 'months' ? rawAge / 12 : rawAge;
+  // --- GET DOSE ---
+  if (config.getDose) {
+    const rawAge = parseFloat(ageInput.value) || 0;
+    const ageY = ageUnit === 'months' ? rawAge / 12 : rawAge;
 
-  const result = config.getDose(weight, ageY);
-  
-  if (!result) {
-    hideGroup(toArray(config.outputId));
-    clearGroup(toArray(config.extraId));
-    setDoseLabel(drugKey, ''); // optional
-    return;
+    const result = config.getDose(weight, ageY);
+
+    if (!result || result.hideDose) {
+      hideGroup(toArray(config.outputId));
+      clearGroup(toArray(config.extraId));
+      setDoseLabel(drugKey, '');
+      renderDrugNotes(config, weight, drugKey);
+      return;
+    }
+
+    dMin = result.min;
+    dMax = result.max;
+    perKgLabel = result.perKg;
+
+  } else {
+    const [minDose, maxDose] = config.dose;
+    dMin = minDose * weight;
+    dMax = maxDose * weight;
   }
 
-  dMin = result.min;
-  dMax = result.max;
-  perKgLabel = result.perKg;
-} else {
-  const [minDose, maxDose] = config.dose;
-  dMin = minDose * weight;
-  dMax = maxDose * weight;
-}
-
+  // --- CAP ---
   if (config.cap) {
     dMin = Math.min(dMin, config.cap);
     dMax = Math.min(dMax, config.cap);
@@ -2340,18 +2353,18 @@ if (config.getDose) {
   const outputIds = toArray(config.outputId);
   const extraIds  = toArray(config.extraId);
 
-  const doseText = (dMin === dMax)
+  const sameDose = Math.abs(dMin - dMax) < 0.0001;
+
+  const doseText = sameDose
     ? stripZeros(dMin.toFixed(1))
     : `${stripZeros(dMin.toFixed(1))}–${stripZeros(dMax.toFixed(1))}`;
 
+  // --- OUTPUT ---
   outputIds.forEach(id => {
-  const el = document.getElementById(id);
-  if (!el) {
-    console.warn(`Missing element: ${id} for ${drugKey}`);
-    return;
-  }
+    const el = document.getElementById(id);
+    if (!el) return;
 
-  el.textContent = doseText;
+    el.textContent = doseText;
     el.style.display = 'inline';
 
     const unit = el.nextElementSibling;
@@ -2360,59 +2373,56 @@ if (config.getDose) {
     }
   });
 
-  // 🔹 Volume
+  // --- VOLUME ---
   if (config.conc && extraIds.length) {
     const vMin = dMin / config.conc;
     const vMax = dMax / config.conc;
 
-    const volText = (dMin === dMax)
+    const sameVol = Math.abs(vMin - vMax) < 0.0001;
+
+    const volText = sameVol
       ? stripZeros(vMin.toFixed(2))
       : `${stripZeros(vMin.toFixed(2))}–${stripZeros(vMax.toFixed(2))}`;
 
-  extraIds.forEach(id => {
-  const el = document.getElementById(id);
-  if (!el) {
-    console.warn(`Missing element: ${id} for ${drugKey}`);
-    return;
+    extraIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+
+      const concText = config.concLabel || `${config.conc} ${config.unit}/mL`;
+      el.innerHTML = `${volText} mL of ${concText}`;
+    });
   }
 
-  const concText = config.concLabel || `${config.conc} ${config.unit}/mL`;
-  el.innerHTML = `${volText} mL of ${concText}`;
-});
-  }
+  // --- LABEL ---
+  if (config.labelId) {
+    let finalLabel = '';
 
-if (config.labelId) {
+    if (perKgLabel !== undefined) {
+      finalLabel = `${perKgLabel} ${config.unit}/kg`;
+    } else if (config.dose) {
+      const [minDose, maxDose] = config.dose;
+      finalLabel = (minDose === maxDose)
+        ? `${minDose} ${config.unit}/kg`
+        : `${minDose}–${maxDose} ${config.unit}/kg`;
+    }
 
-  let finalLabel = '';
+    if (label) {
+      finalLabel += `<br><small class="drug-weight-label">${label}</small>`;
+    }
 
-  if (perKgLabel !== undefined) {
-    finalLabel = `${perKgLabel} ${config.unit}/kg`;
-  } else if (config.dose) {
-    const [minDose, maxDose] = config.dose;
-    finalLabel = (minDose === maxDose)
-      ? `${minDose} ${config.unit}/kg`
-      : `${minDose}–${maxDose} ${config.unit}/kg`;
-  }
-
-  if (label) {
-    finalLabel += `<br><small class="drug-weight-label">${label}</small>`;
-  }
-
-  if (finalLabel) {
     setDoseLabel(drugKey, finalLabel);
   }
-}
+
+  // --- CAP LABEL (e.g. cyclizine) ---
   if (config.capLabel) {
-  const rawAge = parseFloat(ageInput.value) || 0;
-  const ageY = ageUnit === 'months' ? rawAge / 12 : rawAge;
+    const rawAge = parseFloat(ageInput.value) || 0;
+    const ageY = ageUnit === 'months' ? rawAge / 12 : rawAge;
 
-  const capText = config.capLabel(ageY);
-
-  const capEl = document.getElementById(`${drugKey}-max`);
-  if (capEl) {
-    capEl.textContent = capText || '';
+    const capEl = document.getElementById(`${drugKey}-max`);
+    if (capEl) {
+      capEl.textContent = config.capLabel(ageY) || '';
+    }
   }
-}
 }
 
 function renderInfusionBag(config, weight, label, drugKey) {
@@ -2490,6 +2500,30 @@ function renderInfusionRangeSplit(config, weight, label, drugKey) {
       mlEl.textContent = `${mlText} mL/hr`;
     }
   }
+}
+
+function renderDrugNotes(config, weight, drugKey) {
+  if (!config.notes || !config.noteId) return;
+
+  const rawAge = parseFloat(ageInput.value) || 0;
+  const ageMonths = ageUnit === 'months' ? rawAge : rawAge * 12;
+
+  const note = config.notes.find(n =>
+    n.condition({ ageMonths, weight })
+  );
+
+  toArray(config.noteId).forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    if (note) {
+      el.textContent = note.text;
+      el.style.display = 'inline';
+    } else {
+      el.textContent = '';
+      el.style.display = 'none';
+    }
+  });
 }
 
 function updateAll() {
