@@ -322,34 +322,44 @@ dexamethasone: {
   labelId: 'ketorolac-dose-text',
 
   getDose: (w, ageY) => {
-    if (w <= 0 || isNaN(w)) return null;
+  if (w <= 0 || isNaN(w)) return null;
 
-    // Paeds
-    if (ageY < 16) {
-      let min = 0.5 * w;
-      let max = 1.0 * w;
-
-      if (min > 15) min = 15;
-      if (max > 15) max = 15;
-
-      return {
-        min,
-        max,
-        perKg: '0.5–1'
-      };
-    }
-
-    // Adult
+  // 🔥 NEW: <6 months → no calculated dose
+  if (ageY < 0.5) {
     return {
-      min: 30,
-      max: 30,
+      min: 0,
+      max: 0,
       perKg: '0.5–1'
     };
-  },
+  }
+
+  // Paeds
+  if (ageY < 16) {
+    let min = 0.5 * w;
+    let max = 1.0 * w;
+
+    if (min > 15) min = 15;
+    if (max > 15) max = 15;
+
+    return {
+      min,
+      max,
+      perKg: '0.5–1'
+    };
+  }
+
+  // Adult
+  return {
+    min: 30,
+    max: 30,
+    perKg: '0.5–1'
+  };
+},
 
   capLabel: (ageY) => {
-    return ageY < 16 ? 'Max 15 mg' : 'Max 30 mg';
-  }
+  if (ageY < 0.5) return 'BNFC: >6 months';
+  return ageY < 16 ? 'Max 15 mg' : 'Max 30 mg';
+}
 }
 };
 
@@ -2284,6 +2294,26 @@ function renderBolusDrug(config, weight, label, drugKey) {
   const outputIds = toArray(config.outputId);
   const extraIds  = toArray(config.extraId);
 
+if (dMin === 0 && dMax === 0) {
+  hideGroup(outputIds);
+  clearGroup(extraIds);
+
+  if (config.labelId) {
+    let labelText = `${perKgLabel || '0.5–1'} ${config.unit}/kg`;
+    setDoseLabel(drugKey, labelText);
+  }
+
+  if (config.capLabel) {
+    const rawAge = parseFloat(ageInput.value) || 0;
+    const ageY = ageUnit === 'months' ? rawAge / 12 : rawAge;
+
+    const capEl = document.getElementById(`${drugKey}-max`);
+    if (capEl) capEl.textContent = config.capLabel(ageY);
+  }
+
+  return;
+}
+  
   const sameDose = Math.abs(dMin - dMax) < 0.0001;
 
   const doseText = sameDose
