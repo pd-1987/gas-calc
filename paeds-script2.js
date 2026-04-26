@@ -17,7 +17,8 @@ const GA_DRUG_LIST = [
   'cyclizine',
   'ibuprofeniv',
   'diclofenaciv',
-  'ketorolac'
+  'ketorolac',
+  'paracetamoliv'
 ];
 
 const DRUGS = {
@@ -302,7 +303,7 @@ diclofenaciv: {
   getDose: (w, ageY) => {
     if (w <= 0 || isNaN(w)) return null;
 
-    // 🔥 <2 years → zero dose (handled by renderer)
+    // <2 years → zero dose (handled by renderer)
     if (ageY < 2) {
       return {
         min: 0,
@@ -373,6 +374,59 @@ diclofenaciv: {
   if (ageY < 0.5) return 'BNFC: ≥6 months';
   return ageY < 16 ? 'Max 15 mg' : 'Max 30 mg';
 }
+},
+  paracetamoliv: {
+  weight: 'AdjBW',
+  unit: 'mg',
+  outputId: 'paracetamol-iv',
+  labelId: 'paracetamol-iv-inline',
+  noteId: 'paracetamol-iv-note',
+
+  getDose: (w) => {
+    if (!w || isNaN(w)) return null;
+
+    if (w <= 10) {
+      return {
+        min: 10 * w,
+        max: 10 * w,
+        perKg: '10'
+      };
+    }
+
+    if (w <= 50) {
+      return {
+        min: 15 * w,
+        max: 15 * w,
+        perKg: '15'
+      };
+    }
+
+    return {
+      min: 1000,
+      max: 1000,
+      perKg: null
+    };
+  },
+
+  notes: [
+    {
+      condition: ({ weight }) => weight <= 10,
+      text: 'Every 4–6 h, max 30 mg/kg/day'
+    },
+    {
+      condition: ({ weight }) => weight > 10 && weight <= 50,
+      text: 'Every 4–6 h, max 60 mg/kg/day'
+    },
+    {
+      condition: ({ weight }) => weight > 50,
+      text: 'Every 4–6 h, max 4 g/day'
+    }
+  ],
+
+  capLabel: (ageY, weight) => {
+    if (weight < 10) return '<10 kg';
+    return '';
+  }
 }
 };
 
@@ -903,12 +957,10 @@ const ageMonths = ageUnit === 'months' ? rawAge : rawAge * 12;
 const ageY = ageMonths / 12;
     
 [
-  'paracetamol-iv-note',
   'paracetamol-po-note',
   'ibuprofenpo-note',
   'morphine-iv-extra',
   'morphine-po-extra',
-  'paracetamol-iv-inline',
   'paracetamol-po-inline'
 ].forEach(id => {
   const el = document.getElementById(id);
@@ -918,30 +970,6 @@ const ageY = ageMonths / 12;
 if (!w || isNaN(w)) {
   // hide all outputs and STOP
   return;
-}
-
-// — PARACETAMOL dosing & note —
-
-  // 1) Calculate IV dose & note
-  let paraIVDose, paraIVNote, paraIVInline;
- if (w > 0 && w <= 10) {
-  paraIVDose = 10 * w;
-  const maxDailyLowIV = stripZeros((30 * w).toFixed(2));
-  paraIVInline = '10 mg/kg';
-  paraIVNote = `Every 4–6 h, max 30 mg/kg/day = ${maxDailyLowIV} mg`;
-} else if (w <= 50) {
-  paraIVDose = 15 * w;
-  const maxDailyHighIV = stripZeros((60 * w).toFixed(2));
-  paraIVInline = '15 mg/kg';
-  paraIVNote = `Every 4–6 h, max 60 mg/kg/day = ${maxDailyHighIV} mg`;
-} else if (w > 50) {
-  paraIVDose = 1000;
-  paraIVInline = '1 g';
-  paraIVNote = `Every 4–6 h, max 4 g/day`;
-} else {
-  paraIVDose = 0;
-  paraIVInline = '';
-  paraIVNote = '';
 }
 
   // 2) Calculate PO dose & note
@@ -968,37 +996,6 @@ if (w > 0 && w <= 10) {
   paraPODose = 0;
   paraPOInline = '';
   paraPONote = '';
-}
-
-  // 3) Update IV span & note for Paracetamol
-  const pIvEl     = document.getElementById('paracetamol-iv');
-  const pIvUnit   = pIvEl.nextElementSibling; // the “ mg” span
-  const pIvNoteEl = document.getElementById('paracetamol-iv-note');
-  const pIvInlineEl = document.getElementById('paracetamol-iv-inline');
-
-  if (paraIVDose > 0) {
-  pIvEl.textContent   = stripZeros(paraIVDose.toFixed(2));
-  pIvEl.style.display = 'inline';
-  if (pIvUnit) pIvUnit.style.display = 'inline';
-
-  // ✅ NEW inline note
-  pIvInlineEl.textContent = paraIVInline;
-  pIvInlineEl.style.display = 'inline';
-
-  // existing lower note
-  pIvNoteEl.innerHTML = paraIVNote;
-  pIvNoteEl.style.display = 'inline';
-
-} else {
-  pIvEl.textContent   = '';
-  pIvEl.style.display = 'none';
-  if (pIvUnit) pIvUnit.style.display = 'none';
-
-  pIvInlineEl.textContent = '';
-  pIvInlineEl.style.display = 'none';
-
-  pIvNoteEl.textContent = '';
-  pIvNoteEl.style.display = 'none';
 }
 
   // 4) Update PO span & note for Paracetamol
@@ -2262,6 +2259,9 @@ function renderDrug(drugKey, tbw) {
     case 'bolus':
       return renderBolusDrug(config, weight, label, drugKey);
 
+    case 'paracetamol':
+  return renderParacetamol(config, weight, drugKey);  
+      
     default:
       console.warn(`Unknown drug type: ${type}`, drugKey);
       return;
@@ -2371,9 +2371,9 @@ if (dMin === 0 && dMax === 0) {
   if (config.labelId) {
     let finalLabel = '';
 
-    if (perKgLabel !== undefined) {
-      finalLabel = `${perKgLabel} ${config.unit}/kg`;
-    } else if (config.dose) {
+   if (perKgLabel) {
+  finalLabel = `${perKgLabel} ${config.unit}/kg`;
+} else if (config.dose) {
       const [minDose, maxDose] = config.dose;
       finalLabel = (minDose === maxDose)
         ? `${minDose} ${config.unit}/kg`
@@ -2394,7 +2394,7 @@ if (dMin === 0 && dMax === 0) {
 
     const capEl = document.getElementById(`${drugKey}-max`);
     if (capEl) {
-      capEl.textContent = config.capLabel(ageY) || '';
+      capEl.textContent = config.capLabel(ageY, weight) || '';
     }
   }
 }
