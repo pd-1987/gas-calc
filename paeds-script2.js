@@ -18,7 +18,8 @@ const GA_DRUG_LIST = [
   'ibuprofeniv',
   'diclofenaciv',
   'ketorolac',
-  'paracetamoliv'
+  'paracetamoliv',
+  'morphineiv'
 ];
 
 const DRUGS = {
@@ -427,6 +428,51 @@ diclofenaciv: {
     if (weight < 10) return '<10 kg';
     return '';
   }
+},
+ morphineiv: {
+  weight: 'IBW',
+  unit: 'mg',
+  outputId: 'morphineiv',
+  noteId: 'morphine-iv-extra',
+  labelId: 'morphineiv-inline',
+
+  getDose: (w, ageY) => {
+    if (!w || isNaN(w)) return null;
+
+    const ageMonths = ageY * 12;
+
+    // Neonate (<1 month)
+    if (ageMonths < 1) {
+      const dose = 0.05 * w;
+      return {
+        min: dose,
+        max: dose,
+        perKg: '0.05'
+      };
+    }
+
+    // ≥1 month
+    return {
+      min: 0.05 * w,
+      max: 0.1 * w,
+      perKg: '0.05–0.1'
+    };
+  },
+
+  notes: [
+    {
+      condition: ({ ageMonths }) => ageMonths < 1,
+      text: 'Every 6 hours, adjusted according to response'
+    },
+    {
+      condition: ({ ageMonths }) => ageMonths >= 1 && ageMonths < 6,
+      text: 'Every 6 hours, adjusted according to response'
+    },
+    {
+      condition: ({ ageMonths }) => ageMonths >= 6,
+      text: 'Every 4 hours, adjusted according to response'
+    }
+  ]
 }
 };
 
@@ -959,7 +1005,6 @@ const ageY = ageMonths / 12;
 [
   'paracetamol-po-note',
   'ibuprofenpo-note',
-  'morphine-iv-extra',
   'morphine-po-extra',
   'paracetamol-po-inline'
 ].forEach(id => {
@@ -1029,42 +1074,6 @@ if (paraPODose > 0) {
   pPoNoteEl.style.display = 'none';
 }
     
-   // — MORPHINE IV (0.05–0.1 mg/kg up to 12 y; ≥12 y → 5 mg) —
-  const mIvEl   = document.getElementById('morphineiv');
-  const mIvUnit = mIvEl.nextElementSibling; // “ mg”
-  const mNoteEl = document.getElementById('morphine-iv-extra');
-
-  if (w > 0 && !isNaN(w)) {
-
-    let doseText;
-    if (ageY < 12) {
-      // 0.05–0.1 mg/kg
-      const minDose = 0.05 * w;
-      const maxDose = 0.10 * w;
-      doseText = `${stripZeros(minDose.toFixed(2))}–${stripZeros(maxDose.toFixed(2))}`;
-    } else {
-      // ≥ 12 years → flat 5 mg
-      doseText = '5';
-    }
-
-    // Write dose into the span and show its unit
-    mIvEl.textContent   = doseText;
-    mIvEl.style.display = 'inline';
-    if (mIvUnit && mIvUnit.classList.contains('unit')) {
-      mIvUnit.style.display = 'inline';
-    }
-
-    // Put the note into the <small id="morphine-iv-extra"> cell:
-    mNoteEl.innerHTML = `Every 4 hours, adjusted to response`;
-  } else {
-    // hide Morphine IV span & unit, clear note
-    mIvEl.textContent   = '';
-    mIvEl.style.display = 'none';
-    if (mIvUnit && mIvUnit.classList.contains('unit')) {
-      mIvUnit.style.display = 'none';
-    }
-    mNoteEl.textContent = '';
-  }
 // — MORPHINE PO (age-stratified mcg/kg → mg) —
   const mPoEl    = document.getElementById('morphinepo');
   const mPoUnit  = mPoEl.nextElementSibling; // “ mg”
@@ -1914,10 +1923,15 @@ heightIn.addEventListener('input', () => {
 
   const rawH = heightIn.value.trim();
 
-  // Empty → just update dependent displays
-  if (rawH === '') {
+ if (rawH === '') {
+    window.weightContext.ibw = null;
+    window.weightContext.adjbw = null;
+    window.weightContext.isObese = false;
+
     updateHeightCentileDisplay();
     calculateBMI();
+    updateAll(); // 🔥 ensures drugs re-render correctly
+
     return;
   }
 
@@ -2196,6 +2210,13 @@ function getDrugWeight(drugKey, tbw) {
   const config = DRUGS[drugKey];
   const { ibw, adjbw, isObese } = window.weightContext;
 
+  if (!ibw || !adjbw) {
+    return {
+      weight: tbw,
+      label: null
+    };
+  }
+  
   switch (config.weight) {
 case 'IBW':
   const useIBW = isObese && ibw;
