@@ -176,7 +176,7 @@ atracurium_ga: {
 },
   
  // ANTIEMETICS
-  ondansetron: {
+ondansetron: {
   weight: 'TBW',
   unit: 'mg',
   conc: 2,
@@ -184,17 +184,32 @@ atracurium_ga: {
   extraId: 'ondansetron-ga-extra',
   labelId: 'ondansetron-dose-text',
 
- getDose: (w, ageY) => {
-  if (ageY < 0.5) return null;
+  getDose: (w, ageY) => {
+    if (w <= 0 || isNaN(w)) return null;
 
-  const dose = Math.min(0.15 * w, 4);
+    // 🔥 <6 months → suppress calculation
+    if (ageY < 0.5) {
+      return {
+        min: 0,
+        max: 0,
+        perKg: 0.15
+      };
+    }
 
-  return {
-    min: dose,
-    max: dose,
-    perKg: 0.15
-  };
-}
+    // ≥6 months
+    const dose = Math.min(0.15 * w, 4);
+
+    return {
+      min: dose,
+      max: dose,
+      perKg: 0.15
+    };
+  },
+
+  capLabel: (ageY) => {
+    if (ageY < 0.5) return 'BNFC: ≥6 months';
+    return 'Max 4 mg';
+  }
 },
   cyclizine: {
   weight: 'TBW',
@@ -306,7 +321,7 @@ diclofenaciv: {
   },
 
   capLabel: (ageY) => {
-    if (ageY < 2) return 'BNFC: >2 years';
+    if (ageY < 2) return 'BNFC: ≥2 years';
     return 'Max 75 mg';
   }
 },
@@ -355,7 +370,7 @@ diclofenaciv: {
 },
 
   capLabel: (ageY) => {
-  if (ageY < 0.5) return 'BNFC: >6 months';
+  if (ageY < 0.5) return 'BNFC: ≥6 months';
   return ageY < 16 ? 'Max 15 mg' : 'Max 30 mg';
 }
 }
