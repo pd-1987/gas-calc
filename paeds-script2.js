@@ -20,7 +20,8 @@ const GA_DRUG_LIST = [
   'ketorolac',
   'paracetamoliv',
   'morphineiv', 
-  'paracetamolpo'
+  'paracetamolpo',
+  'ibuprofenpo'
 ];
 
 const DRUGS = {
@@ -528,7 +529,53 @@ diclofenaciv: {
     if (weight < 10) return '<10 kg';
     return '';
   }
-}
+},
+  ibuprofenpo: {
+  weight: 'AdjBW',
+  unit: 'mg',
+  outputId: 'ibuprofenpo',
+  labelId: 'ibuprofenpo-dose-note', // 🔥 this links to your HTML
+  noteId: 'ibuprofenpo-note',
+
+  getDose: (w, ageY) => {
+    const ageMonths = ageY * 12;
+
+    if (!w || isNaN(w)) return null;
+
+    // <3 months → 5 mg/kg
+    if (ageMonths < 3) {
+      let dose = 5 * w;
+      if (dose > 400) dose = 400;
+
+      return {
+        min: dose,
+        max: dose,
+        perKg: '5' // 🔥 drives label
+      };
+    }
+
+    // ≥3 months → 10 mg/kg
+    let dose = 10 * w;
+    if (dose > 400) dose = 400;
+
+    return {
+      min: dose,
+      max: dose,
+      perKg: '10' // 🔥 drives label
+    };
+  },
+
+  notes: [
+    {
+      condition: ({ ageMonths }) => ageMonths < 3,
+      text: 'Every 6–8 hours'
+    },
+    {
+      condition: ({ ageMonths }) => ageMonths >= 3,
+      text: 'Every 6–8 hours, max 30 mg/kg/day'
+    }
+  ]
+},
 };
 
 
@@ -1058,7 +1105,6 @@ const ageMonths = ageUnit === 'months' ? rawAge : rawAge * 12;
 const ageY = ageMonths / 12;
     
 [
-  'ibuprofenpo-note',
   'morphine-po-extra',
 ].forEach(id => {
   const el = document.getElementById(id);
