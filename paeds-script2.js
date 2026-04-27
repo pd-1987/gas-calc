@@ -2526,11 +2526,6 @@ function enableSelectAllOnFocus(input) {
     // slight delay improves reliability on iOS
     setTimeout(() => input.select(), 0);
   });
-
-  // optional: also trigger on click for desktop
-  input.addEventListener('click', () => {
-    input.select();
-  });
 }
 
 // apply to your inputs
