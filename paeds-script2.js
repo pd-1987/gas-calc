@@ -19,7 +19,8 @@ const GA_DRUG_LIST = [
   'diclofenaciv',
   'ketorolac',
   'paracetamoliv',
-  'morphineiv'
+  'morphineiv', 
+  'paracetamolpo'
 ];
 
 const DRUGS = {
@@ -473,6 +474,60 @@ diclofenaciv: {
       text: 'Every 4 hours, adjusted according to response'
     }
   ]
+},
+  // ORAL ANALGESIA
+  paracetamolpo: {
+  weight: 'AdjBW',
+  unit: 'mg',
+  outputId: 'paracetamol-po',
+  labelId: 'paracetamol-po-inline',
+  noteId: 'paracetamol-po-note',
+
+  getDose: (w) => {
+    if (!w || isNaN(w)) return null;
+
+    if (w <= 10) {
+      return {
+        min: 10 * w,
+        max: 10 * w,
+        perKg: '10'
+      };
+    }
+
+    if (w <= 50) {
+      return {
+        min: 15 * w,
+        max: 15 * w,
+        perKg: '15'
+      };
+    }
+
+    return {
+      min: 1000,
+      max: 1000,
+      perKg: null
+    };
+  },
+
+  notes: [
+    {
+      condition: ({ weight }) => weight <= 10,
+      text: 'Every 4–6 h, max 30 mg/kg/day'
+    },
+    {
+      condition: ({ weight }) => weight > 10 && weight <= 50,
+      text: 'Every 4–6 h, max 60 mg/kg/day'
+    },
+    {
+      condition: ({ weight }) => weight > 50,
+      text: 'Every 4–6 h, max 4 g/day'
+    }
+  ],
+
+  capLabel: (ageY, weight) => {
+    if (weight < 10) return '<10 kg';
+    return '';
+  }
 }
 };
 
@@ -1003,10 +1058,8 @@ const ageMonths = ageUnit === 'months' ? rawAge : rawAge * 12;
 const ageY = ageMonths / 12;
     
 [
-  'paracetamol-po-note',
   'ibuprofenpo-note',
   'morphine-po-extra',
-  'paracetamol-po-inline'
 ].forEach(id => {
   const el = document.getElementById(id);
   if (el) el.textContent = '';
@@ -1017,63 +1070,6 @@ if (!w || isNaN(w)) {
   return;
 }
 
-  // 2) Calculate PO dose & note
-let paraPODose, paraPONote, paraPOInline;
-
-if (w > 0 && w <= 10) {
-  paraPODose = 10 * w;
-  const maxDailyLowPO = stripZeros((30 * w).toFixed(2));
-  paraPOInline = '10 mg/kg';
-  paraPONote = `Every 4–6 h, max 30 mg/kg/day = ${maxDailyLowPO} mg`;
-
-} else if (w <= 50) {
-  paraPODose = 15 * w;
-  const maxDailyHighPO = stripZeros((60 * w).toFixed(2));
-  paraPOInline = '15 mg/kg';
-  paraPONote = `Every 4–6 h, max 60 mg/kg/day = ${maxDailyHighPO} mg`;
-
-} else if (w > 50) {
-  paraPODose = 1000;
-  paraPOInline = '1 g';
-  paraPONote = `Every 4–6 h, max 4 g/day`;
-
-} else {
-  paraPODose = 0;
-  paraPOInline = '';
-  paraPONote = '';
-}
-
-  // 4) Update PO span & note for Paracetamol
- const pPoEl       = document.getElementById('paracetamol-po');
-const pPoUnit     = pPoEl.nextElementSibling;
-const pPoNoteEl   = document.getElementById('paracetamol-po-note');
-const pPoInlineEl = document.getElementById('paracetamol-po-inline');
-
-if (paraPODose > 0) {
-  pPoEl.textContent   = stripZeros(paraPODose.toFixed(2));
-  pPoEl.style.display = 'inline';
-  if (pPoUnit) pPoUnit.style.display = 'inline';
-
-  // ✅ NEW inline dose (middle cell)
-  pPoInlineEl.textContent = paraPOInline;
-  pPoInlineEl.style.display = 'inline';
-
-  // ✅ cleaned note (no mg/kg repetition)
-  pPoNoteEl.innerHTML = paraPONote;
-  pPoNoteEl.style.display = 'inline';
-
-} else {
-  pPoEl.textContent   = '';
-  pPoEl.style.display = 'none';
-  if (pPoUnit) pPoUnit.style.display = 'none';
-
-  pPoInlineEl.textContent = '';
-  pPoInlineEl.style.display = 'none';
-
-  pPoNoteEl.textContent = '';
-  pPoNoteEl.style.display = 'none';
-}
-    
 // — MORPHINE PO (age-stratified mcg/kg → mg) —
   const mPoEl    = document.getElementById('morphinepo');
   const mPoUnit  = mPoEl.nextElementSibling; // “ mg”
