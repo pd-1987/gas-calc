@@ -2521,6 +2521,23 @@ function renderDrugNotes(config, weight, drugKey) {
   });
 }
 
+function enableSelectAllOnFocus(input) {
+  input.addEventListener('focus', () => {
+    // slight delay improves reliability on iOS
+    setTimeout(() => input.select(), 0);
+  });
+
+  // optional: also trigger on click for desktop
+  input.addEventListener('click', () => {
+    input.select();
+  });
+}
+
+// apply to your inputs
+enableSelectAllOnFocus(weightIn);
+enableSelectAllOnFocus(heightIn);
+enableSelectAllOnFocus(ageInput);
+
 function updateAll() {
   const rawAge = ageInput.value.trim();
   const a = parseFloat(rawAge);
