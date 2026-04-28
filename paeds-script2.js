@@ -44,6 +44,13 @@ const REVERSAL_LIST = [
   'neostigmine'
 ];
 
+const PREMED_LIST = [
+  'midazolam_po',
+  'midazolam_nas',
+  'dexmed_nas',
+  'midazolam_buccal'
+];
+
 const ANTIBIOTIC_LIST = [
   'amoxicillin',
   'cefuroxime',
@@ -750,7 +757,6 @@ cefuroxime: {
   outputId: 'cefuroxime',
   labelId: 'cefuroxime-dose-text'
 },
-
 'co-amoxiclav': {
   weight: 'TBW',
   dose: [30, 30],
@@ -838,7 +844,46 @@ gentamicin: {
       text: 'Open fractures'
     }
   ]
-}
+},
+  /// PREMEDICATION
+  midazolam_po: {
+  weight: 'TBW',
+  dose: [0.5, 0.5],
+  unit: 'mg',
+  cap: 20,
+
+  outputId: 'premed-midaz',
+  labelId: 'premed-midaz-dose-text'
+},
+
+midazolam_nas: {
+  weight: 'TBW',
+  dose: [0.2, 0.3],
+  unit: 'mg',
+  cap: 10,
+
+  outputId: 'premed-midaz-intranasal',
+  labelId: 'premed-midaz-nas-dose-text'
+},
+
+dexmed_nas: {
+  weight: 'AdjBW',
+  dose: [2, 4],
+  unit: 'mcg',
+  cap: 200,
+
+  outputId: 'premed-dexmed',
+  labelId: 'premed-dexmed-dose-text'
+},
+  midazolam_buccal: {
+  weight: 'TBW',
+  dose: [0.3, 0.3],
+  unit: 'mg',
+  cap: 10,
+
+  outputId: 'premed-midaz-buccal',
+  labelId: 'premed-midaz-buccal-dose-text'
+},
 };
 
 function clearText(id) {
@@ -1155,13 +1200,6 @@ function clearWeight() {
   document.getElementById('laryngoscope').style.display = 'none';
 
    // =========================
-  // Premed
-  // =========================
-  hideGroup([
-    'premed-midaz','premed-midaz-intranasal','premed-dexmed'
-  ]);
-
-   // =========================
   // Airway adjuncts
   // =========================
   hideEl('igel');
@@ -1179,73 +1217,6 @@ function clearWeight() {
   document.querySelectorAll('.normal-values .static')
     .forEach(el => el.style.display = 'none');
 }
-
-function updatePremedication(w) {
-
-const midazEl   = document.getElementById('premed-midaz');
-const midazUnit = midazEl.nextElementSibling; // the “ mg” span
-if (w > 0) {
-  let dose = 0.5 * w;
-  if (dose > 20) dose = 20;
-  midazEl.textContent   = stripZeros(dose.toFixed(2));
-  midazEl.style.display = 'inline';
-  if (midazUnit && midazUnit.classList.contains('unit')) {
-    midazUnit.style.display = 'inline';
-  }
-} else {
-  midazEl.textContent   = '';
-  midazEl.style.display = 'none';
-  if (midazUnit && midazUnit.classList.contains('unit')) {
-    midazUnit.style.display = 'none';
-  }
-}
-  
-  // — Midazolam NAS (0.2–0.3 mg/kg; max 10 mg) —
-const nasEl   = document.getElementById('premed-midaz-intranasal');
-const nasUnit = nasEl.nextElementSibling; // the “ mg” span
-if (w > 0) {
-  // calculate 0.2–0.3 mg/kg and cap at 10 mg
-  const minDose = Math.min(0.2 * w, 10);
-  const maxDose = Math.min(0.3 * w, 10);
-  const doseText = (Math.abs(minDose - maxDose) < 0.001)
-    ? stripZeros(minDose.toFixed(2))
-    : `${stripZeros(minDose.toFixed(2))}–${stripZeros(maxDose.toFixed(2))}`;
-  nasEl.textContent   = doseText;
-  nasEl.style.display = 'inline';
-  if (nasUnit && nasUnit.classList.contains('unit')) {
-    nasUnit.style.display = 'inline';
-  }
-} else {
-  nasEl.textContent   = '';
-  nasEl.style.display = 'none';
-  if (nasUnit && nasUnit.classList.contains('unit')) {
-    nasUnit.style.display = 'none';
-  }
-}
-  
-    // — Dexmedetomidine NAS (2–4 mcg/kg; max 200 mcg) —
-  const dexEl   = document.getElementById('premed-dexmed');
-  const dexUnit = dexEl.nextElementSibling; // the “ mcg” span
-  if (w > 0) {
-    // calculate 2–4 mcg/kg and cap at 200 mcg
-    const minDose = Math.min(2 * w, 200);
-    const maxDose = Math.min(4 * w, 200);
-    const doseText = (Math.abs(minDose - maxDose) < 0.001)
-      ? stripZeros(minDose.toFixed(2))
-      : `${stripZeros(minDose.toFixed(2))}–${stripZeros(maxDose.toFixed(2))}`;
-    dexEl.textContent   = doseText;
-    dexEl.style.display = 'inline';
-    if (dexUnit && dexUnit.classList.contains('unit')) {
-      dexUnit.style.display = 'inline';
-    }
-  } else {
-    dexEl.textContent   = '';
-    dexEl.style.display = 'none';
-    if (dexUnit && dexUnit.classList.contains('unit')) {
-      dexUnit.style.display = 'none';
-    }
-  }
-}  
   
   function toggleAgeUnit() {
   // 2) flip the button and convert the value
@@ -1636,6 +1607,10 @@ function updateSedation(w) {
 
 function updateReversal(w) {
   REVERSAL_LIST.forEach(d => renderDrug(d, w));
+}
+
+function updatePremed(w) {
+  PREMED_LIST.forEach(d => renderDrug(d, w));
 }
 
 function updateAntibiotics(w) {
@@ -2449,7 +2424,7 @@ function updateAll() {
   updateEmergencyDrugs(w); 
   updateSedation(w);
   updateGADrugs(w);
-  updatePremedication(w);
+  updatePremed(w);
   updateReversal(w);
   updateAntibiotics(w);
   
