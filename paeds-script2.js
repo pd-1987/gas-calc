@@ -21,7 +21,21 @@ const GA_DRUG_LIST = [
   'paracetamoliv',
   'morphineiv', 
   'paracetamolpo',
-  'ibuprofenpo'
+  'ibuprofenpo',
+  'morphinepo'
+];
+
+const ANTIBIOTIC_LIST = [
+  'amoxicillin',
+  'cefuroxime',
+  'co-amoxiclav',
+  'flucloxacillin',
+  'flucloxacillin-bone',
+  'metronidazole',
+  'gentamicin',
+  'gentamicin-high',
+  'teicoplanin',
+  'teicoplanin-open'
 ];
 
 const DRUGS = {
@@ -464,15 +478,15 @@ diclofenaciv: {
   notes: [
     {
       condition: ({ ageMonths }) => ageMonths < 1,
-      text: 'Every 6 hours, adjusted according to response'
+      text: 'Every 6 hours, adjusted to response'
     },
     {
       condition: ({ ageMonths }) => ageMonths >= 1 && ageMonths < 6,
-      text: 'Every 6 hours, adjusted according to response'
+      text: 'Every 6 hours, adjusted to response'
     },
     {
       condition: ({ ageMonths }) => ageMonths >= 6,
-      text: 'Every 4 hours, adjusted according to response'
+      text: 'Every 4 hours, adjusted to response'
     }
   ]
 },
@@ -576,9 +590,176 @@ diclofenaciv: {
     }
   ]
 },
+morphinepo: {
+  weight: 'IBW',
+  unit: 'mg',
+  outputId: 'morphinepo',
+  noteId: 'morphine-po-extra',
+  labelId: 'morphine-po-inline',
+
+  getDose: (w, ageY) => {
+    if (!w || isNaN(w)) return null;
+
+    const ageMonths = ageY * 12;
+
+    if (ageMonths < 1) {
+      return { min: 0, max: 0 };
+    }
+
+    if (ageMonths <= 2) {
+      return { min: 0.05 * w, max: 0.1 * w, perKg: '0.05–0.1' };
+    }
+
+    if (ageMonths <= 5) {
+      return { min: 0.1 * w, max: 0.15 * w, perKg: '0.1–0.15' };
+    }
+
+    if (ageMonths < 12) {
+      const dose = 0.2 * w;
+      return { min: dose, max: dose, perKg: '0.2' };
+    }
+
+    if (Math.floor(ageY) === 1) {
+      return { min: 0.2 * w, max: 0.3 * w, perKg: '0.2–0.3' };
+    }
+
+    if (ageY >= 2 && ageY < 12) {
+      let min = 0.2 * w;
+      let max = 0.3 * w;
+
+      if (min > 10) min = 10;
+      if (max > 10) max = 10;
+
+      return { min, max, perKg: '0.2–0.3' };
+    }
+
+   if (ageY >= 12 && ageY < 18) {
+  return { min: 5, max: 10, perKg: null };
+}
+
+    return null;
+  },
+
+  capLabel: (ageY) => {
+    if (ageY >= 2 && ageY < 12) return 'Max 10 mg';
+    return '';
+  },
+
+  notes: [
+    {
+      condition: ({ ageMonths }) => ageMonths >= 1,
+      text: 'Every 4 hours, adjusted to response'
+    }
+   ]
+},
+  /// ANTIBIOTICS
+amoxicillin: {
+  weight: 'TBW',
+  dose: [30, 30],
+  unit: 'mg',
+  cap: 1000,
+  outputId: 'amoxicillin',
+  labelId: 'amoxicillin-dose-text'
+},
+
+cefuroxime: {
+  weight: 'TBW',
+  dose: [50, 50],
+  unit: 'mg',
+  cap: 1500,
+  outputId: 'cefuroxime',
+  labelId: 'cefuroxime-dose-text'
+},
+
+'co-amoxiclav': {
+  weight: 'TBW',
+  dose: [30, 30],
+  unit: 'mg',
+  cap: 1200,
+  outputId: 'co-amoxiclav',
+  labelId: 'co-amoxiclav-dose-text'
+},
+
+flucloxacillin: {
+  weight: 'TBW',
+  dose: [25, 25],
+  unit: 'mg',
+  cap: 1000,
+  outputId: 'flucloxacillin',
+  labelId: 'flucloxacillin-dose-text'
+},
+
+'flucloxacillin-bone': {
+  weight: 'TBW',
+  dose: [50, 50],
+  unit: 'mg',
+  cap: 2000,
+  outputId: 'flucloxacillin-bone',
+  labelId: 'flucloxacillin-bone-dose-text'
+},
+metronidazole: {
+  weight: 'TBW',
+  dose: [30, 30],
+  unit: 'mg',
+  cap: 500,
+  outputId: 'metronidazole',
+  labelId: 'metronidazole-dose-text'
+},
+gentamicin: {
+  weight: 'AdjBW',
+  dose: [2.5, 2.5],
+  unit: 'mg',
+  cap: 160,
+  outputId: 'gentamicin',
+  labelId: 'gentamicin-dose-text'
+},
+'gentamicin-high': {
+  weight: 'AdjBW',
+  dose: [5, 5],
+  unit: 'mg',
+  cap: 480,
+  outputId: 'gentamicin-high',
+  labelId: 'gentamicin-high-dose-text'
+},
+ teicoplanin: {
+  weight: 'TBW',
+  unit: 'mg',
+  outputId: 'teicoplanin',
+  labelId: 'teicoplanin-dose-text',
+  noteId: 'teicoplanin-note',
+
+  dose: [10, 10],   // 🔥 simple mg/kg
+  cap: 400,         // 🔥 max dose
+
+  capLabel: () => 'Max 400 mg',
+
+  notes: [
+    {
+      condition: ({ ageMonths }) => ageMonths >= 2,
+      text: 'Single dose'
+    }
+  ]
+},
+  'teicoplanin-open': {
+  weight: 'TBW',
+  unit: 'mg',
+  outputId: 'teicoplanin-open',
+  labelId: 'teicoplanin-open-dose-text',
+  noteId: 'teicoplanin-open-note',
+
+  dose: [10, 10],
+  cap: 800,   // 🔥 higher cap
+
+  capLabel: () => 'Max 800 mg',
+
+  notes: [
+    {
+      condition: ({ ageMonths }) => ageMonths >= 2,
+      text: 'Open fractures'
+    }
+  ]
+}
 };
-
-
 
 function clearText(id) {
   const el = document.getElementById(id);
@@ -1097,137 +1278,6 @@ function updateReversal(w) {
     });
   }
 }
-  
-  function updateAnalgesics(w) {
-
-const rawAge = parseFloat(ageInput.value) || 0;
-const ageMonths = ageUnit === 'months' ? rawAge : rawAge * 12;
-const ageY = ageMonths / 12;
-    
-[
-  'morphine-po-extra',
-].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) el.textContent = '';
-});
-    
-if (!w || isNaN(w)) {
-  // hide all outputs and STOP
-  return;
-}
-
-// — MORPHINE PO (age-stratified mcg/kg → mg) —
-  const mPoEl    = document.getElementById('morphinepo');
-  const mPoUnit  = mPoEl.nextElementSibling; // “ mg”
-  const mPoNote  = document.getElementById('morphine-po-extra');
-
-  if (w > 0 && !isNaN(w)) {
-
-    let doseMinMg = 0, doseMaxMg = 0;
-    let noteText = '';
-
-    if (ageMonths >= 1 && ageMonths <= 2) {
-      // 50–100 mcg/kg → (50/1000)–(100/1000) mg/kg
-      doseMinMg  = (50  * w) / 1000;
-      doseMaxMg  = (100 * w) / 1000;
-      noteText   = 'Initially 50–100 mcg/kg every 4 hours, adjusted to response';
-    }
-    else if (ageMonths > 2 && ageMonths <= 5) {
-      // 100–150 mcg/kg
-      doseMinMg  = (100 * w) / 1000;
-      doseMaxMg  = (150 * w) / 1000;
-      noteText   = '100–150 mcg/kg every 4 hours, adjusted to response';
-    }
-    else if (ageMonths > 5 && ageMonths < 12) {
-      // 200 mcg/kg exactly
-      doseMinMg  = (200 * w) / 1000;
-      doseMaxMg  = doseMinMg;
-      noteText   = '200 mcg/kg every 4 hours, adjusted to response';
-    }
-    else if (Math.floor(ageY) === 1) {
-      // exactly 1 year → 200–300 mcg/kg
-      doseMinMg  = (200 * w) / 1000;
-      doseMaxMg  = (300 * w) / 1000;
-      noteText   = '200–300 mcg/kg, every 4 hours, adjusted to response';
-    }
-    else if (ageY >= 2 && ageY < 12) {
-      // 2–11 years → 200–300 mcg/kg, max per dose 10 mg
-      const rawMin = (200 * w) / 1000;
-      const rawMax = (300 * w) / 1000;
-      doseMinMg    = Math.min(rawMin, 10);
-      doseMaxMg    = Math.min(rawMax, 10);
-      noteText     = '200–300 mcg/kg, every 4 hours (max 10 mg/dose), adjusted to response';
-    }
-    else if (ageY >= 12 && ageY < 18) {
-      // 12–17 years → 5–10 mg every 4 hours
-      doseMinMg  = 5;
-      doseMaxMg  = 10;
-      noteText   = '5–10 mg every 4 hours, adjusted to response';
-    }
-    else {
-      // if <1 month or ≥18 years, hide
-      doseMinMg = doseMaxMg = 0;
-      noteText = '';
-    }
-
-    if (doseMinMg > 0) {
-      // Format “min–max” or single value
-      const doseText = Math.abs(doseMaxMg - doseMinMg) < 0.01
-        ? stripZeros(doseMinMg.toFixed(2))
-        : `${stripZeros(doseMinMg.toFixed(2))}–${stripZeros(doseMaxMg.toFixed(2))}`;
-
-      mPoEl.textContent   = doseText;
-      mPoEl.style.display = 'inline';
-      if (mPoUnit && mPoUnit.classList.contains('unit')) {
-        mPoUnit.style.display = 'inline';
-      }
-      // middle cell = mg/kg range (or flat dose)
-const mPoInline = document.getElementById('morphine-po-inline');
-
-// Extract just the dose part (before "every...")
-let inlineText = '';
-if (ageMonths >= 1 && ageMonths <= 2) {
-  inlineText = '50–100 mcg/kg';
-}
-else if (ageMonths > 2 && ageMonths <= 5) {
-  inlineText = '100–150 mcg/kg';
-}
-else if (ageMonths > 5 && ageMonths < 12) {
-  inlineText = '200 mcg/kg';
-}
-else if (Math.floor(ageY) === 1) {
-  inlineText = '200–300 mcg/kg';
-}
-else if (ageY >= 2 && ageY < 12) {
-  inlineText = '200–300 mcg/kg';
-}
-else if (ageY >= 12 && ageY < 18) {
-  inlineText = '5–10 mg';
-}
-
-// set middle cell
-mPoInline.textContent = inlineText;
-
-// sub row = frequency etc
-mPoNote.innerHTML = `Every 4 hours, adjusted to response`;
-    } else {
-      mPoEl.textContent   = '';
-      mPoEl.style.display = 'none';
-      if (mPoUnit && mPoUnit.classList.contains('unit')) {
-        mPoUnit.style.display = 'none';
-      }
-      mPoNote.textContent = '';
-    }
-  } else {
-    // no weight → hide Morphine PO entirely
-    mPoEl.textContent   = '';
-    mPoEl.style.display = 'none';
-    if (mPoUnit && mPoUnit.classList.contains('unit')) {
-      mPoUnit.style.display = 'none';
-    }
-    mPoNote.textContent = '';
-  }    
-}
 
   function toggleAgeUnit() {
   // 2) flip the button and convert the value
@@ -1607,7 +1657,6 @@ if (depth) {
   updateEmergencyDrugs(w);
   updateSedation(w);
   updateGADrugs(w);
-  updateAnalgesics(w);
   updatePremedication(w);
   updateReversal(w);
   updateAntibiotics(w);
@@ -1798,118 +1847,10 @@ if (cylMaxEl) {
 }
 
 function updateAntibiotics(w) {
- // ── Teicoplanin ─────────────────────────────────────────────
-  const dosingEl    = document.getElementById('teicoplanin-dosing');
-  const teiEl       = document.getElementById('teicoplanin');
-  const teiUnitSpan = teiEl.nextElementSibling;    // the “mg” span
-  const noteEl      = document.getElementById('teicoplanin-note');
-  const rawAge      = parseFloat(ageInput.value) || 0;
-  const ageMonths   = ageUnit === 'months' ? rawAge : rawAge * 12;
-  const ageYears    = ageMonths / 12;
-
-  // prepare outputs
-  let doseText   = '';
-  let noteText   = '';
-  let numericMg  = 0;
-
-  if (w > 0 && ageMonths >= 2) {
-    if (ageYears < 11) {
- doseText = `
-  <span class="small-dose">
-    <span>10 mg/kg</span>
-    <span>Max 400 mg</span>
-  </span>
-`;
-      noteText  = 'Children aged 2 months – 11 years';
-      numericMg = Math.min(10 * w, 400);
-    } else if (ageYears < 18) {
-      doseText = `
-  <span class="small-dose">
-    <span>6 mg/kg</span>
-    <span>Max 400 mg</span>
-  </span>
-`;
-      noteText  = 'Children aged 12 – 17 years';
-      numericMg = Math.min(6 * w, 400);
-    }
-  }
-
-  // always keep the cell but toggle its contents
-  dosingEl.style.display    = 'table-cell';         // leave empty cell when blank
-
-  // show or hide the number + unit
-  teiEl.textContent         = numericMg ? stripZeros(numericMg.toFixed(2)) : '';
-  teiEl.style.display       = numericMg ? 'inline' : 'none';
-  teiUnitSpan.style.display = numericMg ? 'inline' : 'none';
-
-  // note below
-  noteEl.textContent        = noteText;
-
-  // show or hide
-  if (doseText) {
-    dosingEl.innerHTML   = doseText;
-    dosingEl.style.display  = 'table-cell';
-
-    teiEl.textContent       = stripZeros(numericMg.toFixed(2));
-    teiEl.style.display     = 'inline';
-    teiUnitSpan.style.display = 'inline';
-
-    noteEl.textContent      = noteText;
- } else {
-  // clear everything and hide the number + unit
-  dosingEl.textContent       = '';
-  dosingEl.style.display     = 'table-cell';
-
-  teiEl.textContent          = '';
-  teiEl.style.display        = 'none';
-  teiUnitSpan.style.display  = 'none';
-
-  noteEl.textContent         = '';
-}
   
-  const meds = [
-    { id: 'amoxicillin',    dosePerKg: 30, max: 1000 },
-    { id: 'cefuroxime',     dosePerKg: 50, max: 1500 },
-    { id: 'co-amoxiclav',   dosePerKg: 30, max: 1200 },
-    { id: 'flucloxacillin', dosePerKg: 25, max: 1000 },
-    { id: 'flucloxacillin-bone', dosePerKg: 50, max: 2000 },
-    { id: 'gentamicin',     dosePerKg: 2.5,  max: 160 },
-    { id: 'gentamicin-high',     dosePerKg: 5,  max: 480 },
-    { id: 'metronidazole',  dosePerKg: 30,   max: 500 }
-  ];
-
-  meds.forEach(m => {
-    const el       = document.getElementById(m.id);
-    const unitSpan = el.nextElementSibling; // the “mg” span
-    let text        = '';
-
-    if (w > 0 && !isNaN(w)) {
-      if (m.dosePerKg) {
-        let dose = m.dosePerKg * w;
-        if (m.max) dose = Math.min(dose, m.max);
-        text = stripZeros(dose.toFixed(2));
-      } else {
-        // flucloxacillin range
-        const min = m.dosePerKgMin * w;
-        const max = m.dosePerKgMax * w;
-        let txt = `${stripZeros(min.toFixed(2))}–${stripZeros(max.toFixed(2))}`;
-        if (m.max && max > m.max) {
-          txt = `${stripZeros(Math.min(min, m.max).toFixed(2))}–${stripZeros(m.max.toFixed(2))}`;
-        }
-        text = txt;
-      }
-    }
-
-    if (text) {
-      el.textContent       = text;
-      el.style.display     = 'inline';
-      if (unitSpan) unitSpan.style.display = 'inline';
-    } else {
-      el.textContent       = '';
-      el.style.display     = 'none';
-      if (unitSpan) unitSpan.style.display = 'none';
-    }
-  });
+if (w > 0 && !isNaN(w)) {
+  ANTIBIOTIC_LIST.forEach(d => renderDrug(d, w));
+}  
 }  
   
   // event wiring
