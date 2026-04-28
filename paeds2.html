@@ -1498,6 +1498,7 @@ small[class] {
 <tr class="row-blue">
   <td>
     Morphine PO
+    <span class="small-dose"><span id="morphinepo-max"></span></span>
   </td>
   <td id="morphine-po-inline">
   </td>
@@ -1612,7 +1613,7 @@ small[class] {
                 </span>
             </td>
             <td>
-                <span>30 mg/kg</span>
+                 <span id="amoxicillin-dose-text"></span>
             </td>
             <td>
               <span id="amoxicillin"></span>
@@ -1631,9 +1632,7 @@ small[class] {
                 </span>
             </td>
             <td>
-              
-                <span>50 mg/kg</span>
-              
+                <span id="cefuroxime-dose-text"></span>
             </td>
             <td>
               <span id="cefuroxime"></span>
@@ -1653,7 +1652,7 @@ small[class] {
                </span>
             </td>
             <td>  
-                <span>30 mg/kg</span>
+                <span id="co-amoxiclav-dose-text"></span>
             </td>
             <td>
               <span id="co-amoxiclav"></span>
@@ -1667,11 +1666,11 @@ small[class] {
           </tr>
   <tr class="row-white">
             <td>
-              Flucloxacillin<br>(Soft tissue)
+              Flucloxacillin<br><span class="small-dose">(Soft tissue)</span>
               <span class="small-dose"><span>Max 1 g</span></span>
             </td>
             <td>
-                <span>25 mg/kg</span>
+                <span id="flucloxacillin-dose-text"></span>
             </td>
             <td>
               <span id="flucloxacillin"></span>
@@ -1685,12 +1684,12 @@ small[class] {
   
   <tr class="row-white">
             <td>
-             Flucloxacillin<br>(Open orthopaedic surgery)
+              Flucloxacillin<br><span class="small-dose">(Open orthopaedic surgery)</span>
               <span class="small-dose"><span>Max 2 g</span>
               </span>
             </td>
             <td>
-                <span>50 mg/kg</span>
+                 <span id="flucloxacillin-bone-dose-text"></span>
             </td>
             <td>
               <span id="flucloxacillin-bone"></span>
@@ -1711,7 +1710,7 @@ small[class] {
               </span>
             </td>
             <td>
-                <span>30 mg/kg</span>
+               <span id="metronidazole-dose-text"></span>
             </td>
             <td>
               <span id="metronidazole"></span>
@@ -1726,8 +1725,11 @@ small[class] {
   <tr class="row-white">
             <td>
               Teicoplanin
+              <span class="small-dose"><span id="teicoplanin-max"></span></span>
             </td>
-            <td id="teicoplanin-dosing"></td>
+            <td>
+              <span id="teicoplanin-dose-text"></span>
+</td>
             <td>
               <span id="teicoplanin"></span>
                 <span class="static unit">mg</span>
@@ -1738,6 +1740,26 @@ small[class] {
               <small id="teicoplanin-note"></small>
             </td>
           </tr>
+  <tr class="row-white">
+  <td>
+    Teicoplanin<br><span class="small-dose">(Open fractures)</span>
+    <span class="small-dose">
+      <span id="teicoplanin-open-max"></span>
+    </span>
+  </td>
+  <td>
+    <span id="teicoplanin-open-dose-text"></span>
+  </td>
+  <td>
+    <span id="teicoplanin-open"></span>
+    <span class="static unit">mg</span>
+  </td>
+</tr>
+<tr class="sub-white">
+  <td colspan="3">
+    <small id="teicoplanin-open-note"></small>
+  </td>
+</tr>
   
   <tr class="row-white">
             <td>
@@ -1746,7 +1768,7 @@ small[class] {
               </span>
             </td>
             <td>
-                <span>2.5 mg/kg</span>
+               <span id="gentamicin-dose-text"></span>
             </td>
             <td>
               <span id="gentamicin"></span>
@@ -1755,7 +1777,6 @@ small[class] {
           </tr>
           <tr class="sub-white">
             <td colspan="3">
-              <small>In obesity doses should be calculated based on adjusted body weight.</small>
             </td>
           </tr>
   <tr class="row-white">
@@ -1766,7 +1787,7 @@ small[class] {
             </td>
             <td>
               
-                <span>5 mg/kg</span>
+                <span id="gentamicin-high-dose-text"></span>
               
             </td>
             <td>
