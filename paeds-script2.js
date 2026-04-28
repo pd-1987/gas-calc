@@ -1573,6 +1573,17 @@ function setDoseLabel(drugKey, text) {
 // =========================
 // UI HELPERS
 // =========================
+function getGenderKey() {
+  const genderContainer = document.getElementById("GenderBtn");
+
+  const gender =
+    genderContainer.dataset.gender ||
+    genderContainer.querySelector("button.active")?.dataset.value ||
+    "male";
+
+  return gender === "female" ? "girls" : "boys";
+}
+
 function clearText(id) {
   const el = document.getElementById(id);
   if (el) el.textContent = '';
@@ -1749,16 +1760,6 @@ function updateAirwayCalculations(ageYears, w) {
     return;
   }
 
-  function getGenderKey() {
-  const genderContainer = document.getElementById("GenderBtn");
-
-  const gender =
-    genderContainer.dataset.gender ||
-    genderContainer.querySelector("button.active")?.dataset.value ||
-    "male";
-
-  return gender === "female" ? "girls" : "boys";
-}
   // ==========================
 // NRP 2025 Neonatal ETT tables
 // ==========================
