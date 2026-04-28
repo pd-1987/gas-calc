@@ -1749,6 +1749,16 @@ function updateAirwayCalculations(ageYears, w) {
     return;
   }
 
+  function getGenderKey() {
+  const genderContainer = document.getElementById("GenderBtn");
+
+  const gender =
+    genderContainer.dataset.gender ||
+    genderContainer.querySelector("button.active")?.dataset.value ||
+    "male";
+
+  return gender === "female" ? "girls" : "boys";
+}
   // ==========================
 // NRP 2025 Neonatal ETT tables
 // ==========================
@@ -2265,17 +2275,6 @@ function updateAll() {
 // EVENT HANDLERS
 // =========================
 
-function getGenderKey() {
-  const genderContainer = document.getElementById("GenderBtn");
-
-  const gender =
-    genderContainer.dataset.gender ||
-    genderContainer.querySelector("button.active")?.dataset.value ||
-    "male";
-
-  return gender === "female" ? "girls" : "boys";
-}
-
   unitBtn.addEventListener('click', toggleAgeUnit);
   
   estToggle.addEventListener('change', () => {
@@ -2351,6 +2350,10 @@ document.addEventListener('DOMContentLoaded', () => {
   estToggle.checked = true;
   autoEstimate = true;
   updateEstimateLock();
+  
+  enableSelectAllOnFocus(weightIn);
+  enableSelectAllOnFocus(heightIn);
+  enableSelectAllOnFocus(ageInput);
 });
 
 document.querySelectorAll('.accordion-header').forEach(header => {
@@ -2381,8 +2384,4 @@ genderContainer.addEventListener("click", (e) => {
 
   updateAll();   // ✅ clean + centralised
 });
-
-enableSelectAllOnFocus(weightIn);
-enableSelectAllOnFocus(heightIn);
-enableSelectAllOnFocus(ageInput);
 
