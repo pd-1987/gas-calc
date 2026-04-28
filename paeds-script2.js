@@ -38,6 +38,12 @@ const GA_DRUG_LIST = [
   'morphinepo'
 ];
 
+const REVERSAL_LIST = [
+  'sugammadex_2',
+  'sugammadex_4',
+  'neostigmine'
+];
+
 const ANTIBIOTIC_LIST = [
   'amoxicillin',
   'cefuroxime',
@@ -695,6 +701,37 @@ morphinepo: {
     }
    ]
 },
+  /// REVERSAL
+sugammadex_2: {
+  weight: 'TBW',
+  dose: [2, 2],
+  unit: 'mg',
+  conc: 100,
+  outputId: 'sug-2',
+  extraId: 'sug-2-extra',
+  labelId: 'sug-2-dose-text'
+},
+
+sugammadex_4: {
+  weight: 'TBW',
+  dose: [4, 4],
+  unit: 'mg',
+  conc: 100,
+  outputId: 'sug-4',
+  extraId: 'sug-4-extra',
+  labelId: 'sug-4-dose-text'
+},
+neostigmine: {
+  weight: 'TBW',
+  dose: [0.05, 0.05],
+  unit: 'mg',
+  conc: 2.5,
+  cap: 5,
+
+  outputId: 'neostigmine',
+  extraId: 'neostigmine-extra',
+  labelId: 'neos-dose-text'
+},
   /// ANTIBIOTICS
 amoxicillin: {
   weight: 'TBW',
@@ -1097,19 +1134,14 @@ function updateEstimateLock() {
   heightIn.disabled = autoEstimate;
 }
 
-function clearWeight() {
-  clearGroup([
-    'fentanyl-vol-extra','ketamine-vol-extra','rocuronium-vol-extra',
-    'atropine-vol-extra','adrenalineiv-vol-extra','sux-iv-vol-extra','sux-im-vol-extra',
-    'fentanyl-ga-extra','propofol-ga-extra','rocuronium-ga-extra','atracurium-ga-extra',
-    'ondansetron-ga-extra','dexamethasone-ga-extra',
-    'ketorolac-extra','ketorolac-note','morphine-iv-extra','morphine-po-extra','morphine-po-inline',
-    'paracetamol-iv-note','paracetamol-po-note',
-    'cyclizine-ga-extra',
-    'blood-volume-range'
-  ]);
+function getAgeYears() {
+  const raw = parseFloat(ageInput.value) || 0;
+  return ageUnit === 'months' ? raw / 12 : raw;
+}
 
-  // =========================
+function clearWeight() {
+  Object.keys(DRUGS).forEach(clearDrug);
+   // =========================
   // Calculations display
   // =========================
   calcDiv.innerHTML = '';
@@ -1122,50 +1154,14 @@ function clearWeight() {
   clearText('laryngoscope');
   document.getElementById('laryngoscope').style.display = 'none';
 
-  // =========================
-  // Emergency drugs
-  // =========================
-  hideGroup([
-    'fentanyl','ketamine','rocuronium',
-    'atropine','sux-iv','sux-im',
-    'defib','adrenalineiv','fluidbolus','glucose10'
-  ]);
-
-  // =========================
-  // GA drugs
-  // =========================
-  hideGroup([
-    'propofol','fentanyl-ga','rocuronium-ga','atracurium-ga',
-    'dexamethasone','ondansetron',
-    'paracetamol-iv','paracetamol-po',
-    'ibuprofeniv','ibuprofenpo',
-    'ketorolac','morphineiv','morphinepo','diclofenaciv'
-  ]);
-
-  // =========================
+   // =========================
   // Premed
   // =========================
   hideGroup([
     'premed-midaz','premed-midaz-intranasal','premed-dexmed'
   ]);
 
-  // =========================
-  // Reversal
-  // =========================
-  document.querySelectorAll(
-    '.sug-2-dose, .sug-4-dose, .neos-dose'
-  ).forEach(el => {
-    el.textContent = '';
-    el.style.display = 'none';
-    const unit = el.nextElementSibling;
-    if (unit && unit.classList.contains('unit')) {
-      unit.style.display = 'none';
-    }
-  });
-
-  clearGroup(['.sug-2-extra', '.sug-4-extra', '.neos-extra']);
-
-  // =========================
+   // =========================
   // Airway adjuncts
   // =========================
   hideEl('igel');
@@ -1182,17 +1178,6 @@ function clearWeight() {
 
   document.querySelectorAll('.normal-values .static')
     .forEach(el => el.style.display = 'none');
-
-  // =========================
-  // Blood volume
-  // =========================
-  hideEl('blood-volume');
-
-  // =========================
-  // Misc
-  // =========================
-  hideEl('cyclizine');
-
 }
 
 function updatePremedication(w) {
@@ -1262,66 +1247,6 @@ if (w > 0) {
   }
 }  
   
-function updateReversal(w) {
-  // -- 1) clear all previous doses + extras --
-  [
-    '.sug-2-dose', '.sug-4-dose', '.neos-dose',
-    '.sug-2-extra', '.sug-4-extra', '.neos-extra'
-  ].forEach(sel => {
-    document.querySelectorAll(sel).forEach(el => {
-      el.textContent = '';
-      // hide dose spans (they share the same unit <span>)
-      if (sel.endsWith('-dose')) el.style.display = 'none';
-    });
-  });
-
-  if (w > 0 && !isNaN(w)) {
-    // -- 2) Sugammadex 2 mg/kg @100 mg/mL --
-    document.querySelectorAll('.sug-2-dose').forEach(el => {
-      const dose = 2 * w;
-      el.textContent   = stripZeros(dose.toFixed(2));
-      el.style.display = 'inline';
-      // show its unit
-      const u = el.nextElementSibling;
-      if (u && u.classList.contains('unit')) u.style.display = 'inline';
-    });
-    document.querySelectorAll('.sug-2-extra').forEach(el => {
-      const vol = (2 * w) / 100;
-      el.textContent = `${stripZeros(vol.toFixed(2))} mL of 100 mg/mL`;
-    });
-
-    // -- 3) Sugammadex 4 mg/kg @100 mg/mL --
-    document.querySelectorAll('.sug-4-dose').forEach(el => {
-      const dose = 4 * w;
-      el.textContent   = stripZeros(dose.toFixed(2));
-      el.style.display = 'inline';
-      const u = el.nextElementSibling;
-      if (u && u.classList.contains('unit')) u.style.display = 'inline';
-    });
-    document.querySelectorAll('.sug-4-extra').forEach(el => {
-      const vol = (4 * w) / 100;
-      el.textContent = `${stripZeros(vol.toFixed(2))} mL of 100 mg/mL`;
-    });
-
-    // -- 4) Neostigmine/Glycopyrulate 0.02 mL/kg (2.5 + 0.5 mg/mL) --
-    document.querySelectorAll('.neos-dose').forEach(el => {
-      const vol = 0.02 * w;
-      el.textContent   = stripZeros(vol.toFixed(2));
-      el.style.display = 'inline';
-      const u = el.nextElementSibling;
-      if (u && u.classList.contains('unit')) u.style.display = 'inline';
-    });
-    document.querySelectorAll('.neos-extra').forEach(el => {
-      const vol   = 0.02 * w;
-      const neo   = vol * 2.5;
-      const gly   = vol * 0.5;
-      el.textContent =
-         `${stripZeros(neo.toFixed(2))} mg neostigmine + ` +
-         `${stripZeros(gly.toFixed(2))} mg glycopyrulate`;
-    });
-  }
-}
-
   function toggleAgeUnit() {
   // 2) flip the button and convert the value
   const raw = ageInput.value.trim();
@@ -1693,67 +1618,28 @@ if (depth) {
   } else {
     laryEl.style.display = 'none';
   }
-
-  // ==========================
-  // DRUG TABLE UPDATES
-  // ==========================
-  renderDrug('blood_volume', w);
-  updateSedation(w);
-  updateGADrugs(w);
-  updatePremedication(w);
-  updateReversal(w);
-  updateAntibiotics(w);
 }
   
 function updateEmergencyDrugs(w) {
-  if (w > 0 && !isNaN(w)) {
-  EMERGENCY_DRUG_LIST.forEach(d => renderDrug(d, w));
-}
+EMERGENCY_DRUG_LIST.forEach(d => renderDrug(d, w));
+renderDrug('blood_volume', w);
 }
   
 function updateSedation(w) {
-  if (w > 0 && !isNaN(w)) {
-    renderDrug('midazolam_bag', w);
-    renderDrug('morphine_bag', w);
-    renderDrug('propofol_infusion', w);
-  }
+  ['midazolam_bag', 'morphine_bag', 'propofol_infusion']
+    .forEach(d => renderDrug(d, w));
 }
   
-    function updateGADrugs(w) {
-  // 1) first, clear out any old “extra” notes
-  [
-    'fentanyl-ga-extra',
-    'propofol-ga-extra',
-    'rocuronium-ga-extra',
-    'ondansetron-ga-extra',
-    'dexamethasone-ga-extra'
-  ].forEach(extraId => {
-    const el = document.getElementById(extraId);
-    if (el) el.textContent = '';
-  });
-      
-if (w > 0 && !isNaN(w)) {
+ function updateGADrugs(w) {
   GA_DRUG_LIST.forEach(d => renderDrug(d, w));
 }
 
-  const rawAge = parseFloat(ageInput.value) || 0;
-  const ageY = ageUnit === 'months' ? rawAge/12 : rawAge;      
-  const cylMaxEl = document.getElementById('cyclizine-max');
-      
-if (cylMaxEl) {
-  if (w > 0 && !isNaN(w)) {
-    cylMaxEl.textContent = ageY < 12 ? 'Max 25 mg' : 'Max 50 mg';
-  } else {
-    cylMaxEl.textContent = '';
-  }
-} 
+function updateReversal(w) {
+  REVERSAL_LIST.forEach(d => renderDrug(d, w));
 }
 
 function updateAntibiotics(w) {
-  
-if (w > 0 && !isNaN(w)) {
   ANTIBIOTIC_LIST.forEach(d => renderDrug(d, w));
-}  
 }  
   
   // event wiring
@@ -2150,6 +2036,11 @@ function renderDrug(drugKey, tbw) {
   const config = DRUGS[drugKey];
   if (!config) return;
 
+  if (!tbw || isNaN(tbw)) {
+    clearDrug(drugKey);
+    return;
+  }
+  
   const { weight, label } = getDrugWeight(drugKey, tbw);
   const type = config.type || 'bolus';
 
@@ -2165,9 +2056,6 @@ function renderDrug(drugKey, tbw) {
     case 'bolus':
       return renderBolusDrug(config, weight, label, drugKey);
 
-    case 'paracetamol':
-  return renderParacetamol(config, weight, drugKey);  
-      
     case 'blood_volume':
   return renderBloodVolume(config, weight, label, drugKey);  
       
@@ -2255,7 +2143,7 @@ if (dMin === 0 && dMax === 0) {
     }
   });
 
-  // --- VOLUME ---
+   // --- VOLUME ---
   if (config.conc && extraIds.length) {
     const vMin = dMin / config.conc;
     const vMax = dMax / config.conc;
@@ -2274,7 +2162,7 @@ if (dMin === 0 && dMax === 0) {
       el.innerHTML = `${volText} mL of ${concText}`;
     });
   }
-
+  
   // --- LABEL ---
   if (config.labelId) {
     let finalLabel = '';
@@ -2460,6 +2348,65 @@ function renderBloodVolume(config, weight, label, drugKey) {
   }
 }
 
+function clearDrug(drugKey) {
+  const config = DRUGS[drugKey];
+  if (!config) return;
+
+  // --- main outputs ---
+  toArray(config.outputId).forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    el.textContent = '';
+    el.style.display = 'none';
+
+    const unit = el.nextElementSibling;
+    if (unit && unit.classList.contains('unit')) {
+      unit.style.display = 'none';
+    }
+  });
+
+  // --- extra (e.g. volumes, bags) ---
+  toArray(config.extraId).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = '';
+  });
+
+  // --- split outputs (infusions) ---
+  if (config.outputId?.mg) {
+    const el = document.getElementById(config.outputId.mg);
+    if (el) el.textContent = '';
+  }
+
+  if (config.outputId?.ml) {
+    const el = document.getElementById(config.outputId.ml);
+    if (el) el.textContent = '';
+  }
+
+  // --- labels ---
+  if (config.labelId) {
+    setDoseLabel(drugKey, '');
+  }
+
+  // --- notes ---
+  if (config.noteId) {
+    toArray(config.noteId).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = '';
+    });
+  }
+
+  // --- caps (e.g. "Max 400 mg") ---
+  const capEl = document.getElementById(`${drugKey}-max`);
+  if (capEl) capEl.textContent = '';
+
+  // --- range column (blood volume etc) ---
+  if (config.rangeId) {
+    const el = document.getElementById(config.rangeId);
+    if (el) el.textContent = '';
+  }
+}
+
 function enableSelectAllOnFocus(input) {
   input.addEventListener('focus', () => {
     // slight delay improves reliability on iOS
@@ -2497,8 +2444,15 @@ function updateAll() {
   }
   calculateBMI();
  const w = parseFloat(weightIn.value);
-updateAirwayCalculations(y, w);
-
+  
+  updateAirwayCalculations(y, w);
+  updateEmergencyDrugs(w); 
+  updateSedation(w);
+  updateGADrugs(w);
+  updatePremedication(w);
+  updateReversal(w);
+  updateAntibiotics(w);
+  
   const normals = getNormalValues(a, ageUnit);
   if (normals) updateNormalCentiles(normals);
 
