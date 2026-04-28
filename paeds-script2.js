@@ -1,9 +1,34 @@
+// =========================
+// STATE
+// =========================
 window.weightContext = {
   ibw: null,
   adjbw: null,
   isObese: false
 };
 
+  
+let ageUnit = 'years';
+let autoEstimate = true;
+
+// =========================
+// DOM CACHE
+// =========================
+const ageInput = document.getElementById('age');
+const weightIn = document.getElementById('weight');
+const heightIn = document.getElementById('height');
+const unitBtn  = document.getElementById('AgeUnitBtn');
+const estToggle = document.getElementById('EstimateToggle');
+const calcDiv  = document.getElementById('weight-calculations');
+const hCalc = document.getElementById('height-calculations');
+const bmiOutput = document.getElementById("bmi-value");
+const ibwOutput = document.getElementById("ibw-value");
+const adjbwOutput = document.getElementById("adjbw-value");
+const genderContainer = document.getElementById("GenderBtn");
+
+// =========================
+// CONFIG (DRUGS, LISTS)
+// =========================
 const EMERGENCY_DRUG_LIST = [
   'fentanyl',
   'ketamine',
@@ -886,6 +911,668 @@ dexmed_nas: {
 },
 };
 
+// paediatric normals table
+  const paediatricNormals = {
+    0:   { respRate:[25,50], heartRate:[120,170], bp:{p5:65, p50:[80,90], p95:105} },
+    1:   { respRate:[25,50], heartRate:[120,170], bp:{p5:65, p50:[80,90], p95:105} },
+    3:   { respRate:[25,45], heartRate:[115,160], bp:{p5:65, p50:[80,90], p95:105} },
+    6:   { respRate:[20,40], heartRate:[110,160], bp:{p5:65, p50:[80,90], p95:105} },
+    12:  { respRate:[20,40], heartRate:[110,160], bp:{p5:70, p50:[85,95], p95:105} },
+    18:  { respRate:[20,35], heartRate:[100,155], bp:{p5:70, p50:[85,95], p95:105} },
+    24:  { respRate:[20,30], heartRate:[100,150], bp:{p5:70, p50:[85,100], p95:110} },
+    36:  { respRate:[20,30], heartRate:[90,140],  bp:{p5:70, p50:[85,100], p95:110} },
+    48:  { respRate:[20,30], heartRate:[80,135],  bp:{p5:70, p50:[85,100], p95:110} },
+    60:  { respRate:[20,30], heartRate:[80,135],  bp:{p5:80, p50:[90,110], p95:120} },
+    72:  { respRate:[20,30], heartRate:[80,130],  bp:{p5:80, p50:[90,110], p95:120} },
+    84:  { respRate:[20,30], heartRate:[80,130],  bp:{p5:80, p50:[90,110], p95:120} },
+    96:  { respRate:[15,25], heartRate:[70,120],  bp:{p5:80, p50:[90,110], p95:120} },
+    108: { respRate:[15,25], heartRate:[70,120],  bp:{p5:80, p50:[90,110], p95:120} },
+    120: { respRate:[15,25], heartRate:[70,120],  bp:{p5:80, p50:[90,110], p95:120} },
+    132: { respRate:[15,25], heartRate:[70,120],  bp:{p5:80, p50:[90,110], p95:120} },
+    144: { respRate:[12,24], heartRate:[65,115],  bp:{p5:90, p50:[100,120],p95:140} },
+    168: { respRate:[12,24], heartRate:[60,110],  bp:{p5:90, p50:[100,120],p95:140} }
+  };
+// =========================
+// CORE CALCULATION
+// =========================
+function stripZeros(str) {
+    return str
+      .replace(/(\.\d*?[1-9])0+$/ , '$1')   // drop extra zeroes after a significant decimal
+      .replace(/\.0+$/            , ''   );// drop ".0", ".00", etc.
+  }
+
+function toArray(val) {
+  if (!val) return [];
+  return Array.isArray(val) ? val : [val];
+}
+
+function getAgeYears() {
+  const raw = parseFloat(ageInput.value) || 0;
+  return ageUnit === 'months' ? raw / 12 : raw;
+}
+
+function getDrugWeight(drugKey, tbw) {
+  const config = DRUGS[drugKey];
+  const { ibw, adjbw, isObese } = window.weightContext;
+
+  if (!ibw || !adjbw) {
+    return {
+      weight: tbw,
+      label: null
+    };
+  }
+  
+  switch (config.weight) {
+case 'IBW':
+  const useIBW = isObese && ibw;
+  return {
+    weight: useIBW ? ibw : tbw,
+    label: useIBW ? 'IBW' : (isObese ? 'TBW' : null)
+  };
+
+case 'AdjBW':
+  const useAdjBW = isObese && adjbw;
+  return {
+    weight: useAdjBW ? adjbw : tbw,
+    label: useAdjBW ? 'AdjBW' : (isObese ? 'TBW' : null)
+  };
+
+case 'TBW':
+default:
+  return {
+    weight: tbw,
+    label: isObese ? 'TBW' : null
+  };
+  }
+}
+
+function getWeightEstimateFromLMS(ageYears) {
+
+  const lms = getWeightLMS(ageYears);
+  if (!lms) return null;
+
+  return lms.M;
+}
+
+function getWeightLMS(ageYears) {
+
+  const genderKey = getGenderKey();
+
+  if (!paedsWeightData || !paedsWeightData[genderKey]) return null;
+
+  const dataset = paedsWeightData[genderKey];
+
+  return interpolateLMS(dataset, ageYears); // ✅ smooth interpolation
+}
+
+function interpolateLMS(data, age) {
+  if (!data || data.length === 0) return null;
+
+  if (age <= data[0].age) return data[0];
+  if (age >= data[data.length - 1].age) return data[data.length - 1];
+
+  for (let i = 0; i < data.length - 1; i++) {
+    const a = data[i];
+    const b = data[i + 1];
+
+    if (age >= a.age && age <= b.age) {
+      const t = (age - a.age) / (b.age - a.age);
+
+      return {
+        L: a.L + t * (b.L - a.L),
+        M: a.M + t * (b.M - a.M),
+        S: a.S + t * (b.S - a.S)
+      };
+    }
+  }
+
+  return null;
+}
+
+function lmsZ(bmi, L, M, S) {
+  if (L === 0) return Math.log(bmi / M) / S;
+  return (Math.pow(bmi / M, L) - 1) / (L * S);
+}
+
+function zToCentile(z) {
+  return 0.5 * (1 + erf(z / Math.sqrt(2))) * 100;
+}
+
+function erf(x) {
+  const sign = x >= 0 ? 1 : -1;
+  x = Math.abs(x);
+
+  const a1 = 0.254829592,
+        a2 = -0.284496736,
+        a3 = 1.421413741,
+        a4 = -1.453152027,
+        a5 = 1.061405429,
+        p  = 0.3275911;
+
+  const t = 1 / (1 + p * x);
+  const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+
+  return sign * y;
+}
+
+function getWeightCentile(weight, ageYears) {
+
+  const lms = getWeightLMS(ageYears);
+  if (!lms) return null;
+
+  const z = lmsZ(weight, lms.L, lms.M, lms.S);
+  const centile = zToCentile(z);
+
+  return centile;
+}
+
+function formatCentile(c) {
+  if (c < 0.4) return "<0.4th";
+  if (c > 99.6) return ">99.6th";
+
+  const rounded = Math.round(c);
+
+  const suffix =
+    rounded % 10 === 1 && rounded % 100 !== 11 ? "st" :
+    rounded % 10 === 2 && rounded % 100 !== 12 ? "nd" :
+    rounded % 10 === 3 && rounded % 100 !== 13 ? "rd" :
+    "th";
+
+  return `${rounded}${suffix}`;
+}
+
+function getHeightLMS(ageYears) {
+  const genderKey = getGenderKey();
+
+  if (!paedsHeightData || !paedsHeightData[genderKey]) return null;
+
+  const dataset = paedsHeightData[genderKey];
+
+  return interpolateLMS(dataset, ageYears);
+}
+
+function getHeightCentile(height, ageYears) {
+
+  const lms = getHeightLMS(ageYears);
+  if (!lms) return null;
+
+  const z = lmsZ(height, lms.L, lms.M, lms.S);
+  return zToCentile(z);
+}
+
+function getBMILMS(ageYears, gender) {
+
+  if (ageYears < (1/12)) return null;
+
+  const dataset =
+    gender === "female"
+      ? paedsBMIData.girls
+      : paedsBMIData.boys;
+
+  return interpolateLMS(dataset, ageYears);
+}
+
+function getBMICentile(bmi, ageYears, gender) {
+
+  const lms = getBMILMS(ageYears, gender);
+  if (!lms) return null;
+
+  const z = lmsZ(bmi, lms.L, lms.M, lms.S);
+  const centile = zToCentile(z);
+
+  return {
+    centile,
+    category: classifyBMI(centile),
+    z
+  };
+}
+
+function classifyBMI(centile) {
+
+  if (centile < 0.4) return "Severely underweight";
+  if (centile < 2) return "Underweight";
+  if (centile < 91) return "Healthy weight";
+  if (centile < 98) return "Overweight";
+  if (centile < 99.6) return "Obese";
+
+  return "Severely obese";
+}
+
+ function getNormalValues(age, unit) {
+    const months = unit==='months'? age : age*12;
+    const keys = Object.keys(paediatricNormals).map(k=>+k).sort((a,b)=>a-b);
+    if (months < 12) {
+      const mks = keys.filter(k=>k<12);
+      return paediatricNormals[mks.reduce((a,b)=>Math.abs(b-months)<Math.abs(a-months)?b:a, mks[0])];
+    } else {
+      const ideal = Math.floor(months/12)*12;
+      const below = keys.filter(k=>k<=ideal);
+      const key   = below.length? below.pop() : keys.find(k=>k>=12);
+      return paediatricNormals[key];
+    }
+  }
+
+// =========================
+// RENDER ENGINE
+// =========================
+function updateEmergencyDrugs(w) {
+EMERGENCY_DRUG_LIST.forEach(d => renderDrug(d, w));
+renderDrug('blood_volume', w);
+}
+  
+function updateSedation(w) {
+  ['midazolam_bag', 'morphine_bag', 'propofol_infusion']
+    .forEach(d => renderDrug(d, w));
+}
+  
+ function updateGADrugs(w) {
+  GA_DRUG_LIST.forEach(d => renderDrug(d, w));
+}
+
+function updateReversal(w) {
+  REVERSAL_LIST.forEach(d => renderDrug(d, w));
+}
+
+function updatePremed(w) {
+  PREMED_LIST.forEach(d => renderDrug(d, w));
+}
+
+function updateAntibiotics(w) {
+  ANTIBIOTIC_LIST.forEach(d => renderDrug(d, w));
+}  
+
+function renderDrug(drugKey, tbw) {
+  const config = DRUGS[drugKey];
+  if (!config) return;
+
+  if (!tbw || isNaN(tbw)) {
+    clearDrug(drugKey);
+    return;
+  }
+  
+  const { weight, label } = getDrugWeight(drugKey, tbw);
+  const type = config.type || 'bolus';
+
+   renderDrugNotes(config, weight, drugKey);
+  
+  switch (type) {
+    case 'infusion_bag':
+      return renderInfusionBag(config, weight, label, drugKey);
+
+    case 'infusion_range_split':
+      return renderInfusionRangeSplit(config, weight, label, drugKey);
+
+    case 'bolus':
+      return renderBolusDrug(config, weight, label, drugKey);
+
+    case 'blood_volume':
+  return renderBloodVolume(config, weight, label, drugKey);  
+      
+    default:
+      console.warn(`Unknown drug type: ${type}`, drugKey);
+      return;
+  }
+}
+
+function renderBolusDrug(config, weight, label, drugKey) {
+  if (!config.dose && !config.getDose) return;
+
+  let dMin, dMax, perKgLabel;
+
+  // --- GET DOSE ---
+  if (config.getDose) {
+    const rawAge = parseFloat(ageInput.value) || 0;
+    const ageY = ageUnit === 'months' ? rawAge / 12 : rawAge;
+
+    const result = config.getDose(weight, ageY);
+
+    if (!result || result.hideDose) {
+      hideGroup(toArray(config.outputId));
+      clearGroup(toArray(config.extraId));
+      setDoseLabel(drugKey, '');
+      return;
+    }
+
+    dMin = result.min;
+    dMax = result.max;
+    perKgLabel = result.perKg;
+
+  } else {
+    const [minDose, maxDose] = config.dose;
+    dMin = minDose * weight;
+    dMax = maxDose * weight;
+  }
+
+  // --- CAP ---
+  if (config.cap) {
+    dMin = Math.min(dMin, config.cap);
+    dMax = Math.min(dMax, config.cap);
+  }
+
+  const outputIds = toArray(config.outputId);
+  const extraIds  = toArray(config.extraId);
+
+if (dMin === 0 && dMax === 0) {
+  hideGroup(outputIds);
+  clearGroup(extraIds);
+
+  if (config.labelId) {
+    let labelText = `${perKgLabel || '0.5–1'} ${config.unit}/kg`;
+    setDoseLabel(drugKey, labelText);
+  }
+
+  if (config.capLabel) {
+    const rawAge = parseFloat(ageInput.value) || 0;
+    const ageY = ageUnit === 'months' ? rawAge / 12 : rawAge;
+
+    const capEl = document.getElementById(`${drugKey}-max`);
+    if (capEl) capEl.textContent = config.capLabel(ageY);
+  }
+
+  return;
+}
+  
+  const sameDose = Math.abs(dMin - dMax) < 0.0001;
+
+  const doseText = sameDose
+    ? stripZeros(dMin.toFixed(1))
+    : `${stripZeros(dMin.toFixed(1))}–${stripZeros(dMax.toFixed(1))}`;
+
+  // --- OUTPUT ---
+  outputIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    el.textContent = doseText;
+    el.style.display = 'inline';
+
+    const unit = el.nextElementSibling;
+    if (unit && unit.classList.contains('unit')) {
+      unit.style.display = 'inline';
+    }
+  });
+
+   // --- VOLUME ---
+  if (config.conc && extraIds.length) {
+    const vMin = dMin / config.conc;
+    const vMax = dMax / config.conc;
+
+    const sameVol = Math.abs(vMin - vMax) < 0.0001;
+
+    const volText = sameVol
+      ? stripZeros(vMin.toFixed(2))
+      : `${stripZeros(vMin.toFixed(2))}–${stripZeros(vMax.toFixed(2))}`;
+
+    extraIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+
+      const concText = config.concLabel || `${config.conc} ${config.unit}/mL`;
+      el.innerHTML = `${volText} mL of ${concText}`;
+    });
+  }
+  
+  // --- LABEL ---
+  if (config.labelId) {
+    let finalLabel = '';
+
+   if (perKgLabel) {
+  finalLabel = `${perKgLabel} ${config.unit}/kg`;
+} else if (config.dose) {
+      const [minDose, maxDose] = config.dose;
+      finalLabel = (minDose === maxDose)
+        ? `${minDose} ${config.unit}/kg`
+        : `${minDose}–${maxDose} ${config.unit}/kg`;
+    }
+
+    if (label) {
+      finalLabel += `<br><small class="drug-weight-label">${label}</small>`;
+    }
+
+    setDoseLabel(drugKey, finalLabel);
+  }
+
+  // --- CAP LABEL (e.g. cyclizine) ---
+  if (config.capLabel) {
+    const rawAge = parseFloat(ageInput.value) || 0;
+    const ageY = ageUnit === 'months' ? rawAge / 12 : rawAge;
+
+    const capEl = document.getElementById(`${drugKey}-max`);
+    if (capEl) {
+      capEl.textContent = config.capLabel(ageY, weight) || '';
+    }
+  }
+}
+
+function renderInfusionBag(config, weight, label, drugKey) {
+  const mgPerHr = config.dosePerKgHr * weight;
+
+  const conc = mgPerHr / config.targetRate; // mg/mL
+  const bagMg = conc * config.bagVolume;
+
+  const labelText = label
+  ? ` <small class="drug-weight-label">(${label})</small>`
+  : '';
+
+const text =
+  `${stripZeros(bagMg.toFixed(2))} mg in ${config.bagVolume} mL ${config.diluent}${labelText}`;
+
+  toArray(config.extraId).forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    el.innerHTML = text;
+    el.style.display = 'inline';
+  });
+
+  if (config.dosePerKgHr) {
+    const labelText = `${config.dosePerKgHr} mg/kg/hr`;
+
+    setDoseLabel(
+      drugKey,
+      label
+        ? `${labelText} <small class="drug-weight-label">(${label})</small>`
+        : labelText
+    );
+  }
+}
+function renderInfusionRangeSplit(config, weight, label, drugKey) {
+  if (!config.dose) return;
+
+  const [minDose, maxDose] = config.dose;
+
+  let rateMin = minDose * weight;
+  let rateMax = maxDose * weight;
+
+  // per min → per hour
+  if (config.per === 'min') {
+    rateMin *= 60;
+    rateMax *= 60;
+  }
+
+  const mgMin = rateMin;
+  const mgMax = rateMax;
+
+  const mlMin = config.conc ? mgMin / config.conc : null;
+  const mlMax = config.conc ? mgMax / config.conc : null;
+
+  // 🔹 MG/HR OUTPUT (with label here)
+  const mgText = (mgMin === mgMax)
+    ? `${stripZeros(mgMin.toFixed(2))}`
+    : `${stripZeros(mgMin.toFixed(2))}–${stripZeros(mgMax.toFixed(2))}`;
+
+  const mgEl = document.getElementById(config.outputId.mg);
+  if (mgEl) {
+    mgEl.innerHTML = label
+  ? `${mgText} mg/hr <small class="drug-weight-label">(${label})</small>`
+  : `${mgText} mg/hr`;
+  }
+
+  // 🔹 ML/HR OUTPUT (separate line/location)
+  if (mlMin !== null) {
+    const mlText = (mlMin === mlMax)
+      ? `${stripZeros(mlMin.toFixed(2))}`
+      : `${stripZeros(mlMin.toFixed(2))}–${stripZeros(mlMax.toFixed(2))}`;
+
+    const mlEl = document.getElementById(config.outputId.ml);
+    if (mlEl) {
+      mlEl.textContent = `${mlText} mL/hr`;
+    }
+  }
+}
+
+function renderBloodVolume(config, weight, label, drugKey) {
+
+  const rawAge = parseFloat(ageInput.value) || 0;
+  const ageY = ageUnit === 'months' ? rawAge / 12 : rawAge;
+
+  const result = config.getValues(weight, ageY);
+
+  const el = document.getElementById(config.outputId);
+  const unit = el?.nextElementSibling;
+  const rangeEl = document.getElementById(config.rangeId);
+
+  if (!result) {
+    if (el) {
+      el.textContent = '';
+      el.style.display = 'none';
+    }
+    if (unit) unit.style.display = 'none';
+    if (rangeEl) rangeEl.textContent = '';
+    return;
+  }
+
+  const { min, max, perKgMin, perKgMax } = result;
+
+  // --- RANGE TEXT (middle column) ---
+  let rangeText =
+    perKgMin === perKgMax
+      ? `${perKgMin} mL/kg`
+      : `${perKgMin}–${perKgMax} mL/kg`;
+
+  if (label) {
+    rangeText += `<br><small class="drug-weight-label">${label}</small>`;
+  }
+
+  if (rangeEl) rangeEl.innerHTML = rangeText;
+
+  // --- VALUE (right column) ---
+  const same = Math.abs(min - max) < 0.001;
+
+  const text = same
+    ? stripZeros(min.toFixed(0))
+    : `${stripZeros(min.toFixed(0))}–${stripZeros(max.toFixed(0))}`;
+
+  if (el) {
+    el.textContent = text;
+    el.style.display = 'inline';
+  }
+
+  if (unit && unit.classList.contains('unit')) {
+    unit.style.display = 'inline';
+  }
+}
+
+function renderDrugNotes(config, weight, drugKey) {
+  if (!config.notes || !config.noteId) return;
+
+  const rawAge = parseFloat(ageInput.value) || 0;
+  const ageMonths = ageUnit === 'months' ? rawAge : rawAge * 12;
+
+  const note = config.notes.find(n =>
+    n.condition({ ageMonths, weight })
+  );
+
+  toArray(config.noteId).forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    if (note) {
+      el.textContent = note.text;
+      el.style.display = 'inline';
+    } else {
+      el.textContent = '';
+      el.style.display = 'none';
+    }
+  });
+}
+
+function clearDrug(drugKey) {
+  const config = DRUGS[drugKey];
+  if (!config) return;
+
+  // --- main outputs ---
+  toArray(config.outputId).forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    el.textContent = '';
+    el.style.display = 'none';
+
+    const unit = el.nextElementSibling;
+    if (unit && unit.classList.contains('unit')) {
+      unit.style.display = 'none';
+    }
+  });
+
+  // --- extra (e.g. volumes, bags) ---
+  toArray(config.extraId).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = '';
+  });
+
+  // --- split outputs (infusions) ---
+  if (config.outputId?.mg) {
+    const el = document.getElementById(config.outputId.mg);
+    if (el) el.textContent = '';
+  }
+
+  if (config.outputId?.ml) {
+    const el = document.getElementById(config.outputId.ml);
+    if (el) el.textContent = '';
+  }
+
+  // --- labels ---
+  if (config.labelId) {
+    setDoseLabel(drugKey, '');
+  }
+
+  // --- notes ---
+  if (config.noteId) {
+    toArray(config.noteId).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = '';
+    });
+  }
+
+  // --- caps (e.g. "Max 400 mg") ---
+  const capEl = document.getElementById(`${drugKey}-max`);
+  if (capEl) capEl.textContent = '';
+
+  // --- range column (blood volume etc) ---
+  if (config.rangeId) {
+    const el = document.getElementById(config.rangeId);
+    if (el) el.textContent = '';
+  }
+}
+
+function setDoseLabel(drugKey, text) {
+  const ids = DRUGS[drugKey].labelId;
+  if (!ids) return; // 🔥 add this
+
+  if (Array.isArray(ids)) {
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = text;
+    });
+  } else {
+    const el = document.getElementById(ids);
+    if (el) el.innerHTML = text;
+  }
+}
+// =========================
+// UI HELPERS
+// =========================
 function clearText(id) {
   const el = document.getElementById(id);
   if (el) el.textContent = '';
@@ -925,316 +1612,6 @@ function hideGroup(ids) {
   ids.forEach(id => hideEl(id));
 }
 
-// ===============================
-// Paediatric Weight Estimate (LMS)
-// Uses 50th centile (M)
-// ===============================
-function getGenderKey() {
-  const genderContainer = document.getElementById("GenderBtn");
-
-  const gender =
-    genderContainer.dataset.gender ||
-    genderContainer.querySelector("button.active")?.dataset.value ||
-    "male";
-
-  return gender === "female" ? "girls" : "boys";
-}
-
-// Get weight from LMS (nearest age)
-function getWeightEstimateFromLMS(ageYears) {
-
-  const lms = getWeightLMS(ageYears);
-  if (!lms) return null;
-
-  return lms.M;
-}
-
-// ===============================
-// Z → Centile
-// ===============================
-// Error function approximation
-function erf(x) {
-  const sign = x >= 0 ? 1 : -1;
-  x = Math.abs(x);
-
-  const a1 = 0.254829592,
-        a2 = -0.284496736,
-        a3 = 1.421413741,
-        a4 = -1.453152027,
-        a5 = 1.061405429,
-        p  = 0.3275911;
-
-  const t = 1 / (1 + p * x);
-  const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
-
-  return sign * y;
-}
-
-// ===============================
-// Get LMS for age
-// ===============================
-function getWeightLMS(ageYears) {
-
-  const genderKey = getGenderKey();
-
-  if (!paedsWeightData || !paedsWeightData[genderKey]) return null;
-
-  const dataset = paedsWeightData[genderKey];
-
-  return interpolateLMS(dataset, ageYears); // ✅ smooth interpolation
-}
-
-// ===============================
-// Get centile from weight
-// ===============================
-function getWeightCentile(weight, ageYears) {
-
-  const lms = getWeightLMS(ageYears);
-  if (!lms) return null;
-
-  const z = lmsZ(weight, lms.L, lms.M, lms.S);
-  const centile = zToCentile(z);
-
-  return centile;
-}
-
-// ===============================
-// Format centile nicely
-// ===============================
-function formatCentile(c) {
-  if (c < 0.4) return "<0.4th";
-  if (c > 99.6) return ">99.6th";
-
-  const rounded = Math.round(c);
-
-  const suffix =
-    rounded % 10 === 1 && rounded % 100 !== 11 ? "st" :
-    rounded % 10 === 2 && rounded % 100 !== 12 ? "nd" :
-    rounded % 10 === 3 && rounded % 100 !== 13 ? "rd" :
-    "th";
-
-  return `${rounded}${suffix}`;
-}
-
-function updateWeightCentileDisplay() {
-  const ageVal = parseFloat(ageInput.value);
-  const weightVal = parseFloat(weightIn.value);
-
-  if (!isNaN(ageVal) && !isNaN(weightVal)) {
-    const ageY = ageUnit === 'months' ? ageVal / 12 : ageVal;
-    const centile = getWeightCentile(weightVal, ageY);
-
-    if (centile !== null) {
-      calcDiv.innerHTML =
-  `<small class="centile-text">${formatCentile(centile)} centile</small>`;
-    }
-  }
-}
-
-function interpolateLMS(data, age) {
-  if (!data || data.length === 0) return null;
-
-  if (age <= data[0].age) return data[0];
-  if (age >= data[data.length - 1].age) return data[data.length - 1];
-
-  for (let i = 0; i < data.length - 1; i++) {
-    const a = data[i];
-    const b = data[i + 1];
-
-    if (age >= a.age && age <= b.age) {
-      const t = (age - a.age) / (b.age - a.age);
-
-      return {
-        L: a.L + t * (b.L - a.L),
-        M: a.M + t * (b.M - a.M),
-        S: a.S + t * (b.S - a.S)
-      };
-    }
-  }
-
-  return null;
-}
-
-function lmsZ(bmi, L, M, S) {
-  if (L === 0) return Math.log(bmi / M) / S;
-  return (Math.pow(bmi / M, L) - 1) / (L * S);
-}
-
-function zToCentile(z) {
-  return 0.5 * (1 + erf(z / Math.sqrt(2))) * 100;
-}
-
-function classifyBMI(centile) {
-
-  if (centile < 0.4) return "Severely underweight";
-  if (centile < 2) return "Underweight";
-  if (centile < 91) return "Healthy weight";
-  if (centile < 98) return "Overweight";
-  if (centile < 99.6) return "Obese";
-
-  return "Severely obese";
-}
-
-function getBMILMS(ageYears, gender) {
-
-  if (ageYears < (1/12)) return null;
-
-  const dataset =
-    gender === "female"
-      ? paedsBMIData.girls
-      : paedsBMIData.boys;
-
-  return interpolateLMS(dataset, ageYears);
-}
-
-function getHeightLMS(ageYears) {
-  const genderKey = getGenderKey();
-
-  if (!paedsHeightData || !paedsHeightData[genderKey]) return null;
-
-  const dataset = paedsHeightData[genderKey];
-
-  return interpolateLMS(dataset, ageYears);
-}
-
-function getHeightCentile(height, ageYears) {
-
-  const lms = getHeightLMS(ageYears);
-  if (!lms) return null;
-
-  const z = lmsZ(height, lms.L, lms.M, lms.S);
-  return zToCentile(z);
-}
-
-function estimateHeight() {
-  
-  const heightInput = document.getElementById("height");
-
-  const a = parseFloat(ageInput.value);
-
-  if (isNaN(a) || a < 0) return;
-
-  const ageY = (ageUnit === 'months') ? (a / 12) : a;
-
-  // Optional upper limit (match weight logic)
-  if (ageY > 20) return;
-
-  const lms = getHeightLMS(ageY);
-  if (!lms) return;
-
-  const estimatedHeight = lms.M;
-
-  heightInput.value = stripZeros(estimatedHeight.toFixed(1));
-
-  // Optional display (you can style this later)
-  const heightCentileDisplay = document.getElementById("height-calculations");
-  if (heightCentileDisplay) {
-  }
-  updateHeightCentileDisplay();
-}
-
-function updateHeightCentileDisplay() {
-  const heightInput = document.getElementById("height");
-  const heightVal = parseFloat(heightInput.value);
-  const ageVal = parseFloat(ageInput.value);
-
-  const el = document.getElementById("height-calculations");
-
-  if (!el || isNaN(heightVal) || isNaN(ageVal)) {
-    if (el) el.innerHTML = '';
-    return;
-  }
-
-  const ageY = ageUnit === 'months' ? ageVal / 12 : ageVal;
-  const centile = getHeightCentile(heightVal, ageY);
-
-  el.innerHTML = centile !== null
-    ? `<small class="centile-text">${formatCentile(centile)} centile</small>`
-    : '';
-}
-
-// MAIN FUNCTIONS //
-
-function stripZeros(str) {
-    return str
-      .replace(/(\.\d*?[1-9])0+$/ , '$1')   // drop extra zeroes after a significant decimal
-      .replace(/\.0+$/            , ''   );// drop ".0", ".00", etc.
-  }
-  
-  let ageUnit = 'years';
-  let autoEstimate = true;
-
-  // grab your nodes once
-  const ageInput = document.getElementById('age');
-  const weightIn = document.getElementById('weight');
-  const heightIn = document.getElementById('height');
-  const unitBtn  = document.getElementById('AgeUnitBtn');
-  const estToggle = document.getElementById('EstimateToggle');
-  const calcDiv  = document.getElementById('weight-calculations');
-  const hCalc = document.getElementById('height-calculations');
-  if (hCalc) hCalc.innerHTML = '';
-
-function updateEstimateLock() {
-  weightIn.disabled = autoEstimate;
-  heightIn.disabled = autoEstimate;
-}
-
-function getAgeYears() {
-  const raw = parseFloat(ageInput.value) || 0;
-  return ageUnit === 'months' ? raw / 12 : raw;
-}
-
-function clearWeight() {
-  Object.keys(DRUGS).forEach(clearDrug);
-   // =========================
-  // Calculations display
-  // =========================
-  calcDiv.innerHTML = '';
-  if (hCalc) hCalc.innerHTML = '';
-
-  // =========================
-  // Airway
-  // =========================
-  hideGroup(['ett-uncuffed','ett-cuffed','ett-depth-lips']);
-  clearText('laryngoscope');
-  document.getElementById('laryngoscope').style.display = 'none';
-
-   // =========================
-  // Airway adjuncts
-  // =========================
-  hideEl('igel');
-  hideEl('tidalvolume');
-  hideEl('tv-neonates-ards');
-
-  // =========================
-  // Normals
-  // =========================
-  clearGroup([
-    'sbp-5','sbp-50','sbp-95',
-    'hr-5','hr-95','rr-5','rr-95'
-  ]);
-
-  document.querySelectorAll('.normal-values .static')
-    .forEach(el => el.style.display = 'none');
-}
-  
-  function toggleAgeUnit() {
-  // 2) flip the button and convert the value
-  const raw = ageInput.value.trim();
-  const n   = parseFloat(raw);
-
-  if (ageUnit === 'years') {
-    ageUnit = 'months';
-    unitBtn.textContent = 'months';
-    ageInput.value = (raw !== '' && !isNaN(n)) ? Math.round(n * 12) : '';
-  } else {
-    ageUnit = 'years';
-    unitBtn.textContent = 'years';
-    ageInput.value = (raw !== '' && !isNaN(n)) ? Math.round((n / 12) * 10) / 10 : '';
-  }
-    updateAll();
-}
-
 function estimateWeight() {
   if (!autoEstimate) return;
   
@@ -1270,45 +1647,78 @@ function estimateWeight() {
 updateWeightCentileDisplay();  
 }
 
-  // paediatric normals table
-  const paediatricNormals = {
-    0:   { respRate:[25,50], heartRate:[120,170], bp:{p5:65, p50:[80,90], p95:105} },
-    1:   { respRate:[25,50], heartRate:[120,170], bp:{p5:65, p50:[80,90], p95:105} },
-    3:   { respRate:[25,45], heartRate:[115,160], bp:{p5:65, p50:[80,90], p95:105} },
-    6:   { respRate:[20,40], heartRate:[110,160], bp:{p5:65, p50:[80,90], p95:105} },
-    12:  { respRate:[20,40], heartRate:[110,160], bp:{p5:70, p50:[85,95], p95:105} },
-    18:  { respRate:[20,35], heartRate:[100,155], bp:{p5:70, p50:[85,95], p95:105} },
-    24:  { respRate:[20,30], heartRate:[100,150], bp:{p5:70, p50:[85,100], p95:110} },
-    36:  { respRate:[20,30], heartRate:[90,140],  bp:{p5:70, p50:[85,100], p95:110} },
-    48:  { respRate:[20,30], heartRate:[80,135],  bp:{p5:70, p50:[85,100], p95:110} },
-    60:  { respRate:[20,30], heartRate:[80,135],  bp:{p5:80, p50:[90,110], p95:120} },
-    72:  { respRate:[20,30], heartRate:[80,130],  bp:{p5:80, p50:[90,110], p95:120} },
-    84:  { respRate:[20,30], heartRate:[80,130],  bp:{p5:80, p50:[90,110], p95:120} },
-    96:  { respRate:[15,25], heartRate:[70,120],  bp:{p5:80, p50:[90,110], p95:120} },
-    108: { respRate:[15,25], heartRate:[70,120],  bp:{p5:80, p50:[90,110], p95:120} },
-    120: { respRate:[15,25], heartRate:[70,120],  bp:{p5:80, p50:[90,110], p95:120} },
-    132: { respRate:[15,25], heartRate:[70,120],  bp:{p5:80, p50:[90,110], p95:120} },
-    144: { respRate:[12,24], heartRate:[65,115],  bp:{p5:90, p50:[100,120],p95:140} },
-    168: { respRate:[12,24], heartRate:[60,110],  bp:{p5:90, p50:[100,120],p95:140} }
-  };
+function estimateHeight() {
 
-  // pick the nearest key
-  function getNormalValues(age, unit) {
-    const months = unit==='months'? age : age*12;
-    const keys = Object.keys(paediatricNormals).map(k=>+k).sort((a,b)=>a-b);
-    if (months < 12) {
-      const mks = keys.filter(k=>k<12);
-      return paediatricNormals[mks.reduce((a,b)=>Math.abs(b-months)<Math.abs(a-months)?b:a, mks[0])];
-    } else {
-      const ideal = Math.floor(months/12)*12;
-      const below = keys.filter(k=>k<=ideal);
-      const key   = below.length? below.pop() : keys.find(k=>k>=12);
-      return paediatricNormals[key];
+  const a = parseFloat(ageInput.value);
+
+  if (isNaN(a) || a < 0) return;
+
+  const ageY = (ageUnit === 'months') ? (a / 12) : a;
+
+  if (ageY > 20) return;
+
+  const lms = getHeightLMS(ageY);
+  if (!lms) return;
+
+  const estimatedHeight = lms.M;
+  
+  heightIn.value = stripZeros(estimatedHeight.toFixed(1));
+
+  updateHeightCentileDisplay();
+}
+
+  function toggleAgeUnit() {
+  // 2) flip the button and convert the value
+  const raw = ageInput.value.trim();
+  const n   = parseFloat(raw);
+
+  if (ageUnit === 'years') {
+    ageUnit = 'months';
+    unitBtn.textContent = 'months';
+    ageInput.value = (raw !== '' && !isNaN(n)) ? Math.round(n * 12) : '';
+  } else {
+    ageUnit = 'years';
+    unitBtn.textContent = 'years';
+    ageInput.value = (raw !== '' && !isNaN(n)) ? Math.round((n / 12) * 10) / 10 : '';
+  }
+    updateAll();
+}
+
+function updateWeightCentileDisplay() {
+  const ageVal = parseFloat(ageInput.value);
+  const weightVal = parseFloat(weightIn.value);
+
+  if (!isNaN(ageVal) && !isNaN(weightVal)) {
+    const ageY = ageUnit === 'months' ? ageVal / 12 : ageVal;
+    const centile = getWeightCentile(weightVal, ageY);
+
+    if (centile !== null) {
+      calcDiv.innerHTML =
+  `<small class="centile-text">${formatCentile(centile)} centile</small>`;
     }
   }
+}
 
-  // show centiles
-  function updateNormalCentiles(n) {
+function updateHeightCentileDisplay() {
+  const heightVal = parseFloat(heightIn.value);
+  const ageVal = parseFloat(ageInput.value);
+
+  const el = document.getElementById("height-calculations");
+
+  if (!el || isNaN(heightVal) || isNaN(ageVal)) {
+    if (el) el.innerHTML = '';
+    return;
+  }
+
+  const ageY = ageUnit === 'months' ? ageVal / 12 : ageVal;
+  const centile = getHeightCentile(heightVal, ageY);
+
+  el.innerHTML = centile !== null
+    ? `<small class="centile-text">${formatCentile(centile)} centile</small>`
+    : '';
+}
+
+ function updateNormalCentiles(n) {
     document.getElementById('sbp-5').textContent   = n.bp.p5;
     document.getElementById('sbp-50').textContent =
   Array.isArray(n.bp.p50) ? `${n.bp.p50[0]}–${n.bp.p50[1]}` : n.bp.p50;
@@ -1590,232 +2000,11 @@ if (depth) {
     laryEl.style.display = 'none';
   }
 }
-  
-function updateEmergencyDrugs(w) {
-EMERGENCY_DRUG_LIST.forEach(d => renderDrug(d, w));
-renderDrug('blood_volume', w);
-}
-  
-function updateSedation(w) {
-  ['midazolam_bag', 'morphine_bag', 'propofol_infusion']
-    .forEach(d => renderDrug(d, w));
-}
-  
- function updateGADrugs(w) {
-  GA_DRUG_LIST.forEach(d => renderDrug(d, w));
-}
-
-function updateReversal(w) {
-  REVERSAL_LIST.forEach(d => renderDrug(d, w));
-}
-
-function updatePremed(w) {
-  PREMED_LIST.forEach(d => renderDrug(d, w));
-}
-
-function updateAntibiotics(w) {
-  ANTIBIOTIC_LIST.forEach(d => renderDrug(d, w));
-}  
-  
-  // event wiring
-  unitBtn.addEventListener('click', toggleAgeUnit);
-  
-estToggle.addEventListener('change', () => {
-  autoEstimate = estToggle.checked;
-
-  updateEstimateLock();
-  
-  if (autoEstimate) {
-  clearWeight();
-  updateAll();
-}
-});
-
-ageInput.addEventListener('input', () => {
-  const val = parseFloat(ageInput.value);
-
-  if (!isNaN(val) && val >= 0 && !autoEstimate) {
-    autoEstimate = true;
-    estToggle.checked = true;
-    updateEstimateLock();
-  }
-
-  updateAll();
-});
-
-weightIn.addEventListener('input', () => {
-
-  if (autoEstimate) return;
-
-  const rawAge = ageInput.value.trim();
-  const rawW   = weightIn.value.trim();
-
-  if (rawW === '') return clearWeight();
-
-  const w = parseFloat(rawW);
-
-  if (isNaN(w)) return clearWeight();
-
-if (rawAge === '') {
-  return;
-}
-
-  updateAll();
-});
-
-heightIn.addEventListener('input', () => {
-
-  // If auto mode is on → do nothing
-  if (autoEstimate) return;
-
-  const rawH = heightIn.value.trim();
-
- if (rawH === '') {
-    window.weightContext.ibw = null;
-    window.weightContext.adjbw = null;
-    window.weightContext.isObese = false;
-
-    updateHeightCentileDisplay();
-    calculateBMI();
-    updateAll(); // 🔥 ensures drugs re-render correctly
-
-    return;
-  }
-
-  const h = parseFloat(rawH);
-
-  // Invalid → same behaviour
-  if (isNaN(h)) {
-    updateHeightCentileDisplay();
-    calculateBMI();
-    return;
-  }
-
-  updateAll();
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-  clearWeight();
-  estToggle.checked = true;
-  autoEstimate = true;
-  updateEstimateLock();
-});
-
-function closeAllAccordions() {
-  document.querySelectorAll('.accordion-header').forEach(header => {
-    const content = header.nextElementSibling;
-
-    header.classList.remove('active');
-
-    if (content) {
-      content.classList.remove('show');
-      content.style.maxHeight = null;
-    }
-  });
-}
-
-function resetForm() {
-  // Clear inputs only
-  ageInput.value = '';
-  weightIn.value = '';
-  heightIn.value = '';
-
-  // Reset UI controls
-  ageUnit = 'years';
-  unitBtn.textContent = 'years';
-
-  autoEstimate = true;
-  estToggle.checked = true;
-  updateEstimateLock();
-
-  // Reset gender (optional)
-  const genderContainer = document.getElementById("GenderBtn");
-  genderContainer.dataset.gender = "male";
-  genderContainer.querySelectorAll("button").forEach(b => b.classList.remove("active"));
-  const defaultGender = genderContainer.querySelector('[data-value="male"]');
-  if (defaultGender) defaultGender.classList.add("active");
-
-  // Let your existing logic clear everything properly
-  updateAll();
-  closeAllAccordions(); 
-}
-
-function goHome() {
-  window.location.href = '/'; // or 'index.html'
-}
-  
-  document.querySelectorAll('.accordion-header').forEach(header => {
-
-    header.addEventListener('click', () => {
-
-      const content = header.nextElementSibling;
-
-      const isOpen = content.classList.contains('show');
-
-      header.classList.toggle('active');
-
-      content.classList.toggle('show');
-
-      // Remove inline max-height after animation for better reset
-
-      if (!isOpen) {
-
-        content.style.maxHeight = content.scrollHeight + "px";
-
-      } else {
-
-        content.style.maxHeight = null;
-
-      }
-
-    });
-
-  });
-
-function expandOpenAccordion() {
-  document.querySelectorAll('.accordion-content.show').forEach(content => {
-    // clear any old inline height so the browser can re-measure
-    content.style.maxHeight = null;
-    // then set to its new scrollHeight
-    content.style.maxHeight = content.scrollHeight + 'px';
-  });
-}
-
-// =========================
-// Gender Toggle Button
-// =========================
-
-const genderContainer = document.getElementById("GenderBtn");
-
-genderContainer.addEventListener("click", (e) => {
-  const btn = e.target.closest("button");
-  if (!btn) return;
-
-  genderContainer.querySelectorAll("button").forEach(b =>
-    b.classList.remove("active")
-  );
-
-  btn.classList.add("active");
-
-  genderContainer.dataset.gender = btn.dataset.value;
-
-  updateAll();   // ✅ clean + centralised
-});
-
-// =========================
-// BMI Calculation
-// =========================
-
-const weightInput = document.getElementById("weight");
-const heightInput = document.getElementById("height");
-const bmiOutput = document.getElementById("bmi-value");
-const ibwOutput = document.getElementById("ibw-value");
-const adjbwOutput = document.getElementById("adjbw-value");
 
 function calculateBMI() {
 
-  const weight = parseFloat(weightInput.value);
-  const heightCm = parseFloat(heightInput.value);
+  const weight = parseFloat(weightIn.value);
+  const heightCm = parseFloat(heightIn.value);
 
   const rawAge = parseFloat(ageInput.value) || 0;
   const ageYears = ageUnit === 'months' ? rawAge / 12 : rawAge;
@@ -1918,25 +2107,91 @@ if (ageYears < 2) {
 }
 }
 
-// ===============================
-// UK-WHO BMI 50th centile (median)
-// Age in years 2–18
-// 2-decimal precision
-// ===============================
+function updateEstimateLock() {
+  weightIn.disabled = autoEstimate;
+  heightIn.disabled = autoEstimate;
+}
 
-function getBMICentile(bmi, ageYears, gender) {
+function clearWeight() {
+  Object.keys(DRUGS).forEach(clearDrug);
+   // =========================
+  // Calculations display
+  // =========================
+  calcDiv.innerHTML = '';
+  if (hCalc) hCalc.innerHTML = '';
 
-  const lms = getBMILMS(ageYears, gender);
-  if (!lms) return null;
+  // =========================
+  // Airway
+  // =========================
+  hideGroup(['ett-uncuffed','ett-cuffed','ett-depth-lips']);
+  clearText('laryngoscope');
+  document.getElementById('laryngoscope').style.display = 'none';
 
-  const z = lmsZ(bmi, lms.L, lms.M, lms.S);
-  const centile = zToCentile(z);
+   // =========================
+  // Airway adjuncts
+  // =========================
+  hideEl('igel');
+  hideEl('tidalvolume');
+  hideEl('tv-neonates-ards');
 
-  return {
-    centile,
-    category: classifyBMI(centile),
-    z
-  };
+  // =========================
+  // Normals
+  // =========================
+  clearGroup([
+    'sbp-5','sbp-50','sbp-95',
+    'hr-5','hr-95','rr-5','rr-95'
+  ]);
+
+  document.querySelectorAll('.normal-values .static')
+    .forEach(el => el.style.display = 'none');
+}
+
+function resetForm() {
+  // Clear inputs only
+  ageInput.value = '';
+  weightIn.value = '';
+  heightIn.value = '';
+
+  // Reset UI controls
+  ageUnit = 'years';
+  unitBtn.textContent = 'years';
+
+  autoEstimate = true;
+  estToggle.checked = true;
+  updateEstimateLock();
+
+  // Reset gender (optional)
+  const genderContainer = document.getElementById("GenderBtn");
+  genderContainer.dataset.gender = "male";
+  genderContainer.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+  const defaultGender = genderContainer.querySelector('[data-value="male"]');
+  if (defaultGender) defaultGender.classList.add("active");
+
+  // Let your existing logic clear everything properly
+  updateAll();
+  closeAllAccordions(); 
+}
+
+function closeAllAccordions() {
+  document.querySelectorAll('.accordion-header').forEach(header => {
+    const content = header.nextElementSibling;
+
+    header.classList.remove('active');
+
+    if (content) {
+      content.classList.remove('show');
+      content.style.maxHeight = null;
+    }
+  });
+}
+
+function expandOpenAccordion() {
+  document.querySelectorAll('.accordion-content.show').forEach(content => {
+    // clear any old inline height so the browser can re-measure
+    content.style.maxHeight = null;
+    // then set to its new scrollHeight
+    content.style.maxHeight = content.scrollHeight + 'px';
+  });
 }
 
 function openAccordionById(headerId) {
@@ -1952,436 +2207,6 @@ function openAccordionById(headerId) {
   }
 }
 
-function getDrugWeight(drugKey, tbw) {
-  const config = DRUGS[drugKey];
-  const { ibw, adjbw, isObese } = window.weightContext;
-
-  if (!ibw || !adjbw) {
-    return {
-      weight: tbw,
-      label: null
-    };
-  }
-  
-  switch (config.weight) {
-case 'IBW':
-  const useIBW = isObese && ibw;
-  return {
-    weight: useIBW ? ibw : tbw,
-    label: useIBW ? 'IBW' : (isObese ? 'TBW' : null)
-  };
-
-case 'AdjBW':
-  const useAdjBW = isObese && adjbw;
-  return {
-    weight: useAdjBW ? adjbw : tbw,
-    label: useAdjBW ? 'AdjBW' : (isObese ? 'TBW' : null)
-  };
-
-case 'TBW':
-default:
-  return {
-    weight: tbw,
-    label: isObese ? 'TBW' : null
-  };
-  }
-}
-
-function setDoseLabel(drugKey, text) {
-  const ids = DRUGS[drugKey].labelId;
-  if (!ids) return; // 🔥 add this
-
-  if (Array.isArray(ids)) {
-    ids.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.innerHTML = text;
-    });
-  } else {
-    const el = document.getElementById(ids);
-    if (el) el.innerHTML = text;
-  }
-}
-
-function toArray(val) {
-  if (!val) return [];
-  return Array.isArray(val) ? val : [val];
-}
-
-function renderDrug(drugKey, tbw) {
-  const config = DRUGS[drugKey];
-  if (!config) return;
-
-  if (!tbw || isNaN(tbw)) {
-    clearDrug(drugKey);
-    return;
-  }
-  
-  const { weight, label } = getDrugWeight(drugKey, tbw);
-  const type = config.type || 'bolus';
-
-   renderDrugNotes(config, weight, drugKey);
-  
-  switch (type) {
-    case 'infusion_bag':
-      return renderInfusionBag(config, weight, label, drugKey);
-
-    case 'infusion_range_split':
-      return renderInfusionRangeSplit(config, weight, label, drugKey);
-
-    case 'bolus':
-      return renderBolusDrug(config, weight, label, drugKey);
-
-    case 'blood_volume':
-  return renderBloodVolume(config, weight, label, drugKey);  
-      
-    default:
-      console.warn(`Unknown drug type: ${type}`, drugKey);
-      return;
-  }
-}
-
-function renderBolusDrug(config, weight, label, drugKey) {
-  if (!config.dose && !config.getDose) return;
-
-  let dMin, dMax, perKgLabel;
-
-  // --- GET DOSE ---
-  if (config.getDose) {
-    const rawAge = parseFloat(ageInput.value) || 0;
-    const ageY = ageUnit === 'months' ? rawAge / 12 : rawAge;
-
-    const result = config.getDose(weight, ageY);
-
-    if (!result || result.hideDose) {
-      hideGroup(toArray(config.outputId));
-      clearGroup(toArray(config.extraId));
-      setDoseLabel(drugKey, '');
-      return;
-    }
-
-    dMin = result.min;
-    dMax = result.max;
-    perKgLabel = result.perKg;
-
-  } else {
-    const [minDose, maxDose] = config.dose;
-    dMin = minDose * weight;
-    dMax = maxDose * weight;
-  }
-
-  // --- CAP ---
-  if (config.cap) {
-    dMin = Math.min(dMin, config.cap);
-    dMax = Math.min(dMax, config.cap);
-  }
-
-  const outputIds = toArray(config.outputId);
-  const extraIds  = toArray(config.extraId);
-
-if (dMin === 0 && dMax === 0) {
-  hideGroup(outputIds);
-  clearGroup(extraIds);
-
-  if (config.labelId) {
-    let labelText = `${perKgLabel || '0.5–1'} ${config.unit}/kg`;
-    setDoseLabel(drugKey, labelText);
-  }
-
-  if (config.capLabel) {
-    const rawAge = parseFloat(ageInput.value) || 0;
-    const ageY = ageUnit === 'months' ? rawAge / 12 : rawAge;
-
-    const capEl = document.getElementById(`${drugKey}-max`);
-    if (capEl) capEl.textContent = config.capLabel(ageY);
-  }
-
-  return;
-}
-  
-  const sameDose = Math.abs(dMin - dMax) < 0.0001;
-
-  const doseText = sameDose
-    ? stripZeros(dMin.toFixed(1))
-    : `${stripZeros(dMin.toFixed(1))}–${stripZeros(dMax.toFixed(1))}`;
-
-  // --- OUTPUT ---
-  outputIds.forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-
-    el.textContent = doseText;
-    el.style.display = 'inline';
-
-    const unit = el.nextElementSibling;
-    if (unit && unit.classList.contains('unit')) {
-      unit.style.display = 'inline';
-    }
-  });
-
-   // --- VOLUME ---
-  if (config.conc && extraIds.length) {
-    const vMin = dMin / config.conc;
-    const vMax = dMax / config.conc;
-
-    const sameVol = Math.abs(vMin - vMax) < 0.0001;
-
-    const volText = sameVol
-      ? stripZeros(vMin.toFixed(2))
-      : `${stripZeros(vMin.toFixed(2))}–${stripZeros(vMax.toFixed(2))}`;
-
-    extraIds.forEach(id => {
-      const el = document.getElementById(id);
-      if (!el) return;
-
-      const concText = config.concLabel || `${config.conc} ${config.unit}/mL`;
-      el.innerHTML = `${volText} mL of ${concText}`;
-    });
-  }
-  
-  // --- LABEL ---
-  if (config.labelId) {
-    let finalLabel = '';
-
-   if (perKgLabel) {
-  finalLabel = `${perKgLabel} ${config.unit}/kg`;
-} else if (config.dose) {
-      const [minDose, maxDose] = config.dose;
-      finalLabel = (minDose === maxDose)
-        ? `${minDose} ${config.unit}/kg`
-        : `${minDose}–${maxDose} ${config.unit}/kg`;
-    }
-
-    if (label) {
-      finalLabel += `<br><small class="drug-weight-label">${label}</small>`;
-    }
-
-    setDoseLabel(drugKey, finalLabel);
-  }
-
-  // --- CAP LABEL (e.g. cyclizine) ---
-  if (config.capLabel) {
-    const rawAge = parseFloat(ageInput.value) || 0;
-    const ageY = ageUnit === 'months' ? rawAge / 12 : rawAge;
-
-    const capEl = document.getElementById(`${drugKey}-max`);
-    if (capEl) {
-      capEl.textContent = config.capLabel(ageY, weight) || '';
-    }
-  }
-}
-
-function renderInfusionBag(config, weight, label, drugKey) {
-  const mgPerHr = config.dosePerKgHr * weight;
-
-  const conc = mgPerHr / config.targetRate; // mg/mL
-  const bagMg = conc * config.bagVolume;
-
-  const labelText = label
-  ? ` <small class="drug-weight-label">(${label})</small>`
-  : '';
-
-const text =
-  `${stripZeros(bagMg.toFixed(2))} mg in ${config.bagVolume} mL ${config.diluent}${labelText}`;
-
-  toArray(config.extraId).forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-
-    el.innerHTML = text;
-    el.style.display = 'inline';
-  });
-
-  if (config.dosePerKgHr) {
-    const labelText = `${config.dosePerKgHr} mg/kg/hr`;
-
-    setDoseLabel(
-      drugKey,
-      label
-        ? `${labelText} <small class="drug-weight-label">(${label})</small>`
-        : labelText
-    );
-  }
-}
-function renderInfusionRangeSplit(config, weight, label, drugKey) {
-  if (!config.dose) return;
-
-  const [minDose, maxDose] = config.dose;
-
-  let rateMin = minDose * weight;
-  let rateMax = maxDose * weight;
-
-  // per min → per hour
-  if (config.per === 'min') {
-    rateMin *= 60;
-    rateMax *= 60;
-  }
-
-  const mgMin = rateMin;
-  const mgMax = rateMax;
-
-  const mlMin = config.conc ? mgMin / config.conc : null;
-  const mlMax = config.conc ? mgMax / config.conc : null;
-
-  // 🔹 MG/HR OUTPUT (with label here)
-  const mgText = (mgMin === mgMax)
-    ? `${stripZeros(mgMin.toFixed(2))}`
-    : `${stripZeros(mgMin.toFixed(2))}–${stripZeros(mgMax.toFixed(2))}`;
-
-  const mgEl = document.getElementById(config.outputId.mg);
-  if (mgEl) {
-    mgEl.innerHTML = label
-  ? `${mgText} mg/hr <small class="drug-weight-label">(${label})</small>`
-  : `${mgText} mg/hr`;
-  }
-
-  // 🔹 ML/HR OUTPUT (separate line/location)
-  if (mlMin !== null) {
-    const mlText = (mlMin === mlMax)
-      ? `${stripZeros(mlMin.toFixed(2))}`
-      : `${stripZeros(mlMin.toFixed(2))}–${stripZeros(mlMax.toFixed(2))}`;
-
-    const mlEl = document.getElementById(config.outputId.ml);
-    if (mlEl) {
-      mlEl.textContent = `${mlText} mL/hr`;
-    }
-  }
-}
-
-function renderDrugNotes(config, weight, drugKey) {
-  if (!config.notes || !config.noteId) return;
-
-  const rawAge = parseFloat(ageInput.value) || 0;
-  const ageMonths = ageUnit === 'months' ? rawAge : rawAge * 12;
-
-  const note = config.notes.find(n =>
-    n.condition({ ageMonths, weight })
-  );
-
-  toArray(config.noteId).forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-
-    if (note) {
-      el.textContent = note.text;
-      el.style.display = 'inline';
-    } else {
-      el.textContent = '';
-      el.style.display = 'none';
-    }
-  });
-}
-
-function renderBloodVolume(config, weight, label, drugKey) {
-
-  const rawAge = parseFloat(ageInput.value) || 0;
-  const ageY = ageUnit === 'months' ? rawAge / 12 : rawAge;
-
-  const result = config.getValues(weight, ageY);
-
-  const el = document.getElementById(config.outputId);
-  const unit = el?.nextElementSibling;
-  const rangeEl = document.getElementById(config.rangeId);
-
-  if (!result) {
-    if (el) {
-      el.textContent = '';
-      el.style.display = 'none';
-    }
-    if (unit) unit.style.display = 'none';
-    if (rangeEl) rangeEl.textContent = '';
-    return;
-  }
-
-  const { min, max, perKgMin, perKgMax } = result;
-
-  // --- RANGE TEXT (middle column) ---
-  let rangeText =
-    perKgMin === perKgMax
-      ? `${perKgMin} mL/kg`
-      : `${perKgMin}–${perKgMax} mL/kg`;
-
-  if (label) {
-    rangeText += `<br><small class="drug-weight-label">${label}</small>`;
-  }
-
-  if (rangeEl) rangeEl.innerHTML = rangeText;
-
-  // --- VALUE (right column) ---
-  const same = Math.abs(min - max) < 0.001;
-
-  const text = same
-    ? stripZeros(min.toFixed(0))
-    : `${stripZeros(min.toFixed(0))}–${stripZeros(max.toFixed(0))}`;
-
-  if (el) {
-    el.textContent = text;
-    el.style.display = 'inline';
-  }
-
-  if (unit && unit.classList.contains('unit')) {
-    unit.style.display = 'inline';
-  }
-}
-
-function clearDrug(drugKey) {
-  const config = DRUGS[drugKey];
-  if (!config) return;
-
-  // --- main outputs ---
-  toArray(config.outputId).forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-
-    el.textContent = '';
-    el.style.display = 'none';
-
-    const unit = el.nextElementSibling;
-    if (unit && unit.classList.contains('unit')) {
-      unit.style.display = 'none';
-    }
-  });
-
-  // --- extra (e.g. volumes, bags) ---
-  toArray(config.extraId).forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = '';
-  });
-
-  // --- split outputs (infusions) ---
-  if (config.outputId?.mg) {
-    const el = document.getElementById(config.outputId.mg);
-    if (el) el.textContent = '';
-  }
-
-  if (config.outputId?.ml) {
-    const el = document.getElementById(config.outputId.ml);
-    if (el) el.textContent = '';
-  }
-
-  // --- labels ---
-  if (config.labelId) {
-    setDoseLabel(drugKey, '');
-  }
-
-  // --- notes ---
-  if (config.noteId) {
-    toArray(config.noteId).forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.textContent = '';
-    });
-  }
-
-  // --- caps (e.g. "Max 400 mg") ---
-  const capEl = document.getElementById(`${drugKey}-max`);
-  if (capEl) capEl.textContent = '';
-
-  // --- range column (blood volume etc) ---
-  if (config.rangeId) {
-    const el = document.getElementById(config.rangeId);
-    if (el) el.textContent = '';
-  }
-}
-
 function enableSelectAllOnFocus(input) {
   input.addEventListener('focus', () => {
     // slight delay improves reliability on iOS
@@ -2389,10 +2214,9 @@ function enableSelectAllOnFocus(input) {
   });
 }
 
-// apply to your inputs
-enableSelectAllOnFocus(weightIn);
-enableSelectAllOnFocus(heightIn);
-enableSelectAllOnFocus(ageInput);
+function goHome() {
+  window.location.href = '/'; // or 'index.html'
+}
 
 function updateAll() {
   const rawAge = ageInput.value.trim();
@@ -2437,3 +2261,128 @@ function updateAll() {
 
   expandOpenAccordion();
 }
+// =========================
+// EVENT HANDLERS
+// =========================
+
+function getGenderKey() {
+  const genderContainer = document.getElementById("GenderBtn");
+
+  const gender =
+    genderContainer.dataset.gender ||
+    genderContainer.querySelector("button.active")?.dataset.value ||
+    "male";
+
+  return gender === "female" ? "girls" : "boys";
+}
+
+  unitBtn.addEventListener('click', toggleAgeUnit);
+  
+  estToggle.addEventListener('change', () => {
+  autoEstimate = estToggle.checked;
+
+  updateEstimateLock();
+  
+  if (autoEstimate) {
+  clearWeight();
+  updateAll();
+}
+});
+
+ageInput.addEventListener('input', () => {
+  const val = parseFloat(ageInput.value);
+
+  if (!isNaN(val) && val >= 0 && !autoEstimate) {
+    autoEstimate = true;
+    estToggle.checked = true;
+    updateEstimateLock();
+  }
+
+  updateAll();
+});
+
+weightIn.addEventListener('input', () => {
+  if (autoEstimate) return;
+
+  const rawAge = ageInput.value.trim();
+  const rawW   = weightIn.value.trim();
+
+  if (rawW === '') return clearWeight();
+
+  const w = parseFloat(rawW);
+
+  if (isNaN(w)) return clearWeight();
+
+if (rawAge === '') {
+  return;
+}
+
+  updateAll();
+});
+
+heightIn.addEventListener('input', () => {
+ if (autoEstimate) return;
+
+  const rawH = heightIn.value.trim();
+
+ if (rawH === '') {
+    window.weightContext.ibw = null;
+    window.weightContext.adjbw = null;
+    window.weightContext.isObese = false;
+
+    updateHeightCentileDisplay();
+    calculateBMI();
+    updateAll(); // 🔥 ensures drugs re-render correctly
+
+    return;
+  }
+  
+  const h = parseFloat(rawH);
+  if (isNaN(h)) {
+    updateHeightCentileDisplay();
+    calculateBMI();
+    return;
+  }
+  updateAll();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  clearWeight();
+  estToggle.checked = true;
+  autoEstimate = true;
+  updateEstimateLock();
+});
+
+document.querySelectorAll('.accordion-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const content = header.nextElementSibling;
+      const isOpen = content.classList.contains('show');
+      header.classList.toggle('active');
+      content.classList.toggle('show');
+      if (!isOpen) {
+        content.style.maxHeight = content.scrollHeight + "px";
+      } else {
+        content.style.maxHeight = null;
+      }
+    });
+  });
+
+genderContainer.addEventListener("click", (e) => {
+  const btn = e.target.closest("button");
+  if (!btn) return;
+
+  genderContainer.querySelectorAll("button").forEach(b =>
+    b.classList.remove("active")
+  );
+
+  btn.classList.add("active");
+
+  genderContainer.dataset.gender = btn.dataset.value;
+
+  updateAll();   // ✅ clean + centralised
+});
+
+enableSelectAllOnFocus(weightIn);
+enableSelectAllOnFocus(heightIn);
+enableSelectAllOnFocus(ageInput);
+
