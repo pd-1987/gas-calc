@@ -79,20 +79,23 @@ const NEONATAL_ETT_DEPTH_TABLE = [
   { max: Infinity, depth: '9' }
 ];
 
-const ETT_INFANT_TABLE = [
-  { maxAge: 0.0833, unc: '3.0–3.5', cuff: '2.5–3.0' },
-  { maxAge: 1/12,   unc: '3.5',      cuff: '3.0' },
-  { maxAge: 2/12,   unc: '3.5',      cuff: '3.0' },
-  { maxAge: 4/12,   unc: '3.5',      cuff: '3.0' },
-  { maxAge: 5/12,   unc: '4.0',      cuff: '3.5' },
-  { maxAge: 6/12,   unc: '4.0',      cuff: '3.5' },
-  { maxAge: 1,      unc: '4.0–4.5',  cuff: '3.5–4.0' }
-];
+const ETT_AGE_TABLE = [
+  // Neonates handled separately
 
-const BOUGIE_TABLE = [
-  { max: 3.5, size: 5, label: '≤3.5 ETT' },
-  { max: 5.5, size: 10, label: '4.0–5.5 ETT' },
-  { max: Infinity, size: 15, label: '≥6.0 ETT' }
+  { maxAge: 3/12,  unc: '3.5',     cuff: '3.0',     depth: '9.0–10.0', bougie: ['5'] },
+  { maxAge: 6/12,  unc: '4.0',     cuff: '3.5',     depth: '10.0–11.0', bougie: ['5','10'] },
+  { maxAge: 1,     unc: '4.0–4.5', cuff: '3.5–4.0', depth: '12.0',      bougie: ['5','10'] },
+  { maxAge: 2,     unc: '4.5–5.0', cuff: '4.0–4.5', depth: '13.0',      bougie: ['10'] },
+  { maxAge: 3,     unc: '4.5–5.0', cuff: '4.0–4.5', depth: '13.5',      bougie: ['10'] },
+  { maxAge: 4,     unc: '5.0–5.5', cuff: '4.5–5.0', depth: '14.0',      bougie: ['10'] },
+  { maxAge: 5,     unc: '5.0–5.5', cuff: '4.5–5.0', depth: '14.5',      bougie: ['10'] },
+  { maxAge: 6,     unc: '6.0',     cuff: '5.0–5.5', depth: '15.0',      bougie: ['10','15'] },
+  { maxAge: 7,     unc: '6.0',     cuff: '5.0–5.5', depth: '15.5',      bougie: ['10','15'] },
+  { maxAge: 8,     unc: '6.5',     cuff: '6.0',     depth: '16.0',      bougie: ['15'] },
+  { maxAge: 9,     unc: '6.5',     cuff: '6.0',     depth: '16.5',      bougie: ['15'] },
+  { maxAge: 10,    unc: '7.0',     cuff: '6.5',     depth: '17.0',      bougie: ['15'] },
+  { maxAge: 12,    unc: '7.5',     cuff: '7.0',     depth: '18.0',      bougie: ['15'] },
+  { maxAge: Infinity, unc: '',     cuff: '7.0–8.0', depth: '20',        bougie: ['15'] }
 ];
 
 const EMERGENCY_DRUG_LIST = [
@@ -1815,185 +1818,136 @@ function lookupByWeight(weight, table) {
 }
 
 function updateAirwayCalculations(ageYears, w) {
-  // normalize age to years
+
   const y = ageUnit === 'months'
-          ? parseFloat(ageInput.value) / 12
-          : ageYears;
+    ? parseFloat(ageInput.value) / 12
+    : ageYears;
 
   if (isNaN(y) || y < 0) {
-    // hide all if invalid
-    ['ett-uncuffed','ett-cuffed','ett-depth-lips'].forEach(id => {
-      const el = document.getElementById(id);
-      el.textContent = '';
-      el.style.display = 'none';
-      const u = el.nextElementSibling;
-      if (u && u.classList.contains('unit')) u.style.display = 'none';
-    });
+    hideGroup(['ett-uncuffed','ett-cuffed','ett-depth-lips','bougie']);
     return;
   }
-  
-if (y === 0 && w > 0) {
-  const uncEl  = document.getElementById('ett-uncuffed');
-  const cuffEl = document.getElementById('ett-cuffed');
 
-const size = lookupByWeight(w, NEONATAL_ETT_SIZE_TABLE);
-const depth = lookupByWeight(w, NEONATAL_ETT_DEPTH_TABLE);
+  // =========================
+  // NEONATES (weight-based)
+  // =========================
+  if (y === 0 && w > 0) {
 
-  // Neonates: uncuffed only
-  uncEl.textContent = size;
-  uncEl.style.display = 'inline';
+    const uncEl  = document.getElementById('ett-uncuffed');
+    const cuffEl = document.getElementById('ett-cuffed');
 
-  cuffEl.textContent = '';
-  cuffEl.style.display = 'none';
+    const size  = lookupByWeight(w, NEONATAL_ETT_SIZE_TABLE);
+    const depth = lookupByWeight(w, NEONATAL_ETT_DEPTH_TABLE);
 
-  const depthEl   = document.getElementById('ett-depth-lips');
-  const depthUnit = depthEl.nextElementSibling;
+    uncEl.textContent = size;
+    uncEl.style.display = 'inline';
 
-  depthEl.textContent = depth;
-  depthEl.style.display = 'inline';
-  depthUnit.style.display = 'inline';
-}
+    cuffEl.textContent = '';
+    cuffEl.style.display = 'none';
+
+    const depthEl   = document.getElementById('ett-depth-lips');
+    const depthUnit = depthEl.nextElementSibling;
+
+    depthEl.textContent = depth;
+    depthEl.style.display = 'inline';
+    depthUnit.style.display = 'inline';
+
+    // Neonatal bougie
+    renderBougieFromRow({ bougie: ['5'] });
+
+  }
+
+  // =========================
+  // EVERYTHING ELSE → TABLE
+  // =========================
   else {
+
+    const row = ETT_AGE_TABLE.find(r => y <= r.maxAge);
+
     let uncuffed = '';
-    let cuffed   = '';
+    let cuffed = '';
+    let depth = '';
 
-    if (y < 1) {
-const row = ETT_INFANT_TABLE.find(r => y <= r.maxAge);
-  if (row) {
-  uncuffed = row.unc;
-  cuffed   = row.cuff;
-}
+    if (row) {
+      uncuffed = row.unc;
+      cuffed   = row.cuff;
+      depth    = row.depth;
+
+      renderBougieFromRow(row);
     }
 
-    else {
-      if (y >= 1 && y <= 8) {
-        const size = (y/4 + 4).toFixed(2);
-        uncuffed = stripZeros(size);
-      }
-
-      if (y >= 1 && y <= 14) {
-        const size = (y/4 + 3.5).toFixed(2);
-        cuffed = stripZeros(size);
-      }
-
-      if (y > 14) {
-        cuffed = '7.0–8.0';
-      }
-    }
-
+    // --- uncuffed ---
     const uncEl = document.getElementById('ett-uncuffed');
     if (uncuffed) {
       uncEl.textContent = uncuffed;
       uncEl.style.display = 'inline';
     } else {
-      uncEl.textContent = '';
-      uncEl.style.display = 'none';
+      hideEl('ett-uncuffed');
     }
 
+    // --- cuffed ---
     const cuffEl = document.getElementById('ett-cuffed');
     if (cuffed && w >= 3.0) {
       cuffEl.textContent = cuffed;
       cuffEl.style.display = 'inline';
     } else {
-      cuffEl.textContent = '';
-      cuffEl.style.display = 'none';
+      hideEl('ett-cuffed');
     }
-    
-const ettForBougie = cuffed || uncuffed;
-renderBougie(cuffed, uncuffed);
 
-let depth = '';
+    // --- depth ---
+    const depthEl = document.getElementById('ett-depth-lips');
+    const depthUnit = depthEl.nextElementSibling;
 
-if (y >= 14) {
-  depth = 20;
-} else if (y >= 1) {
-  // 1–13 years
-  depth = y / 2 + 12;
-  depth = stripZeros(depth.toFixed(2));
-} else if (y > 0 && y <= 3/12) {
-  // 1–3 months
-  depth = '9–10';
-} else if (y > 3/12 && y <= 6/12) {
-  // 4–6 months
-  depth = '10–11';
-} else if (y > 6/12 && y < 1) {
-  // 7–11 months
-  depth = '12';
-}
-
-const depthEl = document.getElementById('ett-depth-lips');
-const depthUnit = depthEl.nextElementSibling;
-if (depth) {
-  depthEl.textContent = depth;
-  depthEl.style.display = 'inline';
-  depthUnit.style.display = 'inline';
-} else {
-  depthEl.textContent = '';
-  depthEl.style.display = 'none';
-  depthUnit.style.display = 'none';
-}
+    if (depth) {
+      depthEl.textContent = depth;
+      depthEl.style.display = 'inline';
+      depthUnit.style.display = 'inline';
+    } else {
+      hideEl('ett-depth-lips');
+    }
   }
 
-const igelEl = document.getElementById('igel');
+  const igelEl = document.getElementById('igel');
+  const igelSize = w >= 2 ? lookupByWeight(w, IGEL_TABLE) : '';
+  igelEl.innerHTML = igelSize;
+  igelEl.style.display = igelSize ? 'inline' : 'none';
 
-const igelSize = w >= 2 ? lookupByWeight(w, IGEL_TABLE) : '';
+  const lmaEl = document.getElementById('lma');
+  const lmaSize = w > 0 ? lookupByWeight(w, LMA_TABLE) : '';
+  lmaEl.innerHTML = lmaSize;
+  lmaEl.style.display = lmaSize ? 'inline-block' : 'none';
 
-igelEl.innerHTML = igelSize;
-igelEl.style.display = igelSize ? 'inline' : 'none';
+  const rowL = w > 0
+    ? LARYNGOSCOPE_TABLE.find(r => w <= r.max)
+    : null;
 
-const lmaEl = document.getElementById('lma');
-
-const lmaSize = w > 0 ? lookupByWeight(w, LMA_TABLE) : '';
-
-lmaEl.innerHTML = lmaSize;
-lmaEl.style.display = lmaSize ? 'inline-block' : 'none';
-
-const row = w > 0
-  ? LARYNGOSCOPE_TABLE.find(r => w <= r.max)
-  : null;
-
-if (row) {
-  showEl('laryngoscope', row.text);
-  if (row.note) {
-    document.getElementById('laryngoscope').innerHTML =
-      `${row.text}<br><small>${row.note}</small>`;
+  if (rowL) {
+    showEl('laryngoscope', rowL.text);
+    if (rowL.note) {
+      document.getElementById('laryngoscope').innerHTML =
+        `${rowL.text}<br><small>${rowL.note}</small>`;
+    }
+  } else {
+    hideEl('laryngoscope');
   }
-} else {
-  hideEl('laryngoscope');
-}
 }
 
-function getBougieFromETT(ett) {
-  if (!ett) return null;
-
-  const parts = ett.split('–').map(parseFloat);
-  const max = Math.max(...parts);
-
-  return BOUGIE_TABLE.find(r => max <= r.max) || null;
-}
-
-function renderBougie(cuffed, uncuffed) {
-  const unc = getBougieFromETT(uncuffed);
-  const cuff = getBougieFromETT(cuffed);
-
+function renderBougieFromRow(row) {
   const el = document.getElementById('bougie');
-  if (!el) return;
 
-  const rows = [unc, cuff]
-    .filter(Boolean)
-    .filter((r, i, arr) =>
-      arr.findIndex(x => x.size === r.size) === i
-    );
-
-  if (rows.length === 0) {
+  if (!row || !row.bougie) {
     el.innerHTML = '';
     el.style.display = 'none';
     return;
   }
 
-  el.innerHTML = rows
-  .map(r => `${r.size} Ch <small style="display:inline">(${r.label})</small>`)
-  .join('<br>');
+  el.innerHTML = row.bougie
+    .map(size => {
+      if (size === '5') return '5 Ch (≤3.5 ETT)';
+      if (size === '10') return '10 Ch (4.0–5.5 ETT)';
+      if (size === '15') return '15 Ch (≥6.0 ETT)';
+    })
+    .join('<br>');
 
   el.style.display = 'inline-block';
 }
