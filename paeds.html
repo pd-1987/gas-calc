@@ -244,10 +244,12 @@
   letter-spacing: 0.2px;
   font-size: 0.95em;
 }
-.result-table thead th:first-child {
+/* Only round the very top corners */
+.result-table thead tr:first-child th:first-child {
   border-top-left-radius: 12px;
 }
-.result-table thead th:last-child {
+
+.result-table thead tr:first-child th:last-child {
   border-top-right-radius: 12px;
 }
 /* Row labels (left column) */
@@ -1927,75 +1929,33 @@ small[class] {
           </tr>
     </table>
 
-      <table class="result-table"> 
-      <thead>
-      <tr>
-        <th colspan="2">
-         Central venous access - Femoral (preferred)
-        </th>
-      </tr>
-    </thead>        
-  <tr>
-            <td>
-              &lt;6 months
-            </td>
-            <td>
-              4–5	Fr, triple lumen, 6–8cm lines	
-            </td>
-          </tr>
+     <table class="result-table"> 
+  <thead>
+<tr>
+  <th rowspan="2">Patient Weight</th>
+  <th rowspan="2">CVL Diameter</th>
+  <th colspan="2">Insertion Length (cm)</th>
+</tr>
+<tr>
+  <th>Jugular</th>
+  <th>Femoral</th>
+</tr>
+  </thead>
 
-    <tr>
-            <td>
-              6 m–5 y
-            </td>
-            <td>
-              5	Fr triple lumen, 8–12 cm
-            </td>
-          </tr>
-            <tr>
-            <td>
-              &gt;5 y
-            </td>
-            <td>
-              7 fr, triple lumen, 15 cm
-            </td>
-          </tr>
-    </table>
-          <br>
-      <table class="result-table"> 
-      <thead>
-      <tr>
-        <th colspan="2">
-         Central venous access - Internal jugular
-        </th>
-      </tr>
-    </thead>        
-  <tr>
-            <td>
-              &lt;15 kg
-            </td>
-            <td>
-              	5 cm		
-            </td>
-          </tr>
-
-    <tr>
-            <td>
-              16–40 kg
-            </td>
-            <td>
-              8 cm
-            </td>
-          </tr>
-            <tr>
-            <td>
-              &gt;40 kg
-            </td>
-            <td>
-              13 cm
-            </td>
-          </tr>
-    </table>
+  <tr><td>2–2.9 kg</td><td>4 Fr</td><td>4</td><td>5</td></tr>
+  <tr><td>3–4.9 kg</td><td>4–4.5 Fr</td><td>5</td><td>8</td></tr>
+  <tr><td>5–6.9 kg</td><td>4–4.5 Fr</td><td>6</td><td>8</td></tr>
+  <tr><td>7–9.9 kg</td><td>4–4.5 Fr</td><td>7</td><td>8</td></tr>
+  <tr><td>10–12.9 kg</td><td>4.5–5.5 Fr</td><td>8</td><td>13</td></tr>
+  <tr><td>13–19.9 kg</td><td>4.5–5.5 Fr</td><td>9</td><td>13</td></tr>
+  <tr><td>20–29.9 kg</td><td>5.5–7 Fr</td><td>10</td><td>16</td></tr>
+  <tr><td>30–39.9 kg</td><td>5.5–7 Fr</td><td>11</td><td>16</td></tr>
+  <tr><td>40–49.9 kg</td><td>7–8.5 Fr</td><td>12</td><td>16–20</td></tr>
+  <tr><td>50–59.9 kg</td><td>7–8.5 Fr</td><td>13</td><td>16–20</td></tr>
+  <tr><td>60–69.9 kg</td><td>7–8.5 Fr</td><td>14</td><td>16–20</td></tr>
+  <tr><td>70–79.9 kg</td><td>7–8.5 Fr</td><td>15</td><td>16–20</td></tr>
+  <tr><td>≥80 kg</td><td>7–8.5 Fr</td><td>16</td><td>16–20</td></tr>
+</table>
 
      <table class="result-table"> 
   <thead>
