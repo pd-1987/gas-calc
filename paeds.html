@@ -129,7 +129,7 @@
   overflow: hidden;
   background: var(--bg-main);
   transition: max-height 0.4s ease, opacity 0.3s ease;
-  font-size: 0.95em;
+  font-size: 1em;
   color: var(--text-main);
   padding: 0 6px;
   border-top: 1px solid var(--border-light);
@@ -140,21 +140,13 @@
     .accordion-content-inner {
   padding: 12px 0;
   }
-    .airway-note {
-  margin: 4px 0 8px 5px;
-  font-size: 12px;
-  font-style: italic;
-  color: var(--text-secondary);
-}
 .estimate-toggle {
   display: inline-flex;
   align-items: center;
   cursor: pointer;
   user-select: none;
-  margin: 5px;             /* adjust spacing as needed */
+  margin: 5px;
 }
-
-/* Hide the native checkbox */
 .estimate-toggle input[type="checkbox"] {
   opacity: 0;
   width: 0;
@@ -223,23 +215,40 @@
 .result-table {
   width: 100%;
   max-width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;       
   margin-bottom: 10px;
   font-size: 13px;
-  border: 1px solid var(--border-light); /* 👈 add this */
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.03),
+    0 4px 12px rgba(0,0,0,0.35);
 }
-
 .result-table th,
 .result-table td {
   padding: 8px;
-  border: 1px solid var(--border-light); /* 👈 single source of truth */
+  border-bottom: 1px solid var(--border-light);
   text-align: center;
 }
-/* Section headers */
+    
+.result-table tr:last-child td {
+  border-bottom: none;
+}
+
 .result-table thead th {
   background: var(--btn-bg);
   color: var(--text-main);
   font-weight: 600;
+  letter-spacing: 0.2px;
+  font-size: 0.95em;
+}
+.result-table thead th:first-child {
+  border-top-left-radius: 12px;
+}
+.result-table thead th:last-child {
+  border-top-right-radius: 12px;
 }
 /* Row labels (left column) */
 .result-table tbody th {
@@ -255,7 +264,7 @@
 .result table th {
   color: var(--text-main);
 }
-    .result-group {
+.result-group {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -438,13 +447,24 @@
 .bmi-overweight  { color: #f59e0b; }     /* amber */
 .bmi-obese       { color: #ef4444; }     /* red */
 .bmi-severe      { color: #b91c1c; }     /* dark red */
+
+small.drug-weight-label {
+      font-weight: 500;
+  color: #374151;
+}
+small[class] {
+  color: inherit;
+}
+ .result span:first-of-type {
+  font-size: 1em;
+}
   </style>
 </head>
   
 <body>
 <header class="calc-header paeds">Paediatric anaesthesia</header>
   <div class="calc-wrapper">
-  <div class="section">
+  <div class="calc-section">
 
   <div class="gender-buttons" id="GenderBtn">
     <button class="active" data-value="male">Male</button>
@@ -474,10 +494,6 @@
   <span class="slider"></span>
   <span class="toggle-label">Estimate <small>(UK-WHO / UK90)</small></span>
 </label>
-
-  <p class="text-center">
-      <small>In Obesity, use <a href="https://www.paedspro.com/">Paeds Prescribing Pro.</a></small>
-      </p>
   </div>
  
   <div class="accordion">
@@ -742,7 +758,7 @@
       Fentanyl
     </td>
     <td>
-      1–2 mcg/kg
+      <span id="fentanyl-dose-text">1–2 mcg/kg</span>
     </td>
     <td>
       <span id="fentanyl"></span><span class="static unit">mcg</span>
@@ -760,7 +776,7 @@
       Ketamine
     </td>
     <td>
-      1–2 mg/kg
+      <span id="ketamine-dose-text">1–2 mg/kg</span>
     </td>
     <td>
       <span id="ketamine"></span><span class="static unit">mg</span>
@@ -778,7 +794,7 @@
      Rocuronium
     </td>
     <td>
-      1 mg/kg
+      <span id="rocuronium-dose-text">1 mg/kg</span>
     </td>
     <td>
       <span id="rocuronium"></span><span class="static unit">mg</span>
@@ -799,13 +815,15 @@
         </th>
       </tr>
     </thead>
-      <!-- Fentanyl -->
   <tr class="row-blue">
     <td>
       Morphine
     </td>
     <td>
-      10–40 mcg/kg/h (0.5–2 ml/h)
+      <span class="small-dose">
+        <span>10–40 mcg/kg/h<br>
+          0.5–2 ml/h
+        </span></span></span>
     </td>
   </tr>
   <tr class="sub-blue">
@@ -819,7 +837,9 @@
       Midazolam
     </td>
     <td>
-      1–3 mcg/kg/min (1–3 ml/h)
+      <span class="small-dose">
+        <span>1–3 mcg/kg/min<br>
+        1–3 ml/h</span></span></span>
     </td>
   </tr>
   <tr class="sub-orange">
@@ -833,15 +853,15 @@
       Propofol
     </td>
     <td>
-      <span>1–4 mg/kg/h</span>
       <span class="small-dose">
-      <span>(4–10 mg/kg/h in routine anaesthesia)</span>
-      </span>
+        <span>1–4 mg/kg/h</span>
+        <span id="propofol-sed-ml"></span>
+        </span></span>
     </td>
   </tr>
   <tr class="sub-yellow">
     <td colspan="3">
-      <small id="propofol-sed"></small>
+      <small id="propofol-sed-mg"></small>
     </td>
   </tr>
         </table>
@@ -858,10 +878,11 @@
   <tr class="row-green">
     <td>
       Atropine
+      <span class="small-dose"><span>Max 600 mcg</span></span>
     </td>
     <td>
-      <span>20 mcg/kg</span>
-      <span class="small-dose"><span>Max 600 mcg</span></span>
+      <span id="atropine-dose-text">20 mcg/kg</span>
+      </span>
     </td>
     <td>
       <span id="atropine"></span><span class="static unit">mcg</span>
@@ -876,24 +897,21 @@
   <!-- Adrenaline IV 1:10,000 -->
   <tr class="row-purple">
     <td>
-      Adrenaline IV 
-      <span class="small-dose">
-      <span>1:10,000</span>
-      <span>100 mcg/ml</span>
+      Adrenaline IV<br>
+      1:10,000
+      <span class="small-dose"><span>100 mcg/ml</span>
         </span>
     </td>
     <td>
-      <span class="small-dose">
-        <span>0.1 mL/kg</span>
-        <span>10 mcg/kg</span>
-          </span>
+      <span>0.1 mL/kg</span><br>
+        <span id="adrenaline-dose-text"><span>10 mcg/kg</span></span>
     </td>
     <td>
       <span id="adrenalineiv"></span><span class="static unit">mcg</span>
     </td>
   </tr>
   <tr class="sub-purple">
-    <td colspan="3"><small id="adrenaline-vol-extra"></small>
+    <td colspan="3"><small id="adrenalineiv-vol-extra"></small>
     </td>
   </tr>
 
@@ -903,8 +921,8 @@
       Suxamethonium IV
     </td>
     <td>
-  <span id="sux-range">1–2</span>
-  <span class="unit">mg/kg</span>
+  <span id="sux-range"> </span>
+  <span class="unit"> </span>
 </td>
     <td>
       <span id="sux-iv"></span><span class="static unit">mg</span>
@@ -919,10 +937,11 @@
   <!-- Suxamethonium IM -->
   <tr class="row-red">
     <td>
-      Suxamethonium IM
+      Sux. IM
+      <span class="small-dose"><span>Max 150 mg</span></span>
     </td>
     <td>
-      4 mg/kg<span class="small-dose"><span>Max 150 mg</span></span>
+      <span id="sux-im-dose-text">mg/kg</span>
     </td>
     <td>
       <span id="sux-im"></span><span class="static unit">mg</span>
@@ -934,8 +953,6 @@
     </td>
   </tr>
 </table>
-
-<br>
 
     <table class="result-table">
    <thead>
@@ -951,7 +968,7 @@
       Fluid bolus
     </td>
     <td>
-      10–20 mL/kg
+      <span id="fluidbolus-dose-text">10–20 mL/kg</span>
     </td>
     <td>
       <span id="fluidbolus"></span><span class="static unit">mL</span>
@@ -962,7 +979,7 @@
       Glucose 10%
     </td>
     <td>
-      2 mL/kg
+     <span id="glucose-dose-text">2 mL/kg</span>
     </td>
     <td>
       <span id="glucose10"></span><span class="static unit">mL</span>
@@ -973,17 +990,18 @@
       Defibrillation energy
     </td>
     <td>
-      4 J/kg
+      <span id="defib-dose-text">4 J/kg</span>
     </td>
     <td>
       <span id="defib"></span><span class="static unit">J</span>
     </td>
   </tr>
 <tr class="row-grey">
-  <td>
+ <td> 
     Estimated blood volume
   </td>
-  <td id="blood-volume-range">
+  <td> 
+    <span id="blood-volume-range"></span>
   </td>
   <td>
     <span id="blood-volume"></span><span class="static unit"> mL</span>
@@ -1040,7 +1058,7 @@
               Midazolam - PO
             </td>
             <td>
-              0.5 mg/kg
+             <span id="premed-midaz-dose-text">0.5 mg/kg</span>
             </td>
             <td>
               <span id="premed-midaz"></span>
@@ -1049,7 +1067,7 @@
           </tr>
           <tr class="sub-orange">
             <td colspan="3">
-              <small>Max 20 mg per dose; 6 months - 14 years. Peak effect at 20-30 mins.</small>
+              <small>1 month–18 yrs. Max 20 mg per dose. Peak effect at 20-30 mins.</small>
             </td>
           </tr>
       
@@ -1058,7 +1076,7 @@
               Midazolam - NAS
             </td>
             <td>
-              0.2 mg/kg
+               <span id="premed-midaz-nas-dose-text"></span>
             </td>
             <td>
               <span id="premed-midaz-intranasal"></span>
@@ -1067,16 +1085,34 @@
           </tr>
           <tr class="sub-orange">
             <td colspan="3">
-              <small>Max 10 mg. Given via short atomiser: 0.1 ml dead space. Peak effect at 10 mins.</small>
+              <small>Max 10 mg. Given via short atomiser: 0.1 ml dead space. Peak effect at 10 mins. Can be repeated within 5–15 minutes to a max 0.5 mg/kg.</small>
             </td>
           </tr>
-      
+      <tr class="row-orange">
+  <td>
+    Buccal Midazolam
+  </td>
+  <td>
+    <span id="premed-midaz-buccal-dose-text">0.3 mg/kg</span>
+  </td>
+  <td>
+    <span id="premed-midaz-buccal"></span>
+    <span class="static unit">mg</span>
+  </td>
+</tr>
+<tr class="sub-orange">
+  <td colspan="3">
+    <small>6 months–18 yrs. Max 10 mg.</small>
+  </td>
+</tr>
+    </table>
+    <table class="result-table">
       <tr class="row-white">
             <td>
               Dexmedetomidine - NAS
             </td>
             <td>
-              2–4 mcg/kg
+              <span id="premed-dexmed-dose-text">2–4 mcg/kg</span>
             </td>
             <td>
               <span id="premed-dexmed"></span>
@@ -1085,11 +1121,18 @@
           </tr>
           <tr class="sub-white">
             <td colspan="3">
-              <small>Max 200 mcg per dose. Given 30 mins before intervention.</small>
+              <small>≥1 year. Max 200 mcg per dose. Given 30 mins before intervention.</small>
             </td>
           </tr>
       
       </table>
+<div class="text-center" style="margin: 0;">
+  <small>
+    <a href="https://stpn.uk/wp-content/uploads/2025/03/STPN-Sedation-Guideline-2.0-FINAL-.pdf">
+      STPN Best Practice Guidance for Procedural Sedation of Children and Young People
+    </a>
+  </small>
+</div>
   </div>
   </div>
     </div>
@@ -1130,13 +1173,12 @@
         </th>
       </tr>
     </thead>
-          <!-- Fentanyl GA -->
           <tr class="row-blue">
             <td>
               Fentanyl
             </td>
             <td>
-              1–2 mcg/kg
+              <span id="fentanyl-ga-dose-text">1–2 mcg/kg</span>
             </td>
             <td>
               <span id="fentanyl-ga"></span>
@@ -1155,7 +1197,7 @@
               Propofol
             </td>
             <td>
-              3–5 mg/kg
+              <span id="propofol-dose-text">3–5 mg/kg</span>
             </td>
             <td>
               <span id="propofol"></span>
@@ -1174,7 +1216,7 @@
               Rocuronium
             </td>
             <td>
-              0.6 mg/kg
+              <span id="rocuronium-ga-dose-text">0.6 mg/kg</span>
             </td>
             <td>
               <span id="rocuronium-ga"></span>
@@ -1192,7 +1234,7 @@
               Atracurium
             </td>
             <td>
-              0.5 mg/kg
+              <span id="atracurium-ga-dose-text">0.5 mg/kg</span>
             </td>
             <td>
               <span id="atracurium-ga"></span>
@@ -1219,11 +1261,12 @@
           <tr class="row-white">
             <td>
               Dexamethasone
+              <span class="small-dose"><span>Max 6.6 mg</span></span>
             </td>
             <td>
-              <span class="small-dose">
-                <span>0.15 mg/kg</span>
-              <span>Max 6.6 mg</span></span>
+             
+                <span id="dexamethasone-dose-text"><span>0.15 mg/kg</span></span>
+              
             </td>
             <td>
               <span id="dexamethasone"></span>
@@ -1240,11 +1283,10 @@
           <tr class="row-antiemetic">
             <td>
               Ondansetron
+              <span class="small-dose"><span id="ondansetron-max"></span></span>
             </td>
-            <td>
-              <span class="small-dose">
-                <span>0.15 mg/kg</span>
-              <span>Max 4 mg</span></span>
+            <td>          
+              <span id="ondansetron-dose-text">0.15 mg/kg</span>
             </td>
             <td>
               <span id="ondansetron"></span>
@@ -1259,12 +1301,13 @@
         
         <tr class="row-antiemetic">
             <td>
-              Cyclizine
+              Cyclizine<br>
+              <span class="small-dose">
+      <span id="cyclizine-max"></span>
+    </span>
             </td>
             <td>
-              <span class="small-dose">
-                <span>0.5–1 mg/kg</span>
-<span id="cyclizine-max"></span></span>
+                <span id="cyclizine-dose-text">0.5–1 mg/kg</span>
             </td>
             <td>
               <span id="cyclizine"></span>
@@ -1282,15 +1325,16 @@
           <thead>
       <tr>
         <th colspan="3">
-          Intraoperative analgesia
+          Intraoperative IV analgesia
         </th>
       </tr>
     </thead>
           <tr class="row-white">
   <td>
-   Paracetamol IV
+   Paracetamol
+    <span class="small-dose"><span id="paracetamoliv-max"></span></span>
   </td>
-  <td><span id="paracetamol-iv-inline" class="dose-note"></span>
+  <td><span id="paracetamol-iv-inline"></span>
   </td>
   <td>
     <span id="paracetamol-iv"></span><span class="static unit">mg</span>
@@ -1305,10 +1349,11 @@
 <!-- Ibuprofen IV -->
 <tr class="row-white">
   <td>
-   Ibuprofen IV
+   Ibuprofen
+    <span class="small-dose"><span>Max 400 mg</span></span>
   </td>
   <td>
-   5–10 mg/kg
+   <span id="ibuprofen-dose-text">5–10 mg/kg</span>
   </td>
   <td>
     <span id="ibuprofeniv"></span><span class="static unit">mg</span>
@@ -1322,11 +1367,11 @@
           <!-- Ketorolac -->
 <tr class="row-white">
   <td>
-    Ketorolac IV
+    Ketorolac
+    <span class="small-dose"><span id="ketorolac-max"></span></span>
   </td>
   <td>
-    <span>0.5–1 mg/kg</span>
-<span class="small-dose"><span id="ketorolac-max"></span></span>
+    <span id="ketorolac-dose-text">0.5–1 mg/kg</span>
   </td>
   <td>
     <span id="ketorolac"></span><span class="static unit">mg</span>
@@ -1340,11 +1385,12 @@
   
   <tr class="row-white">
   <td>
-    Diclofenac IV
+    Diclofenac
+    <span class="small-dose"><span id="diclofenaciv-max"></span></span>
   </td>
   <td>
-    <span>1 mg/kg</span>
-    <span class="small-dose"><span>Max 75 mg</span></span>
+    <span id="diclofenac-dose-text">1 mg/kg</span>
+    
   </td>
   <td>
     <span id="diclofenaciv"></span><span class="static unit">mg</span>
@@ -1358,10 +1404,10 @@
            <!-- Morphine IV -->
 <tr class="row-blue">
   <td>
-    Morphine IV
+    Morphine
   </td>
   <td>
-    0.05–0.1 mg/kg
+    <span id="morphineiv-inline"></span>
   </td>
   <td>
     <span id="morphineiv"></span><span class="static unit">mg</span>
@@ -1384,22 +1430,22 @@
     </thead>     
        <tr class="row-reversal">
   <td>
-    Neostigmine & <br>Glycopyrulate<br><span class="small-dose"><span>2.5 mg/1mL & </span><span>500 mcg/1 mL</span></span>
+    Neostigmine & <br>Glycopyrulate
+    <span class="small-dose"><span>2.5 mg &<br>
+      500 mcg/1 mL</span></span>
   </td>
   <td>
-  <span>0.02 mL/kg</span>
     <span class="small-dose">
-      <span>0.05 mg/kg &</span> 
-    <span>10 mcg/kg</span>
-</span>
+      <span>0.02 mL/kg</span></span>
+    <span id="neos-dose-text"></span>
   </td>
   <td>
-   <span class="neos-dose"></span><span class="static unit">ml</span>
+   <span id="neostigmine"></span><span class="static unit">mg</span>
   </td>
 </tr>
 <tr class="sub-reversal">
   <td colspan="3">
-    <small class="neos-extra"></small>
+    <small id="neostigmine-extra"></small>
   </td>
 </tr> 
        <tr class="row-reversal">
@@ -1407,15 +1453,15 @@
    Sugammadex
   </td>
   <td>
-    2 mg/kg
+    <span id="sug-2-dose-text">2 mg/kg</span>
   </td>
   <td>
-    <span class="sug-2-dose"></span><span class="static unit">mg</span>
+    <span id="sug-2"></span><span class="static unit">mg</span>
   </td>
 </tr>
 <tr class="sub-reversal">
   <td colspan="3">
-    <small class="sug-2-extra"></small>
+    <small id="sug-2-extra"></small>
     <br><small>Moderate block: Return of T<sub>2</sub> in response to TOF.</small>
   </td>
 </tr> 
@@ -1425,16 +1471,16 @@
    Sugammadex
   </td>
   <td>
-    4 mg/kg
+   <span id="sug-4-dose-text">4 mg/kg</span>
   </td>
   <td>
     
-    <span class="sug-4-dose"></span><span class="static unit">mg</span>
+    <span id="sug-4"></span><span class="static unit">mg</span>
   </td>
 </tr>
 <tr class="sub-reversal">
   <td colspan="3">
-    <small class="sug-4-extra"></small>
+    <small id="sug-4-extra"></small>
     <br><small>Deep block: 1-2 PTCs, no twitch responses to TOF.</small>
   </td>
 </tr>
@@ -1444,16 +1490,17 @@
       <thead>
       <tr>
         <th colspan="3">
-          Postoperative analgesia
+          Postoperative Oral analgesia
         </th>
       </tr>
     </thead>     
       <tr class="row-white">
   <td>
-    Paracetamol PO
+    Paracetamol
+     <span class="small-dose"><span id="paracetamolpo-max"></span></span>
   </td>
   <td>
-     <span id="paracetamol-po-inline" class="dose-note"></span>
+     <span id="paracetamol-po-inline"></span>
   </td>
   <td>
     <span id="paracetamol-po"></span><span class="static unit">mg</span>
@@ -1468,10 +1515,11 @@
 <!-- Ibuprofen PO -->
 <tr class="row-white">
   <td>
-    Ibuprofen PO
+    Ibuprofen
+    <span class="small-dose"><span>Max 400 mg</span></span>
   </td>
   <td>
-    5–10 mg/kg
+    <span id="ibuprofenpo-dose-note"></span>
   </td>
   <td>
     <span id="ibuprofenpo"></span><span class="static unit">mg</span>
@@ -1487,7 +1535,8 @@
 <!-- Morphine PO -->
 <tr class="row-blue">
   <td>
-    Morphine PO
+    Morphine
+    <span class="small-dose"><span id="morphinepo-max"></span></span>
   </td>
   <td id="morphine-po-inline">
   </td>
@@ -1513,18 +1562,18 @@
       <tr class="row-green">
   <td>
     Atropine
-  </td>
-  <td>
-    <span>20 mcg/kg</span>
     <span class="small-dose"><span>Max 600 mcg</span></span>
   </td>
   <td>
-    <span class="atropine-dose"></span><span class="static unit">mcg</span>
+    <span id="atropine-ga-dose-text"><span>20 mcg/kg</span></span>
+  </td>
+  <td>
+    <span id="atropine-ga"></span><span class="static unit">mcg</span>
   </td>
 </tr>
 <tr class="sub-green">
   <td colspan="3">
-    <small class="atropine-extra"></small>
+    <small id="atropine-ga-extra"></small>
   </td>
 </tr>
           
@@ -1533,32 +1582,33 @@
     Suxamethonium IV
   </td>
   <td>
-  <span id="sux-ga-range">1–2</span> <span class="unit">mg/kg</span>
+  <span id="sux-ga-range"> </span> <span class="unit"> </span>
 </td>
   <td>
-    <span class="sux-iv-dose"></span><span class="static unit">mg</span>
+    <span id="sux-iv-ga"></span><span class="static unit">mg</span>
   </td>
 </tr>
 <tr class="sub-red">
   <td colspan="3">
-    <small class="sux-iv-extra"></small>
+    <small id="sux-iv-ga-extra"></small>
   </td>
 </tr>
           
 <tr class="row-red">
   <td>
-    Suxamethonium IM
+    Sux. IM
+    <span class="small-dose"><span>Max 150 mg</span></span>
   </td>
   <td>
-    <span>4 mg/kg</span><span class="small-dose"><span>Max 150 mg</span></span>
+    <span id="sux-im-ga-dose-text">4 mg/kg</span>
   </td>
   <td>
-    <span class="sux-im-dose"></span><span class="static unit">mg</span>
+    <span id="sux-im-ga"></span><span class="static unit">mg</span>
   </td>
 </tr>
 <tr class="sub-red">
             <td colspan="3">
-              <small class="sux-im-extra"></small>
+              <small id="sux-im-ga-extra"></small>
   </td>
 </tr>
     </table>    
@@ -1597,12 +1647,11 @@
           <tr class="row-white">
             <td>
               Amoxicillin
+              <span class="small-dose"><span>Max 1 g</span>
+                </span>
             </td>
             <td>
-              <span class="small-dose">
-                <span>30 mg/kg</span>
-              <span>Max 1 g</span>
-                </span>
+                 <span id="amoxicillin-dose-text"></span>
             </td>
             <td>
               <span id="amoxicillin"></span>
@@ -1617,12 +1666,11 @@
           <tr class="row-white">
             <td>
               Cefuroxime
+              <span class="small-dose"><span>Max 1.5 g</span>
+                </span>
             </td>
             <td>
-              <span class="small-dose">
-                <span>50 mg/kg</span>
-              <span>Max 1.5 g</span>
-                </span>
+                <span id="cefuroxime-dose-text"></span>
             </td>
             <td>
               <span id="cefuroxime"></span>
@@ -1638,12 +1686,11 @@
           <tr class="row-white">
             <td>
               Co-Amoxiclav
-            </td>
-            <td>
-              <span class="small-dose">
-                <span>30 mg/kg</span>
-              <span>Max 1.2 g</span>
+             <span class="small-dose"><span>Max 1.2 g</span>
                </span>
+            </td>
+            <td>  
+                <span id="co-amoxiclav-dose-text"></span>
             </td>
             <td>
               <span id="co-amoxiclav"></span>
@@ -1657,13 +1704,12 @@
           </tr>
   <tr class="row-white">
             <td>
-              Flucloxacillin<br>(Soft tissue)
+              Flucloxacillin
+              <span class="small-dose"><span>(Soft tissue)</span></span>
+              <span class="small-dose"><span>Max 1 g</span></span>
             </td>
             <td>
-              <span class="small-dose">
-                <span>25 mg/kg</span>
-              <span>Max 1 g</span>
-                </span>
+                <span id="flucloxacillin-dose-text"></span>
             </td>
             <td>
               <span id="flucloxacillin"></span>
@@ -1677,13 +1723,13 @@
   
   <tr class="row-white">
             <td>
-              Flucloxacillin<br>(Open orthopaedic surgery)
+              Flucloxacillin
+              <span class="small-dose"><span>(Open orthopaedic surgery)</span></span>
+              <span class="small-dose"><span>Max 2 g</span>
+              </span>
             </td>
             <td>
-              <span class="small-dose">
-                <span>50 mg/kg</span>
-              <span>Max 2 g</span>
-              </span>
+                 <span id="flucloxacillin-bone-dose-text"></span>
             </td>
             <td>
               <span id="flucloxacillin-bone"></span>
@@ -1700,12 +1746,11 @@
    <tr class="row-white">
             <td>
               Metronidazole
+              <span class="small-dose"><span>Max 500 mg</span>
+              </span>
             </td>
             <td>
-              <span class="small-dose">
-                <span>30 mg/kg</span>
-              <span>Max 500 mg</span>
-              </span>
+               <span id="metronidazole-dose-text"></span>
             </td>
             <td>
               <span id="metronidazole"></span>
@@ -1720,8 +1765,11 @@
   <tr class="row-white">
             <td>
               Teicoplanin
+              <span class="small-dose"><span id="teicoplanin-max"></span></span>
             </td>
-            <td id="teicoplanin-dosing"></td>
+            <td>
+              <span id="teicoplanin-dose-text"></span>
+</td>
             <td>
               <span id="teicoplanin"></span>
                 <span class="static unit">mg</span>
@@ -1729,19 +1777,37 @@
           </tr>
           <tr class="sub-white">
             <td colspan="3">
-              <small id="teicoplanin-note"></small>
             </td>
           </tr>
+  <tr class="row-white">
+  <td>
+    Teicoplanin
+    <span class="small-dose"><span>(Open fractures)</span></span>
+    <span class="small-dose">
+      <span id="teicoplanin-open-max"></span>
+    </span>
+  </td>
+  <td>
+    <span id="teicoplanin-open-dose-text"></span>
+  </td>
+  <td>
+    <span id="teicoplanin-open"></span>
+    <span class="static unit">mg</span>
+  </td>
+</tr>
+<tr class="sub-white">
+  <td colspan="3">
+  </td>
+</tr>
   
   <tr class="row-white">
             <td>
               Gentamicin
+              <span class="small-dose"><span>Max 160 mg</span>
+              </span>
             </td>
             <td>
-              <span class="small-dose">
-                <span>2.5 mg/kg</span>
-              <span>Max 160 mg</span>
-              </span>
+               <span id="gentamicin-dose-text"></span>
             </td>
             <td>
               <span id="gentamicin"></span>
@@ -1750,18 +1816,19 @@
           </tr>
           <tr class="sub-white">
             <td colspan="3">
-              <small>In obesity doses should be calculated based on adjusted body weight.</small>
             </td>
           </tr>
   <tr class="row-white">
             <td>
-              Gentamicin<br>(high-dose)
+              Gentamicin
+              <span class="small-dose"><span>(high-dose)</span></span>
+              <span class="small-dose"><span>Max 480 mg</span>
+              </span>
             </td>
             <td>
-              <span class="small-dose">
-                <span>5 mg/kg</span>
-              <span>Max 480 mg</span>
-              </span>
+              
+                <span id="gentamicin-high-dose-text"></span>
+              
             </td>
             <td>
               <span id="gentamicin-high"></span>
@@ -1770,7 +1837,6 @@
           </tr>
           <tr class="sub-white">
             <td colspan="3">
-              <small>In obesity doses should be calculated based on adjusted body weight.</small>
             </td>
           </tr>
     </table>
@@ -2285,7 +2351,7 @@
 <script src="paeds-bmi-data.js"></script>
 <script src="paeds-weight-data.js"></script>
  <script src="paeds-height-data.js"></script>
-<script src="paeds-script.js"></script>
+<script src="paeds-script2.js"></script>
     
 </body>
 </html>
