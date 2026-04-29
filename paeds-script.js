@@ -89,6 +89,12 @@ const ETT_INFANT_TABLE = [
   { maxAge: 1,      unc: '4.0–4.5',  cuff: '3.5–4.0' }
 ];
 
+const BOUGIE_TABLE = [
+  { max: 3.5, size: 5, label: '≤3.5 ETT' },
+  { max: 5.5, size: 10, label: '4.0–5.5 ETT' },
+  { max: Infinity, size: 15, label: '≥6.0 ETT' }
+];
+
 const EMERGENCY_DRUG_LIST = [
   'fentanyl',
   'ketamine',
@@ -1892,6 +1898,9 @@ const row = ETT_INFANT_TABLE.find(r => y <= r.maxAge);
       cuffEl.textContent = '';
       cuffEl.style.display = 'none';
     }
+    
+const ettForBougie = cuffed || uncuffed;
+renderBougie(cuffed, uncuffed);
 
 let depth = '';
 
@@ -1952,6 +1961,41 @@ if (row) {
 } else {
   hideEl('laryngoscope');
 }
+}
+
+function getBougieFromETT(ett) {
+  if (!ett) return null;
+
+  const parts = ett.split('–').map(parseFloat);
+  const max = Math.max(...parts);
+
+  return BOUGIE_TABLE.find(r => max <= r.max) || null;
+}
+
+function renderBougie(cuffed, uncuffed) {
+  const unc = getBougieFromETT(uncuffed);
+  const cuff = getBougieFromETT(cuffed);
+
+  const el = document.getElementById('bougie');
+  if (!el) return;
+
+  const rows = [unc, cuff]
+    .filter(Boolean)
+    .filter((r, i, arr) =>
+      arr.findIndex(x => x.size === r.size) === i
+    );
+
+  if (rows.length === 0) {
+    el.innerHTML = '';
+    el.style.display = 'none';
+    return;
+  }
+
+  el.innerHTML = rows
+  .map(r => `${r.size} Ch <small style="display:inline">(${r.label})</small>`)
+  .join('<br>');
+
+  el.style.display = 'inline-block';
 }
 
 function updateVentilation(w) {
