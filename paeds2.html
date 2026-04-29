@@ -215,23 +215,40 @@
 .result-table {
   width: 100%;
   max-width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;       
   margin-bottom: 10px;
   font-size: 13px;
-  border: 1px solid var(--border-light); /* 👈 add this */
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.03),
+    0 4px 12px rgba(0,0,0,0.35);
 }
-
 .result-table th,
 .result-table td {
   padding: 8px;
-  border: 1px solid var(--border-light); /* 👈 single source of truth */
+  border-bottom: 1px solid var(--border-light);
   text-align: center;
 }
-/* Section headers */
+    
+.result-table tr:last-child td {
+  border-bottom: none;
+}
+
 .result-table thead th {
   background: var(--btn-bg);
   color: var(--text-main);
   font-weight: 600;
+  letter-spacing: 0.2px;
+  font-size: 0.95em;
+}
+.result-table thead th:first-child {
+  border-top-left-radius: 12px;
+}
+.result-table thead th:last-child {
+  border-top-right-radius: 12px;
 }
 /* Row labels (left column) */
 .result-table tbody th {
@@ -247,7 +264,7 @@
 .result table th {
   color: var(--text-main);
 }
-    .result-group {
+.result-group {
   display: flex;
   flex-direction: column;
   gap: 10px;
