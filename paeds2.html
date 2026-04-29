@@ -1,2351 +1,2367 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+// =========================
+// STATE
+// =========================
+window.weightContext = {
+  ibw: null,
+  adjbw: null,
+  isObese: false
+};
+
   
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+let ageUnit = 'years';
+let autoEstimate = true;
+
+// =========================
+// DOM CACHE
+// =========================
+const ageInput = document.getElementById('age');
+const weightIn = document.getElementById('weight');
+const heightIn = document.getElementById('height');
+const unitBtn  = document.getElementById('AgeUnitBtn');
+const estToggle = document.getElementById('EstimateToggle');
+const calcDiv  = document.getElementById('weight-calculations');
+const hCalc = document.getElementById('height-calculations');
+const bmiOutput = document.getElementById("bmi-value");
+const ibwOutput = document.getElementById("ibw-value");
+const adjbwOutput = document.getElementById("adjbw-value");
+const genderContainer = document.getElementById("GenderBtn");
+
+// =========================
+// CONFIG (DRUGS, LISTS)
+// =========================
+const LARYNGOSCOPE_TABLE = [
+  { max: 1.5,  text: 'Miller 00 or 0', note: 'Extremely preterm' },
+  { max: 2.5,  text: 'Mac 0 / Miller 0', note: 'Preterm' },
+  { max: 4,    text: 'Mac 0–1 / Miller 0–1', note: 'Term neonate' },
+  { max: 6,    text: 'Mac 1 / Miller 1', note: '1–6 m' },
+  { max: 12,   text: 'Mac 1–2 / Miller 1–2', note: '6 m–2 y' },
+  { max: 30,   text: 'Mac 2', note: '2–10 y' },
+  { max: 60,   text: 'Mac 3', note: '>10 y' },
+  { max: Infinity, text: 'Mac 3–4', note: 'adult' }
+];
+
+const IGEL_TABLE = [
+  { max: 5,  label: '1.0 <small>(2–5 kg)</small>' },
+  { max: 10, label: '1.5 <small>(5–12 kg)</small>' },
+  { max: 25, label: '2.0 <small>(10–25 kg)</small>' },
+  { max: 35, label: '2.5 <small>(25–35 kg)</small>' },
+  { max: 60, label: '3.0 <small>(30–60 kg)</small>' },
+  { max: 90, label: '4.0 <small>(50–90 kg)</small>' },
+  { max: Infinity, label: '5.0 <small>(≥90 kg)</small>' }
+];
+
+const LMA_TABLE = [
+  { max: 5,   label: '1.0 <small>(&lt;5 kg)</small>' },
+  { max: 10,  label: '1.5 <small>(5–10 kg)</small>' },
+  { max: 20,  label: '2.0 <small>(10–20 kg)</small>' },
+  { max: 30,  label: '2.5 <small>(20–30 kg)</small>' },
+  { max: 50,  label: '3.0 <small>(30–50 kg)</small>' },
+  { max: 70,  label: '4.0 <small>(50–70 kg)</small>' },
+  { max: 100, label: '5.0 <small>(70–100 kg)</small>' }
+];
+
+const NEONATAL_ETT_SIZE_TABLE = [
+  { max: 0.799, size: '2.0–2.5' },
+  { max: 1.2, size: '2.5' },
+  { max: 2.2, size: '3.0' },
+  { max: Infinity, size: '3.5' }
+];
+
+const NEONATAL_ETT_DEPTH_TABLE = [
+  { max: 0.499, depth: '5–5.5' },
+  { max: 0.6, depth: '5.5' },
+  { max: 0.8, depth: '6' },
+  { max: 1.0, depth: '6.5' },
+  { max: 1.4, depth: '7' },
+  { max: 1.8, depth: '7.5' },
+  { max: 2.4, depth: '8' },
+  { max: 3.1, depth: '8.5' },
+  { max: Infinity, depth: '9' }
+];
+
+const ETT_AGE_TABLE = [
+  // Neonates handled separately
+
+  { maxAge: 3/12,  unc: '3.5',     cuff: '3.0',     depth: '9.0–10.0', bougie: ['5'] },
+  { maxAge: 6/12,  unc: '4.0',     cuff: '3.5',     depth: '10.0–11.0', bougie: ['5','10'] },
+  { maxAge: 1,     unc: '4.0–4.5', cuff: '3.5–4.0', depth: '12.0',      bougie: ['5','10'] },
+  { maxAge: 2,     unc: '4.5–5.0', cuff: '4.0–4.5', depth: '13.0',      bougie: ['10'] },
+  { maxAge: 3,     unc: '4.5–5.0', cuff: '4.0–4.5', depth: '13.5',      bougie: ['10'] },
+  { maxAge: 4,     unc: '5.0–5.5', cuff: '4.5–5.0', depth: '14.0',      bougie: ['10'] },
+  { maxAge: 5,     unc: '5.0–5.5', cuff: '4.5–5.0', depth: '14.5',      bougie: ['10'] },
+  { maxAge: 6,     unc: '6.0',     cuff: '5.0–5.5', depth: '15.0',      bougie: ['10','15'] },
+  { maxAge: 7,     unc: '6.0',     cuff: '5.0–5.5', depth: '15.5',      bougie: ['10','15'] },
+  { maxAge: 8,     unc: '6.5',     cuff: '6.0',     depth: '16.0',      bougie: ['15'] },
+  { maxAge: 9,     unc: '6.5',     cuff: '6.0',     depth: '16.5',      bougie: ['15'] },
+  { maxAge: 10,    unc: '7.0',     cuff: '6.5',     depth: '17.0',      bougie: ['15'] },
+  { maxAge: 12,    unc: '7.5',     cuff: '7.0',     depth: '18.0',      bougie: ['15'] },
+  { maxAge: Infinity, unc: '',     cuff: '7.0–8.0', depth: '20',        bougie: ['15'] }
+];
+
+const EMERGENCY_DRUG_LIST = [
+  'fentanyl',
+  'ketamine',
+  'rocuronium',
+  'atropine',
+  'adrenaline_iv',
+  'sux_im',
+  'sux_iv',
+  'defib',
+  'fluid_bolus',
+  'glucose10',
+];
+
+const GA_DRUG_LIST = [
+  'fentanyl',
+  'propofol',
+  'rocuronium',
+  'atracurium_ga',
+  'dexamethasone',
+  'atropine',
+  'sux_im',
+  'sux_iv',
+  'ondansetron',
+  'cyclizine',
+  'ibuprofeniv',
+  'diclofenaciv',
+  'ketorolac',
+  'paracetamoliv',
+  'morphineiv', 
+  'paracetamolpo',
+  'ibuprofenpo',
+  'morphinepo'
+];
+
+const REVERSAL_LIST = [
+  'sugammadex_2',
+  'sugammadex_4',
+  'neostigmine'
+];
+
+const PREMED_LIST = [
+  'midazolam_po',
+  'midazolam_nas',
+  'dexmed_nas',
+  'midazolam_buccal'
+];
+
+const ANTIBIOTIC_LIST = [
+  'amoxicillin',
+  'cefuroxime',
+  'co-amoxiclav',
+  'flucloxacillin',
+  'flucloxacillin-bone',
+  'metronidazole',
+  'gentamicin',
+  'gentamicin-high',
+  'teicoplanin',
+  'teicoplanin-open'
+];
+
+const DRUGS = {
+  // EMERGENCY DRUGS
+fentanyl: {
+  weight: 'AdjBW',
+  dose: [1, 2],
+  unit: 'mcg',
+  conc: 50,
+  outputId: ['fentanyl', 'fentanyl-ga'],
+  extraId: ['fentanyl-vol-extra', 'fentanyl-ga-extra'],
+  labelId: ['fentanyl-dose-text', 'fentanyl-ga-dose-text']
+},
+  ketamine: {
+    weight: 'IBW',
+    dose: [1, 2],
+    unit: 'mg',
+    conc: 10,
+    outputId: 'ketamine',
+    extraId: 'ketamine-vol-extra',
+    labelId: 'ketamine-dose-text'
+  },
+  propofol_infusion: {
+  type: 'infusion_range_split', // 🔥 new type
+  weight: 'AdjBW',
+  dose: [1, 4],
+  unit: 'mg',
+  conc: 10,
+  per: 'hr',
+  outputId: {
+    mg: 'propofol-sed-mg',
+    ml: 'propofol-sed-ml'
+  }
+  },
+  midazolam_bag: {
+  type: 'infusion_bag',
+  weight: 'TBW',
+  dosePerKgHr: 0.06, // ← example
+  targetRate: 1,     // mL/hr you want
+  bagVolume: 50,
+  diluent: '0.9% sodium chloride',
+  extraId: 'midaz-sed',
+},
+morphine_bag: {
+  type: 'infusion_bag',
+  weight: 'TBW',
+  dosePerKgHr: 0.02, // ← example
+  targetRate: 1,
+  bagVolume: 50,
+  diluent: '0.9% sodium chloride',
+  extraId: 'morphine-sed',
+},
+  rocuronium: {
+  weight: 'IBW',
+  dose: [0.6, 1],
+  unit: 'mg',
+  conc: 10,
+  outputId: ['rocuronium', 'rocuronium-ga'],
+  extraId: ['rocuronium-vol-extra', 'rocuronium-ga-extra'],
+  labelId: ['rocuronium-dose-text', 'rocuronium-ga-dose-text']
+},
+  atropine: {
+  weight: 'TBW',
+  dose: [20, 20],
+  unit: 'mcg',
+  conc: 600,
+  cap: 600,
+  outputId: ['atropine', 'atropine-ga'],
+  extraId: ['atropine-vol-extra', 'atropine-ga-extra'],
+  labelId: ['atropine-dose-text', 'atropine-ga-dose-text']
+},
+adrenaline_iv: {
+  weight: 'TBW',
+  dose: [10, 10],
+  unit: 'mcg',
+  conc: 100,
+  concLabel: '1:10,000 (100 mcg/mL)', // ✅ add this
+  outputId: 'adrenalineiv',
+  extraId: 'adrenalineiv-vol-extra',
+  labelId: 'adrenaline-dose-text'
+},
+ defib: {
+  weight: 'TBW',
+  dose: [4, 4],
+  unit: 'J',
+  outputId: 'defib',
+  labelId: 'defib-dose-text'
+},
+
+fluid_bolus: {
+  weight: 'TBW',
+  dose: [10, 20],
+  unit: 'mL',
+  outputId: 'fluidbolus',
+  labelId: 'fluidbolus-dose-text'
+},
+
+glucose10: {
+  weight: 'TBW',
+  dose: [2, 2],
+  unit: 'mL',
+  outputId: 'glucose10',
+  labelId: 'glucose-dose-text'
+},
+blood_volume: {
+  type: 'blood_volume',
+
+  weight: 'TBW',
+
+  outputId: 'blood-volume',
+  rangeId: 'blood-volume-range',
+
+  unit: 'mL',
+
+  getValues: (w, ageY) => {
+    if (!w || isNaN(w)) return null;
+
+    const ageMonths = ageY * 12;
+
+    let minPerKg, maxPerKg;
+
+    if (ageMonths < 3) {
+      minPerKg = 80;
+      maxPerKg = 90;
+    } else {
+      minPerKg = 70;
+      maxPerKg = 70;
+    }
+
+    return {
+      min: minPerKg * w,
+      max: maxPerKg * w,
+      perKgMin: minPerKg,
+      perKgMax: maxPerKg
+    };
+  }
+},
+    sux_im: {
+  weight: 'TBW',
+  dose: [4, 4],
+  unit: 'mg',
+  conc: 50,
+  cap: 150,
+  outputId: ['sux-im', 'sux-im-ga'],
+  extraId: ['sux-im-vol-extra', 'sux-im-ga-extra'],
+  labelId: ['sux-im-dose-text','sux-im-ga-dose-text']
+},
+  sux_iv: {
+  weight: 'TBW',
+  unit: 'mg',
+  conc: 50,
+  outputId: ['sux-iv', 'sux-iv-ga'],
+  extraId: ['sux-iv-vol-extra', 'sux-iv-ga-extra'],
+  labelId: ['sux-range', 'sux-ga-range'],
+
+  getDose: (w, ageY) => {
+    const perKg = ageY < 1 ? 2 : 1;
+    const dose = perKg * w;
+
+    return {
+      min: dose,
+      max: dose,
+      perKg
+    };
+  }
+},
   
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <title>Paediatric anaesthesia</title>
-  <style>
-    *,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-    .unit-toggle {
-      width: 80px;
-      font-size: 14px;
-      margin: 5px 5px;
-      padding: 5px;
-      cursor: pointer;
-      background-color: var(--btn-bg);
-      border: 1px solid var(--border-light);
-      color: var(--text-main);
+  // GA DRUGS
+  propofol: {
+  weight: 'IBW',
+  dose: [3, 5],
+  unit: 'mg',
+  conc: 10,
+  outputId: 'propofol',
+  extraId: 'propofol-ga-extra',
+  labelId: 'propofol-dose-text'
+},
+atracurium_ga: {
+  weight: 'IBW',
+  dose: [0.5, 0.5],
+  unit: 'mg',
+  conc: 10,
+  outputId: 'atracurium-ga',
+  extraId: 'atracurium-ga-extra',
+  labelId: 'atracurium-ga-dose-text'
+},
+  
+ // ANTIEMETICS
+ondansetron: {
+  weight: 'TBW',
+  unit: 'mg',
+  conc: 2,
+  outputId: 'ondansetron',
+  extraId: 'ondansetron-ga-extra',
+  labelId: 'ondansetron-dose-text',
+
+  getDose: (w, ageY) => {
+    if (w <= 0 || isNaN(w)) return null;
+
+    // 🔥 <6 months → suppress calculation
+    if (ageY < 0.5) {
+      return {
+        min: 0,
+        max: 0,
+        perKg: 0.15
+      };
     }
 
-    .unit {
-      color: var(--text-secondary);
+    // ≥6 months
+    const dose = Math.min(0.15 * w, 4);
+
+    return {
+      min: dose,
+      max: dose,
+      perKg: 0.15
+    };
+  },
+
+  capLabel: (ageY) => {
+    if (ageY < 0.5) return 'BNFC: ≥6 months';
+    return 'Max 4 mg';
+  }
+},
+  cyclizine: {
+  weight: 'TBW',
+  unit: 'mg',
+  conc: 50,
+  outputId: 'cyclizine',
+  extraId: 'cyclizine-ga-extra',
+  labelId: 'cyclizine-dose-text',
+
+  capLabel: (ageY) => {
+  if (ageY < 1/12) return '';
+  return ageY < 12 ? 'Max 25 mg' : 'Max 50 mg';
+},
+    
+  getDose: (w, ageY) => {
+    if (w <= 0 || isNaN(w) || ageY < 1/12) return null;
+
+    const cap = ageY < 12 ? 25 : 50;
+
+    let min = 0.5 * w;
+    let max = 1.0 * w;
+
+    if (min > cap) min = cap;
+    if (max > cap) max = cap;
+
+    return {
+  min,
+  max,
+  perKg: '0.5–1'
+};
+  }
+},
+dexamethasone: {
+  weight: 'TBW',
+  dose: [0.15, 0.15],
+  unit: 'mg',
+  conc: 3.3,
+  cap: 6.6,
+  outputId: 'dexamethasone',
+  extraId: 'dexamethasone-ga-extra',
+  labelId: 'dexamethasone-dose-text'
+},
+  // ANALGESIA - IV
+ ibuprofeniv: {
+  weight: 'AdjBW',
+
+  getDose: (w, ageY) => {
+    const ageMonths = ageY * 12;
+
+    if (ageMonths < 3 || w < 5) {
+      return {
+        min: 0,
+        max: 0,
+        hideDose: true
+      };
     }
-  .normal-values,
-.airway-section,
-.emergency-section,
-.section {
-  margin: 0 auto 16px auto;
-  padding: 12px;
-  border-radius: 10px;
 
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-light);
+    return {
+      min: 5 * w,
+      max: 10 * w,
+      perKg: '5–10'
+    };
+  },
 
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-  box-sizing: border-box;
-}
-      .section-header {
-      font-weight: 700;
-        text-align: center;
-        margin: 0 0 10px;
+  unit: 'mg',
+  outputId: 'ibuprofeniv',
+  noteId: 'ibuprofeniv-note',
+  labelId: 'ibuprofen-dose-text',
+
+  cap: 400,
+
+  notes: [
+    {
+      condition: ({ ageMonths, weight }) => ageMonths < 3 || weight < 5,
+      text: 'Not recommended under 3 months or <5 kg'
+    },
+    {
+      condition: () => true,
+      text: 'Every 6–8 hours, max 30 mg/kg/day'
     }
-    .normal-values .static {
-  display: none;
+  ]
+},
+diclofenaciv: {
+  weight: 'AdjBW',
+  unit: 'mg',
+  conc: 25,
+  outputId: 'diclofenaciv',
+  labelId: 'diclofenac-dose-text',
+
+  getDose: (w, ageY) => {
+    if (w <= 0 || isNaN(w)) return null;
+
+    // <2 years → zero dose (handled by renderer)
+    if (ageY < 2) {
+      return {
+        min: 0,
+        max: 0,
+        perKg: 1
+      };
+    }
+
+    const dose = Math.min(1 * w, 75);
+
+    return {
+      min: dose,
+      max: dose,
+      perKg: 1
+    };
+  },
+
+  capLabel: (ageY) => {
+    if (ageY < 2) return 'BNFC: ≥2 years';
+    return 'Max 75 mg';
+  }
+},
+ ketorolac: {
+  weight: 'AdjBW',
+  unit: 'mg',
+  conc: 30,
+
+  outputId: 'ketorolac',
+  extraId: 'ketorolac-extra',
+  labelId: 'ketorolac-dose-text',
+
+  getDose: (w, ageY) => {
+  if (w <= 0 || isNaN(w)) return null;
+
+  // 🔥 NEW: <6 months → no calculated dose
+  if (ageY < 0.5) {
+    return {
+      min: 0,
+      max: 0,
+      perKg: '0.5–1'
+    };
+  }
+
+  // Paeds
+  if (ageY < 16) {
+    let min = 0.5 * w;
+    let max = 1.0 * w;
+
+    if (min > 15) min = 15;
+    if (max > 15) max = 15;
+
+    return {
+      min,
+      max,
+      perKg: '0.5–1'
+    };
+  }
+
+  // Adult
+  return {
+    min: 30,
+    max: 30,
+    perKg: '0.5–1'
+  };
+},
+
+  capLabel: (ageY) => {
+  if (ageY < 0.5) return 'BNFC: ≥6 months';
+  return ageY < 16 ? 'Max 15 mg' : 'Max 30 mg';
 }
-.result {
-  color: var(--text-main);
-  margin: 5px;
-}
-    .normal-values .result:first-child {
-  margin-top: 0;
-}
-    .input-group {
-  display: flex;
-  align-items: center;
-  margin: 5px;
-}
-.accordion {
-    max-width: 100%;
-    margin: 0px auto;
+},
+  paracetamoliv: {
+  weight: 'AdjBW',
+  unit: 'mg',
+  outputId: 'paracetamol-iv',
+  labelId: 'paracetamol-iv-inline',
+  noteId: 'paracetamol-iv-note',
+
+  getDose: (w) => {
+    if (!w || isNaN(w)) return null;
+
+    if (w <= 10) {
+      return {
+        min: 10 * w,
+        max: 10 * w,
+        perKg: '10'
+      };
+    }
+
+    if (w <= 50) {
+      return {
+        min: 15 * w,
+        max: 15 * w,
+        perKg: '15'
+      };
+    }
+
+    return {
+      min: 1000,
+      max: 1000,
+      perKg: null
+    };
+  },
+
+  notes: [
+    {
+      condition: ({ weight }) => weight <= 10,
+      text: 'Every 4–6 h, max 30 mg/kg/day'
+    },
+    {
+      condition: ({ weight }) => weight > 10 && weight <= 50,
+      text: 'Every 4–6 h, max 60 mg/kg/day'
+    },
+    {
+      condition: ({ weight }) => weight > 50,
+      text: 'Every 4–6 h, max 4 g/day'
+    }
+  ],
+
+  capLabel: (ageY, weight) => {
+    if (weight < 10) return '<10 kg';
+    return '';
   }
-  .accordion-item {
-  background: var(--bg-card);
-  margin-bottom: 6px;
-  border-radius: 10px;
-  box-shadow: none;
-  overflow: hidden;
-  border: 1px solid var(--border-light);
-  border-left: 3px solid #E37383; /* re-apply after border */
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+},
+ morphineiv: {
+  weight: 'IBW',
+  unit: 'mg',
+  outputId: 'morphineiv',
+  noteId: 'morphine-iv-extra',
+  labelId: 'morphineiv-inline',
+
+  getDose: (w, ageY) => {
+    if (!w || isNaN(w)) return null;
+
+    const ageMonths = ageY * 12;
+
+    // Neonate (<1 month)
+    if (ageMonths < 1) {
+      const dose = 0.05 * w;
+      return {
+        min: dose,
+        max: dose,
+        perKg: '0.05'
+      };
+    }
+
+    // ≥1 month
+    return {
+      min: 0.05 * w,
+      max: 0.1 * w,
+      perKg: '0.05–0.1'
+    };
+  },
+
+  notes: [
+    {
+      condition: ({ ageMonths }) => ageMonths < 1,
+      text: 'Every 6 hours, adjusted to response'
+    },
+    {
+      condition: ({ ageMonths }) => ageMonths >= 1 && ageMonths < 6,
+      text: 'Every 6 hours, adjusted to response'
+    },
+    {
+      condition: ({ ageMonths }) => ageMonths >= 6,
+      text: 'Every 4 hours, adjusted to response'
+    }
+  ]
+},
+  // ORAL ANALGESIA
+  paracetamolpo: {
+  weight: 'AdjBW',
+  unit: 'mg',
+  outputId: 'paracetamol-po',
+  labelId: 'paracetamol-po-inline',
+  noteId: 'paracetamol-po-note',
+
+  getDose: (w) => {
+    if (!w || isNaN(w)) return null;
+
+    if (w <= 10) {
+      return {
+        min: 10 * w,
+        max: 10 * w,
+        perKg: '10'
+      };
+    }
+
+    if (w <= 50) {
+      return {
+        min: 15 * w,
+        max: 15 * w,
+        perKg: '15'
+      };
+    }
+
+    return {
+      min: 1000,
+      max: 1000,
+      perKg: null
+    };
+  },
+
+  notes: [
+    {
+      condition: ({ weight }) => weight <= 10,
+      text: 'Every 4–6 h, max 30 mg/kg/day'
+    },
+    {
+      condition: ({ weight }) => weight > 10 && weight <= 50,
+      text: 'Every 4–6 h, max 60 mg/kg/day'
+    },
+    {
+      condition: ({ weight }) => weight > 50,
+      text: 'Every 4–6 h, max 4 g/day'
+    }
+  ],
+
+  capLabel: (ageY, weight) => {
+    if (weight < 10) return '<10 kg';
+    return '';
   }
-  .accordion-header {
-  background: var(--bg-card);
-  color: var(--text-main);
-  padding: 12px 14px; /* ↓ tighter */
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  font-weight: 600; /* slightly less heavy */
-  font-size: 0.98em; /* ↓ slightly smaller */
-  transition: background 0.15s ease;
+},
+  ibuprofenpo: {
+  weight: 'AdjBW',
+  unit: 'mg',
+  outputId: 'ibuprofenpo',
+  labelId: 'ibuprofenpo-dose-note', // 🔥 this links to your HTML
+  noteId: 'ibuprofenpo-note',
+
+  getDose: (w, ageY) => {
+    const ageMonths = ageY * 12;
+
+    if (!w || isNaN(w)) return null;
+
+    // <3 months → 5 mg/kg
+    if (ageMonths < 3) {
+      let dose = 5 * w;
+      if (dose > 400) dose = 400;
+
+      return {
+        min: dose,
+        max: dose,
+        perKg: '5' // 🔥 drives label
+      };
+    }
+
+    // ≥3 months → 10 mg/kg
+    let dose = 10 * w;
+    if (dose > 400) dose = 400;
+
+    return {
+      min: dose,
+      max: dose,
+      perKg: '10' // 🔥 drives label
+    };
+  },
+
+  notes: [
+  {
+    condition: ({ ageMonths, weight }) => ageMonths < 3 || weight < 5,
+    text: 'Every 6–8 hours. BNFC: Not licensed for use <3 months or <5 kg.'
+  },
+  {
+    condition: ({ ageMonths }) => ageMonths >= 3,
+    text: 'Every 6–8 hours, max 30 mg/kg/day'
   }
-.accordion-header.active {
-  background: var(--btn-bg);
-}
-  .accordion-title {
-  display: flex;
-  align-items: center;
-  gap: 8px; /* ↓ reduced */
-  }
-  .accordion-title i:first-child {
-  color: #E37383;
-  font-size: 1em;
-  }
-  .accordion-header .fa-plus,
-  .accordion-header .fa-minus {
-    color: var(--text-secondary);
-    transition: opacity 0.3s ease;
-  }
-  .accordion-header .fa-minus {
-    display: none;
-  }
-  .accordion-header.active .fa-plus {
-    display: none;
-  }
-  .accordion-header.active .fa-minus {
-    display: inline;
-  }
-.accordion-header .fa-plus,
-.accordion-header .fa-minus {
-  color: var(--text-secondary);
-  font-size: 0.9em;
-}
-  .accordion-content {
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  background: var(--bg-main);
-  transition: max-height 0.4s ease, opacity 0.3s ease;
-  font-size: 1em;
-  color: var(--text-main);
-  padding: 0 6px;
-  border-top: 1px solid var(--border-light);
-  }
-  .accordion-content.show {
-  opacity: 1;
-  }
-    .accordion-content-inner {
-  padding: 12px 0;
-  }
-.estimate-toggle {
-  display: inline-flex;
-  align-items: center;
-  cursor: pointer;
-  user-select: none;
-  margin: 5px;
-}
-.estimate-toggle input[type="checkbox"] {
-  opacity: 0;
-  width: 0;
-  height: 0;
-  position: absolute;
+]
+},
+morphinepo: {
+  weight: 'IBW',
+  unit: 'mg',
+  outputId: 'morphinepo',
+  noteId: 'morphine-po-extra',
+  labelId: 'morphine-po-inline',
+
+  getDose: (w, ageY) => {
+    if (!w || isNaN(w)) return null;
+
+    const ageMonths = ageY * 12;
+
+    if (ageMonths < 1) {
+      return { min: 0, max: 0 };
+    }
+
+    if (ageMonths <= 2) {
+      return { min: 0.05 * w, max: 0.1 * w, perKg: '0.05–0.1' };
+    }
+
+    if (ageMonths <= 5) {
+      return { min: 0.1 * w, max: 0.15 * w, perKg: '0.1–0.15' };
+    }
+
+    if (ageMonths < 12) {
+      const dose = 0.2 * w;
+      return { min: dose, max: dose, perKg: '0.2' };
+    }
+
+    if (Math.floor(ageY) === 1) {
+      return { min: 0.2 * w, max: 0.3 * w, perKg: '0.2–0.3' };
+    }
+
+    if (ageY >= 2 && ageY < 12) {
+      let min = 0.2 * w;
+      let max = 0.3 * w;
+
+      if (min > 10) min = 10;
+      if (max > 10) max = 10;
+
+      return { min, max, perKg: '0.2–0.3' };
+    }
+
+   if (ageY >= 12 && ageY < 18) {
+  return { min: 5, max: 10, perKg: null };
 }
 
-/* The track + the round knob together live in this span */
-.estimate-toggle .slider {
-  position: relative;
-  width: 40px;    /* total width of the switch */
-  height: 20px;   /* total height of the switch */
-  background-color: #ccc;
-  border-radius: 10px;
-  transition: background-color 0.2s ease;
-  margin-right: 0px;  /* spacing between switch and text */
-  flex-shrink: 0;
+   // Adult fallback
+return { min: 5, max: 10, perKg: null };
+  },
+
+  capLabel: (ageY) => {
+    if (ageY >= 2 && ageY < 12) return 'Max 10 mg';
+    return '';
+  },
+
+  notes: [
+    {
+      condition: ({ ageMonths }) => ageMonths >= 1,
+      text: 'Every 4 hours, adjusted to response'
+    }
+   ]
+},
+  /// REVERSAL
+sugammadex_2: {
+  weight: 'TBW',
+  dose: [2, 2],
+  unit: 'mg',
+  conc: 100,
+  outputId: 'sug-2',
+  extraId: 'sug-2-extra',
+  labelId: 'sug-2-dose-text'
+},
+
+sugammadex_4: {
+  weight: 'TBW',
+  dose: [4, 4],
+  unit: 'mg',
+  conc: 100,
+  outputId: 'sug-4',
+  extraId: 'sug-4-extra',
+  labelId: 'sug-4-dose-text'
+},
+neostigmine: {
+  weight: 'TBW',
+  dose: [0.05, 0.05],
+  unit: 'mg',
+  conc: 2.5,
+  cap: 5,
+
+  outputId: 'neostigmine',
+  extraId: 'neostigmine-extra',
+  labelId: 'neos-dose-text'
+},
+  /// ANTIBIOTICS
+amoxicillin: {
+  weight: 'TBW',
+  dose: [30, 30],
+  unit: 'mg',
+  cap: 1000,
+  outputId: 'amoxicillin',
+  labelId: 'amoxicillin-dose-text'
+},
+
+cefuroxime: {
+  weight: 'TBW',
+  dose: [50, 50],
+  unit: 'mg',
+  cap: 1500,
+  outputId: 'cefuroxime',
+  labelId: 'cefuroxime-dose-text'
+},
+'co-amoxiclav': {
+  weight: 'TBW',
+  dose: [30, 30],
+  unit: 'mg',
+  cap: 1200,
+  outputId: 'co-amoxiclav',
+  labelId: 'co-amoxiclav-dose-text'
+},
+
+flucloxacillin: {
+  weight: 'TBW',
+  dose: [25, 25],
+  unit: 'mg',
+  cap: 1000,
+  outputId: 'flucloxacillin',
+  labelId: 'flucloxacillin-dose-text'
+},
+
+'flucloxacillin-bone': {
+  weight: 'TBW',
+  dose: [50, 50],
+  unit: 'mg',
+  cap: 2000,
+  outputId: 'flucloxacillin-bone',
+  labelId: 'flucloxacillin-bone-dose-text'
+},
+metronidazole: {
+  weight: 'TBW',
+  dose: [30, 30],
+  unit: 'mg',
+  cap: 500,
+  outputId: 'metronidazole',
+  labelId: 'metronidazole-dose-text'
+},
+gentamicin: {
+  weight: 'AdjBW',
+  dose: [2.5, 2.5],
+  unit: 'mg',
+  cap: 160,
+  outputId: 'gentamicin',
+  labelId: 'gentamicin-dose-text'
+},
+'gentamicin-high': {
+  weight: 'AdjBW',
+  dose: [5, 5],
+  unit: 'mg',
+  cap: 480,
+  outputId: 'gentamicin-high',
+  labelId: 'gentamicin-high-dose-text'
+},
+ teicoplanin: {
+  weight: 'TBW',
+  unit: 'mg',
+  outputId: 'teicoplanin',
+  labelId: 'teicoplanin-dose-text',
+  noteId: 'teicoplanin-note',
+
+  dose: [10, 10],   // 🔥 simple mg/kg
+  cap: 400,         // 🔥 max dose
+
+  capLabel: () => 'Max 400 mg',
+
+  notes: [
+    {
+      condition: ({ ageMonths }) => ageMonths >= 2,
+      text: 'Single dose'
+    }
+  ]
+},
+  'teicoplanin-open': {
+  weight: 'TBW',
+  unit: 'mg',
+  outputId: 'teicoplanin-open',
+  labelId: 'teicoplanin-open-dose-text',
+  noteId: 'teicoplanin-open-note',
+
+  dose: [10, 10],
+  cap: 800,   // 🔥 higher cap
+
+  capLabel: () => 'Max 800 mg',
+
+  notes: [
+    {
+      condition: ({ ageMonths }) => ageMonths >= 2,
+      text: 'Open fractures'
+    }
+  ]
+},
+  /// PREMEDICATION
+  midazolam_po: {
+  weight: 'TBW',
+  dose: [0.5, 0.5],
+  unit: 'mg',
+  cap: 20,
+
+  outputId: 'premed-midaz',
+  labelId: 'premed-midaz-dose-text'
+},
+
+midazolam_nas: {
+  weight: 'TBW',
+  dose: [0.2, 0.3],
+  unit: 'mg',
+  cap: 10,
+
+  outputId: 'premed-midaz-intranasal',
+  labelId: 'premed-midaz-nas-dose-text'
+},
+
+dexmed_nas: {
+  weight: 'AdjBW',
+  dose: [2, 4],
+  unit: 'mcg',
+  cap: 200,
+
+  outputId: 'premed-dexmed',
+  labelId: 'premed-dexmed-dose-text'
+},
+  midazolam_buccal: {
+  weight: 'TBW',
+  dose: [0.3, 0.3],
+  unit: 'mg',
+  cap: 10,
+
+  outputId: 'premed-midaz-buccal',
+  labelId: 'premed-midaz-buccal-dose-text'
+},
+};
+
+// paediatric normals table
+  const paediatricNormals = {
+    0:   { respRate:[25,50], heartRate:[120,170], bp:{p5:65, p50:[80,90], p95:105} },
+    1:   { respRate:[25,50], heartRate:[120,170], bp:{p5:65, p50:[80,90], p95:105} },
+    3:   { respRate:[25,45], heartRate:[115,160], bp:{p5:65, p50:[80,90], p95:105} },
+    6:   { respRate:[20,40], heartRate:[110,160], bp:{p5:65, p50:[80,90], p95:105} },
+    12:  { respRate:[20,40], heartRate:[110,160], bp:{p5:70, p50:[85,95], p95:105} },
+    18:  { respRate:[20,35], heartRate:[100,155], bp:{p5:70, p50:[85,95], p95:105} },
+    24:  { respRate:[20,30], heartRate:[100,150], bp:{p5:70, p50:[85,100], p95:110} },
+    36:  { respRate:[20,30], heartRate:[90,140],  bp:{p5:70, p50:[85,100], p95:110} },
+    48:  { respRate:[20,30], heartRate:[80,135],  bp:{p5:70, p50:[85,100], p95:110} },
+    60:  { respRate:[20,30], heartRate:[80,135],  bp:{p5:80, p50:[90,110], p95:120} },
+    72:  { respRate:[20,30], heartRate:[80,130],  bp:{p5:80, p50:[90,110], p95:120} },
+    84:  { respRate:[20,30], heartRate:[80,130],  bp:{p5:80, p50:[90,110], p95:120} },
+    96:  { respRate:[15,25], heartRate:[70,120],  bp:{p5:80, p50:[90,110], p95:120} },
+    108: { respRate:[15,25], heartRate:[70,120],  bp:{p5:80, p50:[90,110], p95:120} },
+    120: { respRate:[15,25], heartRate:[70,120],  bp:{p5:80, p50:[90,110], p95:120} },
+    132: { respRate:[15,25], heartRate:[70,120],  bp:{p5:80, p50:[90,110], p95:120} },
+    144: { respRate:[12,24], heartRate:[65,115],  bp:{p5:90, p50:[100,120],p95:140} },
+    168: { respRate:[12,24], heartRate:[60,110],  bp:{p5:90, p50:[100,120],p95:140} }
+  };
+// =========================
+// CORE CALCULATION
+// =========================
+function stripZeros(str) {
+    return str
+      .replace(/(\.\d*?[1-9])0+$/ , '$1')   // drop extra zeroes after a significant decimal
+      .replace(/\.0+$/            , ''   );// drop ".0", ".00", etc.
+  }
+
+function toArray(val) {
+  if (!val) return [];
+  return Array.isArray(val) ? val : [val];
 }
 
-/* The white circular knob inside the track */
-.estimate-toggle .slider::before {
-  content: "";
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 16px;
-  height: 16px;
-  background-color: white;
-  border-radius: 50%;
-  transition: transform 0.2s ease;
+function getAgeYears() {
+  const raw = parseFloat(ageInput.value) || 0;
+  return ageUnit === 'months' ? raw / 12 : raw;
 }
 
-/* When the checkbox is checked, turn track green */
-.estimate-toggle input:checked + .slider {
-  background-color: #4caf50;
+function getDrugWeight(drugKey, tbw) {
+  const config = DRUGS[drugKey];
+  const { ibw, adjbw, isObese } = window.weightContext;
+
+  if (!ibw || !adjbw) {
+    return {
+      weight: tbw,
+      label: null
+    };
+  }
+  
+  switch (config.weight) {
+case 'IBW':
+  const useIBW = isObese && ibw;
+  return {
+    weight: useIBW ? ibw : tbw,
+    label: useIBW ? 'IBW' : (isObese ? 'TBW' : null)
+  };
+
+case 'AdjBW':
+  const useAdjBW = isObese && adjbw;
+  return {
+    weight: useAdjBW ? adjbw : tbw,
+    label: useAdjBW ? 'AdjBW' : (isObese ? 'TBW' : null)
+  };
+
+case 'TBW':
+default:
+  return {
+    weight: tbw,
+    label: isObese ? 'TBW' : null
+  };
+  }
 }
 
-/* When checked, move the knob to the right */
-.estimate-toggle input:checked + .slider::before {
-  transform: translateX(20px);
+function getWeightEstimateFromLMS(ageYears) {
+
+  const lms = getWeightLMS(ageYears);
+  if (!lms) return null;
+
+  return lms.M;
 }
 
-/* The visible text next to the slider */
-.estimate-toggle .toggle-label {
-  font-size: 14px;
-  color: var(--text-main);
-  margin-left: -8px;
+function getWeightLMS(ageYears) {
+
+  const genderKey = getGenderKey();
+
+  if (!paedsWeightData || !paedsWeightData[genderKey]) return null;
+
+  const dataset = paedsWeightData[genderKey];
+
+  return interpolateLMS(dataset, ageYears); // ✅ smooth interpolation
 }
-    .reversal-text {
-  background-color: #fff;      /* text on solid white so it’s readable */
-  padding: 0px 6px;
+
+function interpolateLMS(data, age) {
+  if (!data || data.length === 0) return null;
+
+  if (age <= data[0].age) return data[0];
+  if (age >= data[data.length - 1].age) return data[data.length - 1];
+
+  for (let i = 0; i < data.length - 1; i++) {
+    const a = data[i];
+    const b = data[i + 1];
+
+    if (age >= a.age && age <= b.age) {
+      const t = (age - a.age) / (b.age - a.age);
+
+      return {
+        L: a.L + t * (b.L - a.L),
+        M: a.M + t * (b.M - a.M),
+        S: a.S + t * (b.S - a.S)
+      };
+    }
+  }
+
+  return null;
 }
-    .accordion-title sup {
-  font-size: 0.6em;
-  vertical-align: super;
-  margin-left: 1px;
+
+function lmsZ(bmi, L, M, S) {
+  if (L === 0) return Math.log(bmi / M) / S;
+  return (Math.pow(bmi / M, L) - 1) / (L * S);
 }
-    .text-center {
-  text-align: center;
+
+function zToCentile(z) {
+  return 0.5 * (1 + erf(z / Math.sqrt(2))) * 100;
 }
-.accordion table th {
-  background-color: var(--btn-bg) !important;
-  color: var(--text-main);
+
+function erf(x) {
+  const sign = x >= 0 ? 1 : -1;
+  x = Math.abs(x);
+
+  const a1 = 0.254829592,
+        a2 = -0.284496736,
+        a3 = 1.421413741,
+        a4 = -1.453152027,
+        a5 = 1.061405429,
+        p  = 0.3275911;
+
+  const t = 1 / (1 + p * x);
+  const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+
+  return sign * y;
+}
+
+function getWeightCentile(weight, ageYears) {
+
+  const lms = getWeightLMS(ageYears);
+  if (!lms) return null;
+
+  const z = lmsZ(weight, lms.L, lms.M, lms.S);
+  const centile = zToCentile(z);
+
+  return centile;
+}
+
+function formatCentile(c) {
+  if (c < 0.4) return "<0.4th";
+  if (c > 99.6) return ">99.6th";
+
+  const rounded = Math.round(c);
+
+  const suffix =
+    rounded % 10 === 1 && rounded % 100 !== 11 ? "st" :
+    rounded % 10 === 2 && rounded % 100 !== 12 ? "nd" :
+    rounded % 10 === 3 && rounded % 100 !== 13 ? "rd" :
+    "th";
+
+  return `${rounded}${suffix}`;
+}
+
+function getHeightLMS(ageYears) {
+  const genderKey = getGenderKey();
+
+  if (!paedsHeightData || !paedsHeightData[genderKey]) return null;
+
+  const dataset = paedsHeightData[genderKey];
+
+  return interpolateLMS(dataset, ageYears);
+}
+
+function getHeightCentile(height, ageYears) {
+
+  const lms = getHeightLMS(ageYears);
+  if (!lms) return null;
+
+  const z = lmsZ(height, lms.L, lms.M, lms.S);
+  return zToCentile(z);
+}
+
+function getBMILMS(ageYears, gender) {
+
+  if (ageYears < (1/12)) return null;
+
+  const dataset =
+    gender === "female"
+      ? paedsBMIData.girls
+      : paedsBMIData.boys;
+
+  return interpolateLMS(dataset, ageYears);
+}
+
+function getBMICentile(bmi, ageYears, gender) {
+
+  const lms = getBMILMS(ageYears, gender);
+  if (!lms) return null;
+
+  const z = lmsZ(bmi, lms.L, lms.M, lms.S);
+  const centile = zToCentile(z);
+
+  return {
+    centile,
+    category: classifyBMI(centile),
+    z
+  };
+}
+
+function classifyBMI(centile) {
+
+  if (centile < 0.4) return "Severely underweight";
+  if (centile < 2) return "Underweight";
+  if (centile < 91) return "Healthy weight";
+  if (centile < 98) return "Overweight";
+  if (centile < 99.6) return "Obese";
+
+  return "Severely obese";
+}
+
+ function getNormalValues(age, unit) {
+    const months = unit==='months'? age : age*12;
+    const keys = Object.keys(paediatricNormals).map(k=>+k).sort((a,b)=>a-b);
+    if (months < 12) {
+      const mks = keys.filter(k=>k<12);
+      return paediatricNormals[mks.reduce((a,b)=>Math.abs(b-months)<Math.abs(a-months)?b:a, mks[0])];
+    } else {
+      const ideal = Math.floor(months/12)*12;
+      const below = keys.filter(k=>k<=ideal);
+      const key   = below.length? below.pop() : keys.find(k=>k>=12);
+      return paediatricNormals[key];
+    }
+  }
+
+// =========================
+// RENDER ENGINE
+// =========================
+function updateEmergencyDrugs(w) {
+EMERGENCY_DRUG_LIST.forEach(d => renderDrug(d, w));
+renderDrug('blood_volume', w);
+}
+  
+function updateSedation(w) {
+  ['midazolam_bag', 'morphine_bag', 'propofol_infusion']
+    .forEach(d => renderDrug(d, w));
+}
+  
+ function updateGADrugs(w) {
+  GA_DRUG_LIST.forEach(d => renderDrug(d, w));
+}
+
+function updateReversal(w) {
+  REVERSAL_LIST.forEach(d => renderDrug(d, w));
+}
+
+function updatePremed(w) {
+  PREMED_LIST.forEach(d => renderDrug(d, w));
+}
+
+function updateAntibiotics(w) {
+  ANTIBIOTIC_LIST.forEach(d => renderDrug(d, w));
 }  
-    
-.result-table {
-  width: 100%;
-  max-width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;       
-  margin-bottom: 10px;
-  font-size: 13px;
-  border: 1px solid var(--border-light);
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.03),
-    0 4px 12px rgba(0,0,0,0.35);
-}
-.result-table th,
-.result-table td {
-  padding: 8px;
-  border-bottom: 1px solid var(--border-light);
-  text-align: center;
-}
-    
-.result-table tr:last-child td {
-  border-bottom: none;
+
+function renderDrug(drugKey, tbw) {
+  const config = DRUGS[drugKey];
+  if (!config) return;
+
+  if (!tbw || isNaN(tbw)) {
+    clearDrug(drugKey);
+    return;
+  }
+  
+  const { weight, label } = getDrugWeight(drugKey, tbw);
+  const type = config.type || 'bolus';
+
+   renderDrugNotes(config, weight, drugKey);
+  
+  switch (type) {
+    case 'infusion_bag':
+      return renderInfusionBag(config, weight, label, drugKey);
+
+    case 'infusion_range_split':
+      return renderInfusionRangeSplit(config, weight, label, drugKey);
+
+    case 'bolus':
+      return renderBolusDrug(config, weight, label, drugKey);
+
+    case 'blood_volume':
+  return renderBloodVolume(config, weight, label, drugKey);  
+      
+    default:
+      console.warn(`Unknown drug type: ${type}`, drugKey);
+      return;
+  }
 }
 
-.result-table thead th {
-  background: var(--btn-bg);
-  color: var(--text-main);
-  font-weight: 600;
-  letter-spacing: 0.2px;
-  font-size: 0.95em;
-}
-.result-table thead th:first-child {
-  border-top-left-radius: 12px;
-}
-.result-table thead th:last-child {
-  border-top-right-radius: 12px;
-}
-/* Row labels (left column) */
-.result-table tbody th {
-  font-weight: 500;
-  background: rgba(255,255,255,0.03);
-}
-/* Subtle alternating rows */
-.result-table tbody tr:not([class]):nth-child(even) td {
-  background: rgba(255,255,255,0.02);
-}
-/* Remove harsh forced black text */
-.result table td,
-.result table th {
-  color: var(--text-main);
-}
-.result-group {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-    .result,
-.result span,
-.result small {
-  color: var(--text-main);
-}    
-/* ===== Primary rows (drug rows) ===== */
-.row-blue    { background-color: #98c9ee; color: #000; }
-.row-yellow  { background-color: #ffe733; color: #000; }
-.row-red     { background-color: #ec6f73; color: #000; }
-.row-green   { background-color: #a3ce6f; color: #000; }
-.row-orange  { background-color: #F68B2F; color: #000; }
-.row-purple  { background-color: #d3ace5; color: #000; }
-.row-grey    { background-color: #bcbdc0; color: #000; }
-.row-white   { background-color: #ffffff; color: #000; }
-.row-antiemetic { background-color: #F4B183; color: #000; }
+function renderBolusDrug(config, weight, label, drugKey) {
+  if (!config.dose && !config.getDose) return;
 
-/* ===== Sub rows (info / volume rows) ===== */
-.sub-blue    { background-color: #e0effa; color: #000; }
-.sub-yellow  { background-color: #fff9bf; color: #000; }
-.sub-red     { background-color: #f8d5d5; color: #000; }
-.sub-green   { background-color: #e3f0d4; color: #000; }
-.sub-orange  { background-color: #fff3e0; color: #000; }
-.sub-purple  { background-color: #f2e6f7; color: #000; }
-.sub-grey    { background-color: #e8e6e4; color: #000; }
-.sub-white   { background-color: #f5f5f5; color: #000; }
-.sub-antiemetic { background-color: #FCE5CD; color: #000; }
+  let dMin, dMax, perKgLabel;
 
-.row-blue,
-.row-yellow,
-.row-red,
-.row-green,
-.row-grey,
-.row-orange,
-.row-purple,
-.row-white,
-.row-antiemetic,
-.result-table tr[style*="background-color"] {
-  color: #000 !important;
-}
+  // --- GET DOSE ---
+  if (config.getDose) {
+    const rawAge = parseFloat(ageInput.value) || 0;
+    const ageY = ageUnit === 'months' ? rawAge / 12 : rawAge;
 
-.row-blue td,
-.row-yellow td,
-.row-red td,
-.row-green td,
-.row-grey td,
-.row-orange td,
-.row-purple td,
-.row-white td,
-.row-antiemetic td,
-.result-table tr[style*="background-color"] td {
-  color: #000 !important;
+    const result = config.getDose(weight, ageY);
+
+    if (!result || result.hideDose) {
+      hideGroup(toArray(config.outputId));
+      clearGroup(toArray(config.extraId));
+      setDoseLabel(drugKey, '');
+      return;
+    }
+
+    dMin = result.min;
+    dMax = result.max;
+    perKgLabel = result.perKg;
+
+  } else {
+    const [minDose, maxDose] = config.dose;
+    dMin = minDose * weight;
+    dMax = maxDose * weight;
+  }
+
+  // --- CAP ---
+  if (config.cap) {
+    dMin = Math.min(dMin, config.cap);
+    dMax = Math.min(dMax, config.cap);
+  }
+
+  const outputIds = toArray(config.outputId);
+  const extraIds  = toArray(config.extraId);
+
+if (dMin === 0 && dMax === 0) {
+  hideGroup(outputIds);
+  clearGroup(extraIds);
+
+  if (config.labelId) {
+    let labelText = `${perKgLabel || '0.5–1'} ${config.unit}/kg`;
+    setDoseLabel(drugKey, labelText);
+  }
+
+  if (config.capLabel) {
+    const rawAge = parseFloat(ageInput.value) || 0;
+    const ageY = ageUnit === 'months' ? rawAge / 12 : rawAge;
+
+    const capEl = document.getElementById(`${drugKey}-max`);
+    if (capEl) capEl.textContent = config.capLabel(ageY);
+  }
+
+  return;
 }
-    /* Force sub-row text to be dark */
-.sub-blue,
-.sub-yellow,
-.sub-red,
-.sub-green,
-.sub-orange,
-.sub-purple,
-.sub-grey, 
-.sub-white,
-.sub-antiemetic {
-  color: #000 !important;
-}
-.sub-blue td,
-.sub-yellow td,
-.sub-red td,
-.sub-green td,
-.sub-orange td,
-.sub-purple td,
-.sub-grey td,
-.sub-blue small,
-.sub-yellow small,
-.sub-red small,
-.row-red small,    
-.sub-green small,
-.sub-orange small,
-.sub-purple small,
-.row-purple small,    
-.sub-grey small, 
-.sub-white small, 
-.sub-antiemetic small,
-.row-reversal small,    
-.sub-reversal small {
-  color: #000 !important;
-}
-    /* Force units + dynamic spans to follow row colour */
-.result-table td span,
-.result-table td .unit {
-  color: inherit !important;
-}
- .result-table td span:not(.unit) {
-  font-weight: 600;
-}
-.phys-table tbody th {
-  font-weight: 600;
-  background: var(--btn-bg);
-  color: var(--text-main);
-  text-align: center;
-  width: 40px;
-  white-space: nowrap;
-  border-right: 2px solid var(--border-light);
+  
+  const sameDose = Math.abs(dMin - dMax) < 0.0001;
+
+  const doseText = sameDose
+    ? stripZeros(dMin.toFixed(1))
+    : `${stripZeros(dMin.toFixed(1))}–${stripZeros(dMax.toFixed(1))}`;
+
+  // --- OUTPUT ---
+  outputIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    el.textContent = doseText;
+    el.style.display = 'inline';
+
+    const unit = el.nextElementSibling;
+    if (unit && unit.classList.contains('unit')) {
+      unit.style.display = 'inline';
+    }
+  });
+
+   // --- VOLUME ---
+  if (config.conc && extraIds.length) {
+    const vMin = dMin / config.conc;
+    const vMax = dMax / config.conc;
+
+    const sameVol = Math.abs(vMin - vMax) < 0.0001;
+
+    const volText = sameVol
+      ? stripZeros(vMin.toFixed(2))
+      : `${stripZeros(vMin.toFixed(2))}–${stripZeros(vMax.toFixed(2))}`;
+
+    extraIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+
+      const concText = config.concLabel || `${config.conc} ${config.unit}/mL`;
+      el.innerHTML = `${volText} mL of ${concText}`;
+    });
+  }
+  
+  // --- LABEL ---
+  if (config.labelId) {
+    let finalLabel = '';
+
+   if (perKgLabel) {
+  finalLabel = `${perKgLabel} ${config.unit}/kg`;
+} else if (config.dose) {
+      const [minDose, maxDose] = config.dose;
+      finalLabel = (minDose === maxDose)
+        ? `${minDose} ${config.unit}/kg`
+        : `${minDose}–${maxDose} ${config.unit}/kg`;
+    }
+
+    if (label) {
+      finalLabel += `<br><small class="drug-weight-label">${label}</small>`;
+    }
+
+    setDoseLabel(drugKey, finalLabel);
+  }
+
+  // --- CAP LABEL (e.g. cyclizine) ---
+  if (config.capLabel) {
+    const rawAge = parseFloat(ageInput.value) || 0;
+    const ageY = ageUnit === 'months' ? rawAge / 12 : rawAge;
+
+    const capEl = document.getElementById(`${drugKey}-max`);
+    if (capEl) {
+      capEl.textContent = config.capLabel(ageY, weight) || '';
+    }
+  }
 }
 
-.row-reversal {
-  background: repeating-linear-gradient(
-    135deg,
-    #fcd6e3 0px,
-    #fcd6e3 10px,
-    #fff7fa 10px,
-    #fff7fa 20px
+function renderInfusionBag(config, weight, label, drugKey) {
+  const mgPerHr = config.dosePerKgHr * weight;
+
+  const conc = mgPerHr / config.targetRate; // mg/mL
+  const bagMg = conc * config.bagVolume;
+
+  const labelText = label
+  ? ` <small class="drug-weight-label">(${label})</small>`
+  : '';
+
+const text =
+  `${stripZeros(bagMg.toFixed(2))} mg in ${config.bagVolume} mL ${config.diluent}${labelText}`;
+
+  toArray(config.extraId).forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    el.innerHTML = text;
+    el.style.display = 'inline';
+  });
+
+  if (config.dosePerKgHr) {
+    const labelText = `${config.dosePerKgHr} mg/kg/hr`;
+
+    setDoseLabel(
+      drugKey,
+      label
+        ? `${labelText} <small class="drug-weight-label">(${label})</small>`
+        : labelText
+    );
+  }
+}
+function renderInfusionRangeSplit(config, weight, label, drugKey) {
+  if (!config.dose) return;
+
+  const [minDose, maxDose] = config.dose;
+
+  let rateMin = minDose * weight;
+  let rateMax = maxDose * weight;
+
+  // per min → per hour
+  if (config.per === 'min') {
+    rateMin *= 60;
+    rateMax *= 60;
+  }
+
+  const mgMin = rateMin;
+  const mgMax = rateMax;
+
+  const mlMin = config.conc ? mgMin / config.conc : null;
+  const mlMax = config.conc ? mgMax / config.conc : null;
+
+  // 🔹 MG/HR OUTPUT (with label here)
+  const mgText = (mgMin === mgMax)
+    ? `${stripZeros(mgMin.toFixed(2))}`
+    : `${stripZeros(mgMin.toFixed(2))}–${stripZeros(mgMax.toFixed(2))}`;
+
+  const mgEl = document.getElementById(config.outputId.mg);
+  if (mgEl) {
+    mgEl.innerHTML = label
+  ? `${mgText} mg/hr <small class="drug-weight-label">(${label})</small>`
+  : `${mgText} mg/hr`;
+  }
+
+  // 🔹 ML/HR OUTPUT (separate line/location)
+  if (mlMin !== null) {
+    const mlText = (mlMin === mlMax)
+      ? `${stripZeros(mlMin.toFixed(2))}`
+      : `${stripZeros(mlMin.toFixed(2))}–${stripZeros(mlMax.toFixed(2))}`;
+
+    const mlEl = document.getElementById(config.outputId.ml);
+    if (mlEl) {
+      mlEl.textContent = `${mlText} mL/hr`;
+    }
+  }
+}
+
+function renderBloodVolume(config, weight, label, drugKey) {
+
+  const rawAge = parseFloat(ageInput.value) || 0;
+  const ageY = ageUnit === 'months' ? rawAge / 12 : rawAge;
+
+  const result = config.getValues(weight, ageY);
+
+  const el = document.getElementById(config.outputId);
+  const unit = el?.nextElementSibling;
+  const rangeEl = document.getElementById(config.rangeId);
+
+  if (!result) {
+    if (el) {
+      el.textContent = '';
+      el.style.display = 'none';
+    }
+    if (unit) unit.style.display = 'none';
+    if (rangeEl) rangeEl.textContent = '';
+    return;
+  }
+
+  const { min, max, perKgMin, perKgMax } = result;
+
+  // --- RANGE TEXT (middle column) ---
+  let rangeText =
+    perKgMin === perKgMax
+      ? `${perKgMin} mL/kg`
+      : `${perKgMin}–${perKgMax} mL/kg`;
+
+  if (label) {
+    rangeText += `<br><small class="drug-weight-label">${label}</small>`;
+  }
+
+  if (rangeEl) rangeEl.innerHTML = rangeText;
+
+  // --- VALUE (right column) ---
+  const same = Math.abs(min - max) < 0.001;
+
+  const text = same
+    ? stripZeros(min.toFixed(0))
+    : `${stripZeros(min.toFixed(0))}–${stripZeros(max.toFixed(0))}`;
+
+  if (el) {
+    el.textContent = text;
+    el.style.display = 'inline';
+  }
+
+  if (unit && unit.classList.contains('unit')) {
+    unit.style.display = 'inline';
+  }
+}
+
+function renderDrugNotes(config, weight, drugKey) {
+  if (!config.notes || !config.noteId) return;
+
+  const rawAge = parseFloat(ageInput.value) || 0;
+  const ageMonths = ageUnit === 'months' ? rawAge : rawAge * 12;
+
+  const note = config.notes.find(n =>
+    n.condition({ ageMonths, weight })
   );
-  color: #000;
-}
-.sub-reversal {
-  background-color: #fff5f7;
-  color: #000;
+
+  toArray(config.noteId).forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    if (note) {
+      el.textContent = note.text;
+      el.style.display = 'inline';
+    } else {
+      el.textContent = '';
+      el.style.display = 'none';
+    }
+  });
 }
 
-.row-reversal td,
-.sub-reversal td,
-.sub-reversal small {
-  color: #000 !important;
-}
-    .link-section {
-  margin-bottom: 16px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border-light);
-}
-.link-section h4 {
-  margin: 0 0 6px;
-  font-size: 0.95em;
-  font-weight: 600;
-  color: var(--text-main);
+function clearDrug(drugKey) {
+  const config = DRUGS[drugKey];
+  if (!config) return;
+
+  // --- main outputs ---
+  toArray(config.outputId).forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    el.textContent = '';
+    el.style.display = 'none';
+
+    const unit = el.nextElementSibling;
+    if (unit && unit.classList.contains('unit')) {
+      unit.style.display = 'none';
+    }
+  });
+
+  // --- extra (e.g. volumes, bags) ---
+  toArray(config.extraId).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = '';
+  });
+
+  // --- split outputs (infusions) ---
+  if (config.outputId?.mg) {
+    const el = document.getElementById(config.outputId.mg);
+    if (el) el.textContent = '';
+  }
+
+  if (config.outputId?.ml) {
+    const el = document.getElementById(config.outputId.ml);
+    if (el) el.textContent = '';
+  }
+
+  // --- labels ---
+  if (config.labelId) {
+    setDoseLabel(drugKey, '');
+  }
+
+  // --- notes ---
+  if (config.noteId) {
+    toArray(config.noteId).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = '';
+    });
+  }
+
+  // --- caps (e.g. "Max 400 mg") ---
+  const capEl = document.getElementById(`${drugKey}-max`);
+  if (capEl) capEl.textContent = '';
+
+  // --- range column (blood volume etc) ---
+  if (config.rangeId) {
+    const el = document.getElementById(config.rangeId);
+    if (el) el.textContent = '';
+  }
 }
 
-.link-section ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+function setDoseLabel(drugKey, text) {
+  const ids = DRUGS[drugKey].labelId;
+  if (!ids) return; // 🔥 add this
+
+  if (Array.isArray(ids)) {
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = text;
+    });
+  } else {
+    const el = document.getElementById(ids);
+    if (el) el.innerHTML = text;
+  }
+}
+// =========================
+// UI HELPERS
+// =========================
+function getGenderKey() {
+  const genderContainer = document.getElementById("GenderBtn");
+
+  const gender =
+    genderContainer.dataset.gender ||
+    genderContainer.querySelector("button.active")?.dataset.value ||
+    "male";
+
+  return gender === "female" ? "girls" : "boys";
 }
 
-.link-section li {
-  margin: 4px 0;
-  line-height: 1.4;
+function clearText(id) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = '';
 }
 
-.link-section a {
-  color: var(--link-color);
-  text-decoration: none;
+function hideEl(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  el.textContent = '';
+  el.style.display = 'none';
+
+  const unit = el.nextElementSibling;
+  if (unit && unit.classList.contains('unit')) {
+    unit.style.display = 'none';
+  }
 }
 
-.link-section a:hover {
-  text-decoration: underline;
-}
-.link-section:last-child {
-  border-bottom: none;
-}
-    .small-dose {
-  font-size: 0.7em !important;    
-  line-height: 1.3;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-    .small-dose span {
-  display: block;
-}
- .centile-text {
-  font-size: 0.8em;
-  color: #666;
-  display: inline-block;
-  margin-left: 6px;
-} 
-.bmi-underweight { color: #3b82f6; }     /* blue */
-.bmi-healthy     { color: #16a34a; }     /* green */
-.bmi-overweight  { color: #f59e0b; }     /* amber */
-.bmi-obese       { color: #ef4444; }     /* red */
-.bmi-severe      { color: #b91c1c; }     /* dark red */
+function showEl(id, text) {
+  const el = document.getElementById(id);
+  if (!el) return;
 
-small.drug-weight-label {
-      font-weight: 500;
-  color: #374151;
+  el.textContent = text;
+  el.style.display = 'inline';
+
+  const unit = el.nextElementSibling;
+  if (unit && unit.classList.contains('unit')) {
+    unit.style.display = 'inline';
+  }
 }
-small[class] {
-  color: inherit;
+
+function clearGroup(ids) {
+  ids.forEach(id => clearText(id));
 }
- .result span:first-of-type {
-  font-size: 1em;
+
+function hideGroup(ids) {
+  ids.forEach(id => hideEl(id));
 }
-  </style>
-</head>
+
+function estimateWeight() {
+  if (!autoEstimate) return;
   
-<body>
-<header class="calc-header paeds">Paediatric anaesthesia</header>
-  <div class="calc-wrapper">
-  <div class="calc-section">
+  const a = parseFloat(ageInput.value);
 
-  <div class="gender-buttons" id="GenderBtn">
-    <button class="active" data-value="male">Male</button>
-    <button data-value="female">Female</button>
+  if (isNaN(a) || a < 0) {
+    return;
+  }
 
-</div>        
-  <div class="input-group">
-    <label for="age">Age:</label>
-    <input type="number" id="age" min="0" placeholder="0" />
-    <button class="unit-toggle" id="AgeUnitBtn">years</button>
-  </div>
+  const ageY = (ageUnit === 'months') ? (a / 12) : a;
+
+  // Stop above your existing cutoff
+  if (ageY > 20) {
+    estToggle.checked = false;
+    weightIn.disabled = false;
+    weightIn.value = '';
+    weightIn.placeholder = '0';
+    clearWeight();
+    return;
+  }
+
+  // 🔥 LMS-based estimate
+  const estimatedWeight = getWeightEstimateFromLMS(ageY);
+
+  if (!estimatedWeight) {
+    clearWeight();
+    return;
+  }
+
+  const w = stripZeros(estimatedWeight.toFixed(2));
+  weightIn.value = w;
   
-<div class="input-group">
-  <label for="weight">Weight (kg):</label>
-  <input type="number" id="weight" min="0" placeholder="0" />
-  <div id="weight-calculations"></div>
-</div>
-        <!-- Height input -->
-  <div class="input-group">
-    <label for="height">Height (cm):</label>
-    <input type="number" id="height" min="0" placeholder="0" />
-    <div id="height-calculations"></div>
-  </div>    
+updateWeightCentileDisplay();  
+}
 
-<label class="estimate-toggle">
-  <input type="checkbox" id="EstimateToggle" checked>
-  <span class="slider"></span>
-  <span class="toggle-label">Estimate <small>(UK-WHO / UK90)</small></span>
-</label>
+function estimateHeight() {
 
-  <p class="text-center">
-      <small>In Obesity, use <a href="https://www.paedspro.com/">Paeds Prescribing Pro.</a></small>
-      </p>
-  </div>
+  const a = parseFloat(ageInput.value);
+
+  if (isNaN(a) || a < 0) return;
+
+  const ageY = (ageUnit === 'months') ? (a / 12) : a;
+
+  if (ageY > 20) return;
+
+  const lms = getHeightLMS(ageY);
+  if (!lms) return;
+
+  const estimatedHeight = lms.M;
+  
+  heightIn.value = stripZeros(estimatedHeight.toFixed(1));
+
+  updateHeightCentileDisplay();
+}
+
+  function toggleAgeUnit() {
+  // 2) flip the button and convert the value
+  const raw = ageInput.value.trim();
+  const n   = parseFloat(raw);
+
+  if (ageUnit === 'years') {
+    ageUnit = 'months';
+    unitBtn.textContent = 'months';
+    ageInput.value = (raw !== '' && !isNaN(n)) ? Math.round(n * 12) : '';
+  } else {
+    ageUnit = 'years';
+    unitBtn.textContent = 'years';
+    ageInput.value = (raw !== '' && !isNaN(n)) ? Math.round((n / 12) * 10) / 10 : '';
+  }
+    updateAll();
+}
+
+function updateWeightCentileDisplay() {
+  const ageVal = parseFloat(ageInput.value);
+  const weightVal = parseFloat(weightIn.value);
+
+  if (!isNaN(ageVal) && !isNaN(weightVal)) {
+    const ageY = ageUnit === 'months' ? ageVal / 12 : ageVal;
+    const centile = getWeightCentile(weightVal, ageY);
+
+    if (centile !== null) {
+      calcDiv.innerHTML =
+  `<small class="centile-text">${formatCentile(centile)} centile</small>`;
+    }
+  }
+}
+
+function updateHeightCentileDisplay() {
+  const heightVal = parseFloat(heightIn.value);
+  const ageVal = parseFloat(ageInput.value);
+
+  const el = document.getElementById("height-calculations");
+
+  if (!el || isNaN(heightVal) || isNaN(ageVal)) {
+    if (el) el.innerHTML = '';
+    return;
+  }
+
+  const ageY = ageUnit === 'months' ? ageVal / 12 : ageVal;
+  const centile = getHeightCentile(heightVal, ageY);
+
+  el.innerHTML = centile !== null
+    ? `<small class="centile-text">${formatCentile(centile)} centile</small>`
+    : '';
+}
+
+ function updateNormalCentiles(n) {
+    document.getElementById('sbp-5').textContent   = n.bp.p5;
+    document.getElementById('sbp-50').textContent =
+  Array.isArray(n.bp.p50) ? `${n.bp.p50[0]}–${n.bp.p50[1]}` : n.bp.p50;
+    document.getElementById('sbp-95').textContent  = n.bp.p95;
+    document.getElementById('hr-5').textContent    = n.heartRate[0];
+    document.getElementById('hr-95').textContent   = n.heartRate[1];
+    document.getElementById('rr-5').textContent    = n.respRate[0];
+    document.getElementById('rr-95').textContent   = n.respRate[1];
+    document.querySelectorAll('.normal-values .static')
+      .forEach(el => el.style.display='inline');
+  }
+
+function lookupByWeight(weight, table) {
+  const row = table.find(r => weight <= r.max);
+  return row ? (row.label || row.size || row.depth) : '';
+}
+
+function updateAirwayCalculations(ageYears, w) {
+
+  const y = ageUnit === 'months'
+    ? parseFloat(ageInput.value) / 12
+    : ageYears;
+
+  if (isNaN(y) || y < 0) {
+    hideGroup(['ett-uncuffed','ett-cuffed','ett-depth-lips','bougie']);
+    return;
+  }
+
+  // =========================
+  // NEONATES (weight-based)
+  // =========================
+  if (y === 0 && w > 0) {
+
+    const uncEl  = document.getElementById('ett-uncuffed');
+    const cuffEl = document.getElementById('ett-cuffed');
+
+    const size  = lookupByWeight(w, NEONATAL_ETT_SIZE_TABLE);
+    const depth = lookupByWeight(w, NEONATAL_ETT_DEPTH_TABLE);
+
+    uncEl.textContent = size;
+    uncEl.style.display = 'inline';
+
+    cuffEl.textContent = '';
+    cuffEl.style.display = 'none';
+
+    const depthEl   = document.getElementById('ett-depth-lips');
+    const depthUnit = depthEl.nextElementSibling;
+
+    depthEl.textContent = depth;
+    depthEl.style.display = 'inline';
+    depthUnit.style.display = 'inline';
+
+    // Neonatal bougie
+    renderBougieFromRow({ bougie: ['5'] });
+
+  }
+
+  // =========================
+  // EVERYTHING ELSE → TABLE
+  // =========================
+  else {
+
+    const row = ETT_AGE_TABLE.find(r => y <= r.maxAge);
+
+    let uncuffed = '';
+    let cuffed = '';
+    let depth = '';
+
+    if (row) {
+      uncuffed = row.unc;
+      cuffed   = row.cuff;
+      depth    = row.depth;
+
+      renderBougieFromRow(row);
+    }
+
+    // --- uncuffed ---
+    const uncEl = document.getElementById('ett-uncuffed');
+    if (uncuffed) {
+      uncEl.textContent = uncuffed;
+      uncEl.style.display = 'inline';
+    } else {
+      hideEl('ett-uncuffed');
+    }
+
+    // --- cuffed ---
+    const cuffEl = document.getElementById('ett-cuffed');
+    if (cuffed && w >= 3.0) {
+      cuffEl.textContent = cuffed;
+      cuffEl.style.display = 'inline';
+    } else {
+      hideEl('ett-cuffed');
+    }
+
+    // --- depth ---
+    const depthEl = document.getElementById('ett-depth-lips');
+    const depthUnit = depthEl.nextElementSibling;
+
+    if (depth) {
+      depthEl.textContent = depth;
+      depthEl.style.display = 'inline';
+      depthUnit.style.display = 'inline';
+    } else {
+      hideEl('ett-depth-lips');
+    }
+  }
+
+  // =========================
+  // OTHER AIRWAY STUFF (unchanged)
+  // =========================
+
+  const igelEl = document.getElementById('igel');
+  const igelSize = w >= 2 ? lookupByWeight(w, IGEL_TABLE) : '';
+  igelEl.innerHTML = igelSize;
+  igelEl.style.display = igelSize ? 'inline' : 'none';
+
+  const lmaEl = document.getElementById('lma');
+  const lmaSize = w > 0 ? lookupByWeight(w, LMA_TABLE) : '';
+  lmaEl.innerHTML = lmaSize;
+  lmaEl.style.display = lmaSize ? 'inline-block' : 'none';
+
+  const rowL = w > 0
+    ? LARYNGOSCOPE_TABLE.find(r => w <= r.max)
+    : null;
+
+  if (rowL) {
+    showEl('laryngoscope', rowL.text);
+    if (rowL.note) {
+      document.getElementById('laryngoscope').innerHTML =
+        `${rowL.text}<br><small>${rowL.note}</small>`;
+    }
+  } else {
+    hideEl('laryngoscope');
+  }
+}
+
+function renderBougieFromRow(row) {
+  const el = document.getElementById('bougie');
+
+  if (!row || !row.bougie) {
+    el.innerHTML = '';
+    el.style.display = 'none';
+    return;
+  }
+
+  el.innerHTML = row.bougie
+    .map(size => {
+      if (size === '5') return '5 Ch (≤3.5 ETT)';
+      if (size === '10') return '10 Ch (4.0–5.5 ETT)';
+      if (size === '15') return '15 Ch (≥6.0 ETT)';
+    })
+    .join('<br>');
+
+  el.style.display = 'inline-block';
+}
+
+function updateVentilation(w) {
+  const tvEl = document.getElementById('tidalvolume');
+  const tvArdsEl = document.getElementById('tv-neonates-ards');
+
+  // --- Normal tidal volume (6–8 mL/kg) ---
+  if (tvEl) {
+    if (w > 0) {
+      const min = Math.round(6 * w);
+      const max = Math.round(8 * w);
+
+      tvEl.textContent = `${min}–${max} mL`;
+      tvEl.style.display = 'inline';
+    } else {
+      tvEl.textContent = '';
+      tvEl.style.display = 'none';
+    }
+  }
+
+  // --- ARDS tidal volume (4–6 mL/kg) ---
+  if (tvArdsEl) {
+    if (w > 0) {
+      const min = Math.round(4 * w);
+      const max = Math.round(6 * w);
+
+      tvArdsEl.textContent = `${min}–${max} mL`;
+      tvArdsEl.style.display = 'inline';
+    } else {
+      tvArdsEl.textContent = '';
+      tvArdsEl.style.display = 'none';
+    }
+  }
+}
+
+function calculateBMI() {
+
+  const weight = parseFloat(weightIn.value);
+  const heightCm = parseFloat(heightIn.value);
+
+  const rawAge = parseFloat(ageInput.value) || 0;
+  const ageYears = ageUnit === 'months' ? rawAge / 12 : rawAge;
+
+  const genderContainer = document.getElementById("GenderBtn");
+
+  const gender =
+  genderContainer.dataset.gender ||
+  genderContainer.querySelector("button.active")?.dataset.value ||
+  "male";
+  
+// ── Allow BMI from 1 month, but flag under 2 years ──
+if (ageYears < (1/12)) {
+  bmiOutput.textContent = "";
+  ibwOutput.textContent = "";
+  adjbwOutput.textContent = "";
+  return;
+}
+
+  if (!weight || !heightCm) {
+    bmiOutput.textContent = "";
+    ibwOutput.textContent = "";
+    adjbwOutput.textContent = "";
+    return;
+  }
+
+  const heightM = heightCm / 100;
+
+  // BMI
+  const bmi = weight / (heightM * heightM);
+  const bmiRounded = bmi.toFixed(1);
+
+   const result = getBMICentile(bmi, ageYears, gender);
+
+if (result) {
+
+  const centileText = formatCentile(result.centile);
+  const cssClass = getBMIClass(result.centile);
+
+  bmiOutput.innerHTML =
+  `${bmiRounded} kg/m²<br>
+   <span class="${cssClass}">
+     ${centileText} centile – ${result.category}
+   </span>${ageYears < 2 ? '*' : ''}`;
+
+if (result.centile >= 98) {
+  openAccordionById('bmi-accordion-header');
+}
+
+} else {
+  bmiOutput.textContent = `${bmiRounded} kg/m²`;
+}
+  
+  function getBMIClass(centile) {
+  if (centile < 2) return 'bmi-underweight';
+  if (centile < 91) return 'bmi-healthy';
+  if (centile < 98) return 'bmi-overweight';
+  if (centile < 99.6) return 'bmi-obese';
+  return 'bmi-severe';
+}
+
+// =========================
+// IDEAL BODY WEIGHT
+// =========================
+
+const lms = getBMILMS(ageYears, gender);
+
+let ibw = null;
+let adjbw = null;
+
+if (lms) {
+  const bmi50 = lms.M;
+  ibw = bmi50 * heightM * heightM;
+
+  adjbw = ibw + 0.35 * (weight - ibw);
+
+  if (ageYears < 2) {
+    ibwOutput.textContent = `${ibw.toFixed(1)} kg*`;
+    adjbwOutput.textContent = `${adjbw.toFixed(1)} kg*`;
+  } else {
+    ibwOutput.textContent = `${ibw.toFixed(1)} kg`;
+    adjbwOutput.textContent = `${adjbw.toFixed(1)} kg`;
+  }
+
+} else {
+  ibwOutput.textContent = "";
+  adjbwOutput.textContent = "";
+}
  
-  <div class="accordion">
-
-  <div class="accordion-item">
-
-    <div class="accordion-header" id="bmi-accordion-header">
-
-      <span class="accordion-title">
-
-        <i class="fa-solid fa-scale-balanced"></i>Weight and BMI
-
-      </span>
-
-      <span>
-
-        <i class="fas fa-plus"></i>
-
-        <i class="fas fa-minus"></i>
-
-      </span>
-
-    </div>
-
-    <div class="accordion-content">
-
-      <div class="accordion-content-inner">
-      
-  <!-- BMI display -->
-<div class="input-group">
-  <label>BMI:</label>
-  <span id="bmi-value"></span>
-</div>
-
-<div class="input-group">
-  <label>Ideal body weight:</label>
-  <span id="ibw-value"></span>
-</div>
-
-<div class="input-group">
-  <label>Adjusted body weight:</label>
-  <span id="adjbw-value"></span>
-</div>        
-<small id="bmi-warning"></small>
-</div>
-      </div>
-      </div>
-    </div>
-  <div class="accordion-item">
-
-    <div class="accordion-header">
-
-      <span class="accordion-title">
-
-        <i class="fa-solid fa-heart-pulse"></i><span>Normal Physiological Values</span>
-
-      </span>
-
-      <span>
-
-        <i class="fas fa-plus"></i>
-
-        <i class="fas fa-minus"></i>
-
-      </span>
-
-    </div>
-
-    <div class="accordion-content">
-
-      <div class="accordion-content-inner">
-
-<table class="result-table phys-table">
-  <tbody>
-    <tr>
-      <th>SBP</th>
-      <td>
-        <span id="sbp-50"></span>
-        <span class="unit"> mmHg</span>
-        (<span id="sbp-5"></span>–<span id="sbp-95"></span>
-        <span class="unit"> mmHg</span>)<sup>*</sup>
-      </td>
-    </tr>
-    <tr>
-      <th>HR</th>
-      <td>
-        <span id="hr-5"></span>–<span id="hr-95"></span>
-        <span class="unit"> bpm</span><sup>†</sup>
-      </td>
-    </tr>
-    <tr>
-      <th>RR</th>
-      <td>
-        <span id="rr-5"></span>–<span id="rr-95"></span>
-        <span class="unit"> bpm</span><sup>†</sup>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-<small>
-  <sup>*</sup>50th centile (5th – 95th)<br>
-  <sup>†</sup>5th – 95th centile
-</small>
-      </div>
-      </div>
-    </div>
+  window.weightContext.ibw = ibw;
+  window.weightContext.adjbw = adjbw;
+  window.weightContext.isObese = result.centile >= 98;
   
-  <div class="accordion-item">
+  const warning = document.getElementById("bmi-warning");
 
-    <div class="accordion-header">
+if (ageYears < 2) {
+  warning.textContent = "*BMI centiles not validated <2 years";
+} else {
+  warning.textContent = "";
+}
+}
 
-      <span class="accordion-title">
+function updateEstimateLock() {
+  weightIn.disabled = autoEstimate;
+  heightIn.disabled = autoEstimate;
+}
 
-        <i class="fa-solid fa-mask-ventilator"></i>Airway and Ventilation
+function clearWeight() {
+  Object.keys(DRUGS).forEach(clearDrug);
+   // =========================
+  // Calculations display
+  // =========================
+  calcDiv.innerHTML = '';
+  if (hCalc) hCalc.innerHTML = '';
 
-      </span>
+  // =========================
+  // Airway
+  // =========================
+  hideGroup(['ett-uncuffed','ett-cuffed','ett-depth-lips','bougie']);
+  clearText('laryngoscope');
+  document.getElementById('laryngoscope').style.display = 'none';
 
-      <span>
+   // =========================
+  // Airway adjuncts
+  // =========================
+  hideEl('igel');
+  hideEl('lma');
+  hideEl('tidalvolume');
+  hideEl('tv-neonates-ards');
 
-        <i class="fas fa-plus"></i>
+  // =========================
+  // Normals
+  // =========================
+  clearGroup([
+    'sbp-5','sbp-50','sbp-95',
+    'hr-5','hr-95','rr-5','rr-95'
+  ]);
 
-        <i class="fas fa-minus"></i>
+  document.querySelectorAll('.normal-values .static')
+    .forEach(el => el.style.display = 'none');
+}
 
-      </span>
+function resetForm() {
+  // Clear inputs only
+  ageInput.value = '';
+  weightIn.value = '';
+  heightIn.value = '';
 
-    </div>
+  // Reset UI controls
+  ageUnit = 'years';
+  unitBtn.textContent = 'years';
 
-    <div class="accordion-content">
+  autoEstimate = true;
+  estToggle.checked = true;
+  updateEstimateLock();
 
-      <div class="accordion-content-inner">
-<div class="result-group">
-  <table class="result-table">
-  <thead>
-    <tr>
-      <th colspan="2">Endotracheal tube (ETT)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Laryngoscope</th>
-      <td><span id="laryngoscope"></span></td>
-    </tr>
-    <tr>
-      <th>Uncuffed ETT</th>
-      <td><span id="ett-uncuffed"></span></td>
-    </tr>
-    <tr>
-      <th>Cuffed ETT</th>
-      <td><span id="ett-cuffed"></span></td>
-    </tr>
-    <tr>
-      <th>Depth at lips</th>
-      <td>
-        <span id="ett-depth-lips"></span>
-        <span class="unit">cm</span>
-      </td>
-    </tr>
-  </tbody>
-</table>
-</div>  
+  // Reset gender (optional)
+  const genderContainer = document.getElementById("GenderBtn");
+  genderContainer.dataset.gender = "male";
+  genderContainer.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+  const defaultGender = genderContainer.querySelector('[data-value="male"]');
+  if (defaultGender) defaultGender.classList.add("active");
 
-<table class="result-table">
-  <thead>
-    <tr>
-      <th colspan="2">Supraglottic airway device (SAD)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>LMA</th>
-      <td><span id="lma"></span></td>
-    </tr>
-    <tr>
-      <th>i-Gel</th>
-      <td><span id="igel"></span></td>
-    </tr>
-  </tbody>
-</table>      
+  // Let your existing logic clear everything properly
+  updateAll();
+  closeAllAccordions(); 
+}
 
-        <table class="result-table">
-  <thead>
-    <tr>
-      <th colspan="2">Breathing circuits</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>T-piece</th>
-      <td>0–20 kg</td>
-    </tr>
-    <tr>
-      <th>Infant (Micro) circle</th>
-      <td>0–10 kg</td>
-    </tr>
-    <tr>
-      <th>Paediatric (Mini) circle</th>
-      <td>10–30 kg</td>
-    </tr>
-    <tr>
-      <th>Adult circle</th>
-      <td>&gt;20 kg</td>
-    </tr>
-  </tbody>
-</table>
+function closeAllAccordions() {
+  document.querySelectorAll('.accordion-header').forEach(header => {
+    const content = header.nextElementSibling;
 
-        <table class="result-table">
-  <thead>
-    <tr>
-      <th colspan="2">Ventilation</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Tidal volume (6–8 ml/kg)</th>
-      <td><span id="tidalvolume"></span></td>
-    </tr>
-    <tr>
-      <th>Neonates / ARDS (4–6 ml/kg)</th>
-      <td><span id="tv-neonates-ards"></span></td>
-    </tr>
-  </tbody>
-</table>
-  </div>
-      </div>      
-</div>
+    header.classList.remove('active');
+
+    if (content) {
+      content.classList.remove('show');
+      content.style.maxHeight = null;
+    }
+  });
+}
+
+function expandOpenAccordion() {
+  document.querySelectorAll('.accordion-content.show').forEach(content => {
+    // clear any old inline height so the browser can re-measure
+    content.style.maxHeight = null;
+    // then set to its new scrollHeight
+    content.style.maxHeight = content.scrollHeight + 'px';
+  });
+}
+
+function openAccordionById(headerId) {
+  const header = document.getElementById(headerId);
+  if (!header) return;
+
+  const content = header.nextElementSibling;
+
+  if (!content.classList.contains('show')) {
+    header.classList.add('active');
+    content.classList.add('show');
+    content.style.maxHeight = content.scrollHeight + 'px';
+  }
+}
+
+function enableSelectAllOnFocus(input) {
+  input.addEventListener('focus', () => {
+    // slight delay improves reliability on iOS
+    setTimeout(() => input.select(), 0);
+  });
+}
+
+function goHome() {
+  window.location.href = '/'; // or 'index.html'
+}
+
+function updateAll() {
+  const rawAge = ageInput.value.trim();
+  const a = parseFloat(rawAge);
+
+  if (isNaN(a) || a < 0) {
+    clearWeight();
+    return;
+  }
+
+  const y = ageUnit === 'months' ? a / 12 : a;
+
+  if (y > 20) {
+  estToggle.checked = false;
+  autoEstimate = false;
+  updateEstimateLock();
+  clearWeight();
+  return;
+}
+
+  if (autoEstimate) {
+    estimateWeight();
+    estimateHeight();
+  }
+  calculateBMI();
+ const w = parseFloat(weightIn.value);
   
-<div class="accordion-item">
-
-    <div class="accordion-header">
-
-      <span class="accordion-title">
-
-        <i class="fas fa-syringe"></i>Emergency Intubation
-
-      </span>
-
-      <span>
-
-        <i class="fas fa-plus"></i>
-
-        <i class="fas fa-minus"></i>
-
-      </span>
-
-    </div>
-
-  <div class="accordion-content">
-  <div class="accordion-content-inner">
-      <div class="result">
-    <table class="result-table">
-   <thead>
-      <tr>
-        <th colspan="3">
-          Induction
-        </th>
-      </tr>
-    </thead>
-      <!-- Fentanyl -->
-  <tr class="row-blue">
-    <td>
-      Fentanyl
-    </td>
-    <td>
-      <span id="fentanyl-dose-text">1–2 mcg/kg</span>
-    </td>
-    <td>
-      <span id="fentanyl"></span><span class="static unit">mcg</span>
-    </td>
-  </tr>
-  <tr class="sub-blue">
-    <td colspan="3">
-      <small id="fentanyl-vol-extra"></small>
-    </td>
-  </tr>
-
-  <!-- Ketamine -->
-  <tr class="row-yellow">
-    <td>
-      Ketamine
-    </td>
-    <td>
-      <span id="ketamine-dose-text">1–2 mg/kg</span>
-    </td>
-    <td>
-      <span id="ketamine"></span><span class="static unit">mg</span>
-    </td>
-  </tr>
-  <tr class="sub-yellow">
-    <td colspan="3">
-      <small id="ketamine-vol-extra"></small>
-    </td>
-  </tr>
-
-  <!-- Rocuronium -->
-  <tr class="row-red">
-    <td>
-     Rocuronium
-    </td>
-    <td>
-      <span id="rocuronium-dose-text">1 mg/kg</span>
-    </td>
-    <td>
-      <span id="rocuronium"></span><span class="static unit">mg</span>
-    </td>
-  </tr>
-  <tr class="sub-red">
-    <td colspan="3">
-      <small id="rocuronium-vol-extra"></small>
-    </td>
-  </tr>
-</table>
-
- <table class="result-table">
-   <thead>
-      <tr>
-        <th colspan="3">
-          Maintenance infusions
-        </th>
-      </tr>
-    </thead>
-  <tr class="row-blue">
-    <td>
-      Morphine
-    </td>
-    <td>
-      <span class="small-dose">
-        <span>10–40 mcg/kg/h<br>
-          0.5–2 ml/h
-        </span></span></span>
-    </td>
-  </tr>
-  <tr class="sub-blue">
-    <td colspan="3">
-      <small id="morphine-sed"></small>
-    </td>
-  </tr>
-
-  <tr class="row-orange">
-    <td>
-      Midazolam
-    </td>
-    <td>
-      <span class="small-dose">
-        <span>1–3 mcg/kg/min<br>
-        1–3 ml/h</span></span></span>
-    </td>
-  </tr>
-  <tr class="sub-orange">
-    <td colspan="3">
-      <small id="midaz-sed"></small>
-    </td>
-  </tr>
-          
-            <tr class="row-yellow">
-    <td>
-      Propofol
-    </td>
-    <td>
-      <span class="small-dose">
-        <span>1–4 mg/kg/h</span>
-        <span id="propofol-sed-ml"></span>
-        </span></span>
-    </td>
-  </tr>
-  <tr class="sub-yellow">
-    <td colspan="3">
-      <small id="propofol-sed-mg"></small>
-    </td>
-  </tr>
-        </table>
-        
-    <table class="result-table">
-   <thead>
-      <tr>
-        <th colspan="3">
-          Emergency Drugs
-        </th>
-      </tr>
-    </thead>
-  <!-- Atropine -->
-  <tr class="row-green">
-    <td>
-      Atropine
-      <span class="small-dose"><span>Max 600 mcg</span></span>
-    </td>
-    <td>
-      <span id="atropine-dose-text">20 mcg/kg</span>
-      </span>
-    </td>
-    <td>
-      <span id="atropine"></span><span class="static unit">mcg</span>
-    </td>
-  </tr>
-  <tr class="sub-green">
-    <td colspan="3">
-      <small id="atropine-vol-extra"></small>
-    </td>
-  </tr>
-
-  <!-- Adrenaline IV 1:10,000 -->
-  <tr class="row-purple">
-    <td>
-      Adrenaline IV<br>
-      1:10,000
-      <span class="small-dose"><span>100 mcg/ml</span>
-        </span>
-    </td>
-    <td>
-      <span>0.1 mL/kg</span><br>
-        <span id="adrenaline-dose-text"><span>10 mcg/kg</span></span>
-    </td>
-    <td>
-      <span id="adrenalineiv"></span><span class="static unit">mcg</span>
-    </td>
-  </tr>
-  <tr class="sub-purple">
-    <td colspan="3"><small id="adrenalineiv-vol-extra"></small>
-    </td>
-  </tr>
-
-  <!-- Suxamethonium IV -->
-  <tr class="row-red">
-    <td>
-      Suxamethonium IV
-    </td>
-    <td>
-  <span id="sux-range"> </span>
-  <span class="unit"> </span>
-</td>
-    <td>
-      <span id="sux-iv"></span><span class="static unit">mg</span>
-    </td>
-  </tr>
-  <tr class="sub-red">
-    <td colspan="3">
-      <small id="sux-iv-vol-extra"></small>
-    </td>
-  </tr>
-
-  <!-- Suxamethonium IM -->
-  <tr class="row-red">
-    <td>
-      Sux. IM
-      <span class="small-dose"><span>Max 150 mg</span></span>
-    </td>
-    <td>
-      <span id="sux-im-dose-text">mg/kg</span>
-    </td>
-    <td>
-      <span id="sux-im"></span><span class="static unit">mg</span>
-    </td>
-  </tr>
-  <tr class="sub-red">
-    <td colspan="3">
-      <small id="sux-im-vol-extra"></small>
-    </td>
-  </tr>
-</table>
-
-    <table class="result-table">
-   <thead>
-      <tr>
-        <th colspan="3">
-          Other
-        </th>
-      </tr>
-    </thead>
-  <!-- Non‐drug items (single rows) -->
-  <tr class="row-grey">
-    <td>
-      Fluid bolus
-    </td>
-    <td>
-      <span id="fluidbolus-dose-text">10–20 mL/kg</span>
-    </td>
-    <td>
-      <span id="fluidbolus"></span><span class="static unit">mL</span>
-    </td>
-  </tr>
-  <tr class="row-grey">
-    <td>
-      Glucose 10%
-    </td>
-    <td>
-     <span id="glucose-dose-text">2 mL/kg</span>
-    </td>
-    <td>
-      <span id="glucose10"></span><span class="static unit">mL</span>
-    </td>
-  </tr>
-  <tr class="row-grey">
-    <td>
-      Defibrillation energy
-    </td>
-    <td>
-      <span id="defib-dose-text">4 J/kg</span>
-    </td>
-    <td>
-      <span id="defib"></span><span class="static unit">J</span>
-    </td>
-  </tr>
-<tr class="row-grey">
- <td> 
-    Estimated blood volume
-  </td>
-  <td> 
-    <span id="blood-volume-range"></span>
-  </td>
-  <td>
-    <span id="blood-volume"></span><span class="static unit"> mL</span>
-  </td>
-</tr>
-      
-</table>
-        <p class="text-center">
-        <small>For other drugs and infusions, use Paediatric Emergency Tools: <a href="https://apps.apple.com/gb/app/paediatric-emergency-tools/id415663345">Apple</a> / <a href="https://play.google.com/store/apps/details?id=com.ubqo.paedscalc&hl=en_GB&pli=1">Android</a>.
-          </small></p>
-        <div style="text-align: center; margin-bottom: 0em;">
-        <small>
-          <p><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/Severe-bronchiolitis.pdf">STRS Bronchiolitis</a></p>
-          <p><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/Sepsis.pdf">STRS Sepsis</a></p>
-          <p><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/neonatal-collapse.pdf">STRS Neonatal collapse</a></p>
-        <p><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/peripheral-inotropes.pdf">STRS Peripheral inotropes</a></p>
-          </small>
-          </div>
-  </div>
-</div>
-    </div>
-  </div>
+  updateAirwayCalculations(y, w);
+  updateVentilation(w);
+  updateEmergencyDrugs(w); 
+  updateSedation(w);
+  updateGADrugs(w);
+  updatePremed(w);
+  updateReversal(w);
+  updateAntibiotics(w);
   
-    <div class="accordion-item">
+  const normals = getNormalValues(a, ageUnit);
+  if (normals) updateNormalCentiles(normals);
 
-    <div class="accordion-header">
-
-      <span class="accordion-title">
-
-        <i class="fas fa-pills"></i> Premedication & Sedation
-
-      </span>
-
-      <span>
-
-        <i class="fas fa-plus"></i>
-
-        <i class="fas fa-minus"></i>
-
-      </span>
-
-    </div>
-
-    <div class="accordion-content">
-
-      <div class="accordion-content-inner general-section">      
  
-  <div class="result">
-    
-    <table class="result-table">
+  updateWeightCentileDisplay();
+  updateHeightCentileDisplay();
 
-          <tr class="row-orange">
-            <td>
-              Midazolam - PO
-            </td>
-            <td>
-             <span id="premed-midaz-dose-text">0.5 mg/kg</span>
-            </td>
-            <td>
-              <span id="premed-midaz"></span>
-              <span class="static unit">mg</span>
-            </td>
-          </tr>
-          <tr class="sub-orange">
-            <td colspan="3">
-              <small>Max 20 mg per dose; 1 month–18 yrs. Peak effect at 20-30 mins.</small>
-            </td>
-          </tr>
-      
-      <tr class="row-orange">
-            <td>
-              Midazolam - NAS
-            </td>
-            <td>
-               <span id="premed-midaz-nas-dose-text"></span>
-            </td>
-            <td>
-              <span id="premed-midaz-intranasal"></span>
-              <span class="static unit">mg</span>
-            </td>
-          </tr>
-          <tr class="sub-orange">
-            <td colspan="3">
-              <small>Max 10 mg. Given via short atomiser: 0.1 ml dead space. Peak effect at 10 mins. Can be repeated within 5–15 minutes to a max 0.5 mg/kg.</small>
-            </td>
-          </tr>
-      <tr class="row-orange">
-  <td>
-    Buccal Midazolam
-  </td>
-  <td>
-    <span id="premed-midaz-buccal-dose-text">0.3 mg/kg</span>
-  </td>
-  <td>
-    <span id="premed-midaz-buccal"></span>
-    <span class="static unit">mg</span>
-  </td>
-</tr>
-<tr class="sub-orange">
-  <td colspan="3">
-    <small>Max 10 mg. 6 months–18 yrs.</small>
-  </td>
-</tr>
-    </table>
-    <table class="result-table">
-      <tr class="row-white">
-            <td>
-              Dexmedetomidine - NAS
-            </td>
-            <td>
-              <span id="premed-dexmed-dose-text">2–4 mcg/kg</span>
-            </td>
-            <td>
-              <span id="premed-dexmed"></span>
-              <span class="static unit">mcg</span>
-            </td>
-          </tr>
-          <tr class="sub-white">
-            <td colspan="3">
-              <small>Max 200 mcg per dose. Given 30 mins before intervention.</small>
-            </td>
-          </tr>
-      
-      </table>
-  </div>
-  </div>
-    </div>
-  </div>
-      
-    
-<div class="accordion-item">
+  expandOpenAccordion();
+}
+// =========================
+// EVENT HANDLERS
+// =========================
 
-    <div class="accordion-header">
-
-      <span class="accordion-title">
-
-        <i class="fa-solid fa-bed"></i> Routine General Anaesthesia
-
-      </span>
-
-      <span>
-
-        <i class="fas fa-plus"></i>
-
-        <i class="fas fa-minus"></i>
-
-      </span>
-
-    </div>
-
-    <div class="accordion-content">
-
-      <div class="accordion-content-inner general-section">      
- 
-  <div class="result">
-    
-    <table class="result-table">
-<thead>
-      <tr>
-        <th colspan="3">
-          Induction
-        </th>
-      </tr>
-    </thead>
-          <tr class="row-blue">
-            <td>
-              Fentanyl
-            </td>
-            <td>
-              <span id="fentanyl-ga-dose-text">1–2 mcg/kg</span>
-            </td>
-            <td>
-              <span id="fentanyl-ga"></span>
-              <span class="static unit">mcg</span>
-            </td>
-          </tr>
-          <tr class="sub-blue">
-            <td colspan="3">
-              <small id="fentanyl-ga-extra"></small>
-            </td>
-          </tr>
-
-          <!-- Propofol GA -->
-          <tr class="row-yellow">
-            <td>
-              Propofol
-            </td>
-            <td>
-              <span id="propofol-dose-text">3–5 mg/kg</span>
-            </td>
-            <td>
-              <span id="propofol"></span>
-              <span class="static unit">mg</span>
-            </td>
-          </tr>
-          <tr class="sub-yellow">
-            <td colspan="3">
-              <small id="propofol-ga-extra"></small>
-            </td>
-          </tr>
-
-          <!-- Rocuronium GA -->
-          <tr class="row-red">
-            <td>
-              Rocuronium
-            </td>
-            <td>
-              <span id="rocuronium-ga-dose-text">0.6 mg/kg</span>
-            </td>
-            <td>
-              <span id="rocuronium-ga"></span>
-              <span class="static unit">mg</span>
-            </td>
-          </tr>
-          <tr class="sub-red">
-            <td colspan="3">
-              <small id="rocuronium-ga-extra"></small>
-            </td>
-          </tr>
-                    <!-- Atracurium GA -->
-          <tr class="row-red">
-            <td>
-              Atracurium
-            </td>
-            <td>
-              <span id="atracurium-ga-dose-text">0.5 mg/kg</span>
-            </td>
-            <td>
-              <span id="atracurium-ga"></span>
-              <span class="static unit">mg</span>
-            </td>
-          </tr>
-          <tr class="sub-red">
-            <td colspan="3">
-              <small id="atracurium-ga-extra"></small>
-            </td>
-          </tr>
-    </table>
-
-      <table class="result-table">
-        <thead>
-      <tr>
-        <th colspan="3">
-          Antiemetics
-        </th>
-      </tr>
-    </thead>  
-     
-          <!-- Dexamethasone GA -->
-          <tr class="row-white">
-            <td>
-              Dexamethasone
-              <span class="small-dose"><span>Max 6.6 mg</span></span>
-            </td>
-            <td>
-             
-                <span id="dexamethasone-dose-text"><span>0.15 mg/kg</span></span>
-              
-            </td>
-            <td>
-              <span id="dexamethasone"></span>
-              <span class="static unit">mg</span>
-            </td>
-          </tr>
-          <tr class="sub-white">
-            <td colspan="3">
-              <small id="dexamethasone-ga-extra"></small>
-            </td>
-          </tr>
-        
-         <!-- Ondansetron GA -->
-          <tr class="row-antiemetic">
-            <td>
-              Ondansetron
-              <span class="small-dose"><span id="ondansetron-max"></span></span>
-            </td>
-            <td>          
-              <span id="ondansetron-dose-text">0.15 mg/kg</span>
-            </td>
-            <td>
-              <span id="ondansetron"></span>
-              <span class="static unit">mg</span>
-            </td>
-          </tr>
-          <tr class="sub-antiemetic">
-            <td colspan="3">
-              <small id="ondansetron-ga-extra"></small>
-            </td>
-          </tr>
-        
-        <tr class="row-antiemetic">
-            <td>
-              Cyclizine<br>
-              <span class="small-dose">
-      <span id="cyclizine-max"></span>
-    </span>
-            </td>
-            <td>
-                <span id="cyclizine-dose-text">0.5–1 mg/kg</span>
-            </td>
-            <td>
-              <span id="cyclizine"></span>
-              <span class="static unit">mg</span>
-            </td>
-          </tr>
-          <tr class="sub-antiemetic">
-            <td colspan="3">
-              <small id="cyclizine-ga-extra"></small>
-            </td>
-          </tr>
-    </table>       
-    
-<table class="result-table">
-          <thead>
-      <tr>
-        <th colspan="3">
-          Intraoperative IV analgesia
-        </th>
-      </tr>
-    </thead>
-          <tr class="row-white">
-  <td>
-   Paracetamol
-    <span class="small-dose"><span id="paracetamoliv-max"></span></span>
-  </td>
-  <td><span id="paracetamol-iv-inline"></span>
-  </td>
-  <td>
-    <span id="paracetamol-iv"></span><span class="static unit">mg</span>
-  </td>
-</tr>
-<tr class="sub-white">
-  <td colspan="3">
-    <small id="paracetamol-iv-note"></small>
-  </td>
-</tr>
-
-<!-- Ibuprofen IV -->
-<tr class="row-white">
-  <td>
-   Ibuprofen
-    <span class="small-dose"><span>Max 400 mg</span></span>
-  </td>
-  <td>
-   <span id="ibuprofen-dose-text">5–10 mg/kg</span>
-  </td>
-  <td>
-    <span id="ibuprofeniv"></span><span class="static unit">mg</span>
-  </td>
-</tr>
-<tr class="sub-white">
-  <td colspan="3">
-    <small id="ibuprofeniv-note"></small>
-  </td>
-</tr>
-          <!-- Ketorolac -->
-<tr class="row-white">
-  <td>
-    Ketorolac
-    <span class="small-dose"><span id="ketorolac-max"></span></span>
-  </td>
-  <td>
-    <span id="ketorolac-dose-text">0.5–1 mg/kg</span>
-  </td>
-  <td>
-    <span id="ketorolac"></span><span class="static unit">mg</span>
-  </td>
-</tr>
-<tr class="sub-white">
-  <td colspan="3">
-    <small id="ketorolac-extra"></small>
-  </td>
-</tr>
+  unitBtn.addEventListener('click', toggleAgeUnit);
   
-  <tr class="row-white">
-  <td>
-    Diclofenac
-    <span class="small-dose"><span id="diclofenaciv-max"></span></span>
-  </td>
-  <td>
-    <span id="diclofenac-dose-text">1 mg/kg</span>
-    
-  </td>
-  <td>
-    <span id="diclofenaciv"></span><span class="static unit">mg</span>
-  </td>
-</tr>
-<tr class="sub-white">
-  <td colspan="3">
-    <small id="diclofenaciv-note"></small>
-  </td>
-</tr>
-           <!-- Morphine IV -->
-<tr class="row-blue">
-  <td>
-    Morphine
-  </td>
-  <td>
-    <span id="morphineiv-inline"></span>
-  </td>
-  <td>
-    <span id="morphineiv"></span><span class="static unit">mg</span>
-  </td>
-</tr>
-<tr class="sub-white">
-  <td colspan="3">
-    <small id="morphine-iv-extra"></small>
-  </td>
-</tr>
-    </table>
+  estToggle.addEventListener('change', () => {
+  autoEstimate = estToggle.checked;
 
-    <table class="result-table">
-      <thead>
-      <tr>
-        <th colspan="3">
-          Reversal of neuromuscular blockade
-        </th>
-      </tr>
-    </thead>     
-       <tr class="row-reversal">
-  <td>
-    Neostigmine & <br>Glycopyrulate
-    <span class="small-dose"><span>2.5 mg &<br>
-      500 mcg/1 mL</span></span>
-  </td>
-  <td>
-    <span class="small-dose">
-      <span>0.02 mL/kg</span></span>
-    <span id="neos-dose-text"></span>
-  </td>
-  <td>
-   <span id="neostigmine"></span><span class="static unit">mg</span>
-  </td>
-</tr>
-<tr class="sub-reversal">
-  <td colspan="3">
-    <small id="neostigmine-extra"></small>
-  </td>
-</tr> 
-       <tr class="row-reversal">
-        <td>
-   Sugammadex
-  </td>
-  <td>
-    <span id="sug-2-dose-text">2 mg/kg</span>
-  </td>
-  <td>
-    <span id="sug-2"></span><span class="static unit">mg</span>
-  </td>
-</tr>
-<tr class="sub-reversal">
-  <td colspan="3">
-    <small id="sug-2-extra"></small>
-    <br><small>Moderate block: Return of T<sub>2</sub> in response to TOF.</small>
-  </td>
-</tr> 
-      
-      <tr class="row-reversal">
-  <td>
-   Sugammadex
-  </td>
-  <td>
-   <span id="sug-4-dose-text">4 mg/kg</span>
-  </td>
-  <td>
-    
-    <span id="sug-4"></span><span class="static unit">mg</span>
-  </td>
-</tr>
-<tr class="sub-reversal">
-  <td colspan="3">
-    <small id="sug-4-extra"></small>
-    <br><small>Deep block: 1-2 PTCs, no twitch responses to TOF.</small>
-  </td>
-</tr>
-        </table>
-
-    <table class="result-table">
-      <thead>
-      <tr>
-        <th colspan="3">
-          Postoperative Oral analgesia
-        </th>
-      </tr>
-    </thead>     
-      <tr class="row-white">
-  <td>
-    Paracetamol
-     <span class="small-dose"><span id="paracetamolpo-max"></span></span>
-  </td>
-  <td>
-     <span id="paracetamol-po-inline"></span>
-  </td>
-  <td>
-    <span id="paracetamol-po"></span><span class="static unit">mg</span>
-  </td>
-</tr>
-<tr class="sub-white">
-  <td colspan="3">
-    <small id="paracetamol-po-note"></small>
-  </td>
-</tr>
-          
-<!-- Ibuprofen PO -->
-<tr class="row-white">
-  <td>
-    Ibuprofen
-    <span class="small-dose"><span>Max 400 mg</span></span>
-  </td>
-  <td>
-    <span id="ibuprofenpo-dose-note"></span>
-  </td>
-  <td>
-    <span id="ibuprofenpo"></span><span class="static unit">mg</span>
-  </td>
-</tr>
-<tr class="sub-white">
-  <td colspan="3">
-    <small id="ibuprofenpo-note"></small>
-  </td>
-</tr>
-          
-          <!-- Morphine PO -->
-<!-- Morphine PO -->
-<tr class="row-blue">
-  <td>
-    Morphine
-    <span class="small-dose"><span id="morphinepo-max"></span></span>
-  </td>
-  <td id="morphine-po-inline">
-  </td>
-  <td>
-    <span id="morphinepo"></span><span class="static unit">mg</span>
-  </td>
-</tr>
-<tr class="sub-blue">
-  <td colspan="3">
-    <small id="morphine-po-extra"></small>
-  </td>
-</tr>
-    </table>
-
-<table class="result-table">
-      <thead>
-      <tr>
-        <th colspan="3">
-          Emergency Drugs
-        </th>
-      </tr>
-    </thead>     
-      <tr class="row-green">
-  <td>
-    Atropine
-    <span class="small-dose"><span>Max 600 mcg</span></span>
-  </td>
-  <td>
-    <span id="atropine-ga-dose-text"><span>20 mcg/kg</span></span>
-  </td>
-  <td>
-    <span id="atropine-ga"></span><span class="static unit">mcg</span>
-  </td>
-</tr>
-<tr class="sub-green">
-  <td colspan="3">
-    <small id="atropine-ga-extra"></small>
-  </td>
-</tr>
-          
-<tr class="row-red">
-  <td>
-    Suxamethonium IV
-  </td>
-  <td>
-  <span id="sux-ga-range"> </span> <span class="unit"> </span>
-</td>
-  <td>
-    <span id="sux-iv-ga"></span><span class="static unit">mg</span>
-  </td>
-</tr>
-<tr class="sub-red">
-  <td colspan="3">
-    <small id="sux-iv-ga-extra"></small>
-  </td>
-</tr>
-          
-<tr class="row-red">
-  <td>
-    Sux. IM
-    <span class="small-dose"><span>Max 150 mg</span></span>
-  </td>
-  <td>
-    <span id="sux-im-ga-dose-text">4 mg/kg</span>
-  </td>
-  <td>
-    <span id="sux-im-ga"></span><span class="static unit">mg</span>
-  </td>
-</tr>
-<tr class="sub-red">
-            <td colspan="3">
-              <small id="sux-im-ga-extra"></small>
-  </td>
-</tr>
-    </table>    
-  </div>
-  </div>
-  </div>
-  </div>
-    
-        <div class="accordion-item">
-
-    <div class="accordion-header">
-
-      <span class="accordion-title">
-
-        <i class="fa-solid fa-prescription-bottle-medical"></i> Antibiotics - Surgical prophylaxis
-
-      </span>
-
-      <span>
-
-        <i class="fas fa-plus"></i>
-
-        <i class="fas fa-minus"></i>
-
-      </span>
-
-    </div>
-
-    <div class="accordion-content">
-
-      <div class="accordion-content-inner general-section">      
- 
-  <div class="result">
-    
-<table class="result-table"> 
-          <tr class="row-white">
-            <td>
-              Amoxicillin
-              <span class="small-dose"><span>Max 1 g</span>
-                </span>
-            </td>
-            <td>
-                 <span id="amoxicillin-dose-text"></span>
-            </td>
-            <td>
-              <span id="amoxicillin"></span>
-              <span class="static unit">mg</span>
-            </td>
-          </tr>
-          <tr class="sub-white">
-            <td colspan="3">
-              <small></small>
-            </td>
-          </tr>
-          <tr class="row-white">
-            <td>
-              Cefuroxime
-              <span class="small-dose"><span>Max 1.5 g</span>
-                </span>
-            </td>
-            <td>
-                <span id="cefuroxime-dose-text"></span>
-            </td>
-            <td>
-              <span id="cefuroxime"></span>
-              <span class="static unit">mg</span>
-            </td>
-          </tr>
-          <tr class="sub-white">
-            <td colspan="3">
-              <small></small>
-            </td>
-          </tr>
-
-          <tr class="row-white">
-            <td>
-              Co-Amoxiclav
-             <span class="small-dose"><span>Max 1.2 g</span>
-               </span>
-            </td>
-            <td>  
-                <span id="co-amoxiclav-dose-text"></span>
-            </td>
-            <td>
-              <span id="co-amoxiclav"></span>
-              <span class="static unit">mg</span>
-            </td>
-          </tr>
-          <tr class="sub-white">
-            <td colspan="3">
-              <small></small>
-            </td>
-          </tr>
-  <tr class="row-white">
-            <td>
-              Flucloxacillin<br><span class="small-dose">(Soft tissue)</span>
-              <span class="small-dose"><span>Max 1 g</span></span>
-            </td>
-            <td>
-                <span id="flucloxacillin-dose-text"></span>
-            </td>
-            <td>
-              <span id="flucloxacillin"></span>
-              <span class="static unit">mg</span>
-            </td>
-          </tr>
-   <tr class="sub-white">
-            <td colspan="3">
-              <small></small>
-            </td>
+  updateEstimateLock();
   
-  <tr class="row-white">
-            <td>
-              Flucloxacillin<br><span class="small-dose">(Open orthopaedic surgery)</span>
-              <span class="small-dose"><span>Max 2 g</span>
-              </span>
-            </td>
-            <td>
-                 <span id="flucloxacillin-bone-dose-text"></span>
-            </td>
-            <td>
-              <span id="flucloxacillin-bone"></span>
-              <span class="static unit">mg</span>
-            </td>
-          </tr>
+  if (autoEstimate) {
+  clearWeight();
+  updateAll();
+}
+});
+
+ageInput.addEventListener('input', () => {
+  const val = parseFloat(ageInput.value);
+
+  if (!isNaN(val) && val >= 0 && !autoEstimate) {
+    autoEstimate = true;
+    estToggle.checked = true;
+    updateEstimateLock();
+  }
+
+  updateAll();
+});
+
+weightIn.addEventListener('input', () => {
+  if (autoEstimate) return;
+
+  const rawAge = ageInput.value.trim();
+  const rawW   = weightIn.value.trim();
+
+  if (rawW === '') return clearWeight();
+
+  const w = parseFloat(rawW);
+
+  if (isNaN(w)) return clearWeight();
+
+if (rawAge === '') {
+  return;
+}
+
+  updateAll();
+});
+
+heightIn.addEventListener('input', () => {
+ if (autoEstimate) return;
+
+  const rawH = heightIn.value.trim();
+
+ if (rawH === '') {
+    window.weightContext.ibw = null;
+    window.weightContext.adjbw = null;
+    window.weightContext.isObese = false;
+
+    updateHeightCentileDisplay();
+    calculateBMI();
+    updateAll(); // 🔥 ensures drugs re-render correctly
+
+    return;
+  }
   
-          <tr class="sub-white">
-            <td colspan="3">
-              <small></small>
-            </td>
-          </tr>
-    
-   <tr class="row-white">
-            <td>
-              Metronidazole
-              <span class="small-dose"><span>Max 500 mg</span>
-              </span>
-            </td>
-            <td>
-               <span id="metronidazole-dose-text"></span>
-            </td>
-            <td>
-              <span id="metronidazole"></span>
-              <span class="static unit">mg</span>
-            </td>
-          </tr>
-            <tr class="sub-white">
-            <td colspan="3">
-              <small></small>
-            </td>
-          </tr>
-  <tr class="row-white">
-            <td>
-              Teicoplanin
-              <span class="small-dose"><span id="teicoplanin-max"></span></span>
-            </td>
-            <td>
-              <span id="teicoplanin-dose-text"></span>
-</td>
-            <td>
-              <span id="teicoplanin"></span>
-                <span class="static unit">mg</span>
-            </td>
-          </tr>
-          <tr class="sub-white">
-            <td colspan="3">
-            </td>
-          </tr>
-  <tr class="row-white">
-  <td>
-    Teicoplanin<br><span class="small-dose">(Open fractures)</span>
-    <span class="small-dose">
-      <span id="teicoplanin-open-max"></span>
-    </span>
-  </td>
-  <td>
-    <span id="teicoplanin-open-dose-text"></span>
-  </td>
-  <td>
-    <span id="teicoplanin-open"></span>
-    <span class="static unit">mg</span>
-  </td>
-</tr>
-<tr class="sub-white">
-  <td colspan="3">
-  </td>
-</tr>
+  const h = parseFloat(rawH);
+  if (isNaN(h)) {
+    updateHeightCentileDisplay();
+    calculateBMI();
+    return;
+  }
+  updateAll();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  clearWeight();
+  estToggle.checked = true;
+  autoEstimate = true;
+  updateEstimateLock();
   
-  <tr class="row-white">
-            <td>
-              Gentamicin
-              <span class="small-dose"><span>Max 160 mg</span>
-              </span>
-            </td>
-            <td>
-               <span id="gentamicin-dose-text"></span>
-            </td>
-            <td>
-              <span id="gentamicin"></span>
-              <span class="static unit">mg</span>
-            </td>
-          </tr>
-          <tr class="sub-white">
-            <td colspan="3">
-            </td>
-          </tr>
-  <tr class="row-white">
-            <td>
-              Gentamicin<br><span class="small-dose">(high-dose)</span>
-              <span class="small-dose"><span>Max 480 mg</span>
-              </span>
-            </td>
-            <td>
-              
-                <span id="gentamicin-high-dose-text"></span>
-              
-            </td>
-            <td>
-              <span id="gentamicin-high"></span>
-              <span class="static unit">mg</span>
-            </td>
-          </tr>
-          <tr class="sub-white">
-            <td colspan="3">
-              <small>In obesity doses should be calculated based on adjusted body weight.</small>
-            </td>
-          </tr>
-    </table>
-  </div>
-  </div>
-    </div>
-  </div> 
-     <div class="accordion-item">
-    <div class="accordion-header">
-      <span class="accordion-title">
-        <i class="fa-solid fa-grip-lines"></i> Lines and Suction catheters
-      </span>
-      <span>
-        <i class="fas fa-plus"></i>
-        <i class="fas fa-minus"></i>
-      </span>
-    </div>    
-     <div class="accordion-content">
-      <div class="accordion-content-inner general-section">     
-  <div class="result">    
-<table class="result-table"> 
-      <thead>
-      <tr>
-        <th colspan="2">
-         Arterial lines - Radial
-        </th>
-      </tr>
-    </thead>        
-  <tr>
-            <td>
-              Neonates/Infants &lt;10 kg
-            </td>
-            <td>
-              24 G<br>Pressure transducer: 150 mmHg (generates a flow rate of 1.5 mL/hr)
-            </td>
-          </tr>
-   
-          <tr>
-            <td>
-              Children &gt;10 kg
-            </td>
-            <td>
-              22 G<br>Pressure transducer: 300 mmHg (generates a flow rate of 3 mL/hr)
-            </td>
-          </tr>
+  enableSelectAllOnFocus(weightIn);
+  enableSelectAllOnFocus(heightIn);
+  enableSelectAllOnFocus(ageInput);
+});
 
-          <tr>
-            <td>
-              Children &gt;50 kg
-            </td>
-            <td>
-              20 G
-            </td>
+document.querySelectorAll('.accordion-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const content = header.nextElementSibling;
+      const isOpen = content.classList.contains('show');
+      header.classList.toggle('active');
+      content.classList.toggle('show');
+      if (!isOpen) {
+        content.style.maxHeight = content.scrollHeight + "px";
+      } else {
+        content.style.maxHeight = null;
+      }
+    });
+  });
 
-          </tr>
-    </table>
+genderContainer.addEventListener("click", (e) => {
+  const btn = e.target.closest("button");
+  if (!btn) return;
 
-      <table class="result-table"> 
-      <thead>
-      <tr>
-        <th colspan="2">
-         Arterial lines - Femoral
-        </th>
-      </tr>
-    </thead>        
-  <tr>
-            <td>
-              Neonates
-            </td>
-            <td>
-              22 G, 8cm
-            </td>
-          </tr>
+  genderContainer.querySelectorAll("button").forEach(b =>
+    b.classList.remove("active")
+  );
 
-    <tr>
-            <td>
-              Children
-            </td>
-            <td>
-              20 G, 8cm
-            </td>
-          </tr>
-    </table>
+  btn.classList.add("active");
 
-      <table class="result-table"> 
-      <thead>
-      <tr>
-        <th colspan="2">
-         Central venous access - Femoral (preferred)
-        </th>
-      </tr>
-    </thead>        
-  <tr>
-            <td>
-              &lt;6 months
-            </td>
-            <td>
-              4–5	Fr, triple lumen, 6–8cm lines	
-            </td>
-          </tr>
+  genderContainer.dataset.gender = btn.dataset.value;
 
-    <tr>
-            <td>
-              6 m–5 y
-            </td>
-            <td>
-              5	Fr triple lumen, 8–12 cm
-            </td>
-          </tr>
-            <tr>
-            <td>
-              &gt;5 y
-            </td>
-            <td>
-              7 fr, triple lumen, 15 cm
-            </td>
-          </tr>
-    </table>
-          <br>
-      <table class="result-table"> 
-      <thead>
-      <tr>
-        <th colspan="2">
-         Central venous access - Internal jugular
-        </th>
-      </tr>
-    </thead>        
-  <tr>
-            <td>
-              &lt;15 kg
-            </td>
-            <td>
-              	5 cm		
-            </td>
-          </tr>
+  updateAll();   // ✅ clean + centralised
+});
 
-    <tr>
-            <td>
-              16–40 kg
-            </td>
-            <td>
-              8 cm
-            </td>
-          </tr>
-            <tr>
-            <td>
-              &gt;40 kg
-            </td>
-            <td>
-              13 cm
-            </td>
-          </tr>
-    </table>
-
-     <table class="result-table"> 
-  <thead>
-    <tr>
-      <th colspan="3">EZ-IO Intraosseous needle sizing</th>
-    </tr>
-  </thead>      
-
-   <tr style="background-color: #f8a1c4;">
-    <td>Pink</td>
-    <td>15 mm / 15 G</td>
-    <td>3–39 kg<br>Typically &lt;6 months</td>
-  </tr>
-
-     <tr style="background-color: #90caf9;">
-    <td>Blue</td>
-    <td>25 mm / 15 G</td>
-    <td>≥3 kg<br>Typically &gt;6 months</td>
-  </tr>
-
-  <tr style="background-color: #ffe082;">
-    <td>Yellow</td>
-    <td>45 mm / 15 G</td>
-    <td>≥40 kg and/or excessive tissue depth</td>
-  </tr>
-       <tr>
-  <td colspan="3">
-    Proximal tibia (first choice)
-    Distal tibia<br>
-    Distal femur (infants, e.g. 0–12 months)<br>
-    Proximal humerus (older children, e.g. &gt;5 years)
-  </td>
-</tr>
-
-</table>
-      
-      <table class="result-table"> 
-<thead>
-  <tr>
-    <th colspan="3">Suction catheters</th>
-  </tr>
-  <tr>
-    <th>Age</th>
-    <th>ETT size (mm)</th>
-    <th>Suction catheter (Fr)</th>
-  </tr>
-</thead>      
-  <tr>
-  <td>Premature</td>
-  <td>2.5</td>
-  <td>6 Fr</td>
-</tr>
-
-<tr>
-  <td>Newborn</td>
-  <td>3.0</td>
-  <td>6 Fr</td>
-</tr>
-
-<tr>
-  <td>6 months</td>
-  <td>3.5</td>
-  <td>6 Fr</td>
-</tr>
-
-<tr>
-  <td>18 months</td>
-  <td>4.0</td>
-  <td>8 Fr</td>
-</tr>
-
-<tr>
-  <td>3 years</td>
-  <td>4.5</td>
-  <td>8 Fr</td>
-</tr>
-
-<tr>
-  <td>5 years</td>
-  <td>5.0</td>
-  <td>10 Fr</td>
-</tr>
-
-<tr>
-  <td>6 years</td>
-  <td>5.5</td>
-  <td>10 Fr</td>
-</tr>
-
-<tr>
-  <td>8 years</td>
-  <td>6.0</td>
-  <td>10 Fr</td>
-</tr>
-
-<tr>
-  <td>12 years</td>
-  <td>6.5</td>
-  <td>10 Fr</td>
-</tr>
-
-<tr>
-  <td>16 years / small adult</td>
-  <td>7.0</td>
-  <td>12 Fr</td>
-</tr>
-
-<tr>
-  <td>Adult female</td>
-  <td>7.5</td>
-  <td>12 Fr</td>
-</tr>
-
-<tr>
-  <td>Adult male</td>
-  <td>8.0+</td>
-  <td>14 Fr</td>
-</tr>
-    </table>              
-  </div>
-  </div>
-  </div>
-  </div>
-    
-     <div class="accordion-item">
-
-    <div class="accordion-header">
-
-      <span class="accordion-title">
-
-        <i class="fa-solid fa-book"></i> Useful Links and Guidelines
-
-      </span>
-
-      <span>
-
-        <i class="fas fa-plus"></i>
-
-        <i class="fas fa-minus"></i>
-
-      </span>
-
-    </div>
-
-    <div class="accordion-content">
-
-      <div class="accordion-content-inner general-section">      
- <div class="link-section">
-  <h4>Other calculators</h4>
-  <ul>
-    <li><a href="https://www.paedspro.com/">Paeds Prescribing Pro Drug Calculator</a></li>
-    <li>
-      Paediatric Emergency Tools:
-      <a href="https://apps.apple.com/gb/app/paediatric-emergency-tools/id415663345">Apple</a> /
-      <a href="https://play.google.com/store/apps/details?id=com.ubqo.paedscalc&hl=en_GB&pli=1">Android</a>
-    </li>
-  </ul>
-</div>       
-     
-<div class="link-section">
-  <h4>Retrieval teams</h4>
-  <ul>
-    <li><a href="https://www.evelinalondon.nhs.uk/our-services/hospital/south-thames-retrieval-service/clinical-guidelines.aspx">South Thames Retrieval Service (STRS) Clinical Guidelines</a></li>
-    <li><a href="https://cats.nhs.uk/clinical-guidelines/">Children’s Acute Transport Service (CATS) Clinical Guidelines</a></li>
-    <li><a href="https://www.sort.nhs.uk/home.aspx">Southampton Oxford Retrieval Team (SORT) Clinical Guidelines</a>
-    </li>
-  </ul>
-</div>        
-        
- <div class="link-section">
-  <h4>Specific Emergency Guidelines</h4>
-  <ul>
-    <li><a href="/guidelines/paediatrics/strs-intubation-guideline.pdf">STRS Intubation Guideline and Checklist</a></li>
-    <li><a href="/guidelines/paediatrics/cats-intubation-checklist.pdf">CATS Intubation Checklist</a></li>
-    <li><a href="/guidelines/paediatrics/apls-emergency-drug-chart-2021.pdf">APLS Emergency Drug Chart</a>
-    </li>
-        <li><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/Severe-bronchiolitis.pdf">STRS Bronchiolitis</a>
-    </li>
-        <li><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/Sepsis.pdf">STRS Sepsis</a>
-    </li>
-        <li><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/peripheral-inotropes.pdf">STRS Peripheral inotropes</a>
-    </li>
-        <li><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/neonatal-collapse.pdf">STRS Neonatal collapse</a></li>
- <li><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/status-elipticus-april-2018.pdf">STRS Status epilepticus</a></li>
-<li><a href="https://www.evelinalondon.nhs.uk/resources/our-services/hospital/south-thames-retrieval-service/Extubation-DGH-post-RSI-for-status-epilepticus.pdf">STRS Extubation post-RSI for status epilepticus</a></li>
-  </ul>
-</div>           
-
- <div class="link-section">
-  <h4>Airway Guidelines</h4>
-  <ul>
-    <li><a href="https://cats.nhs.uk/das-paediatric-difficult-bmv.pdf/">DAS Difficult mask ventilation during routine induction of anaesthesia in a child aged 1–8 years guideline</a></li>
-    <li><a href="/guidelines/paediatrics/das-paediatric-difficult-intubation.pdf">DAS Difficult intubation during routine induction of anaesthesia in a child aged 1–8 years guideline</a></li>
-    <li><a href="/guidelines/paediatrics/das-paediatric-cicv.pdf">DAS Cannot Intubate and Cannot Ventilate (CICV) in a paralysed anaesthetised child aged 1–8 years</a>
-    </li>
-  </ul>
-</div>                 
-  </div>
-  </div>
-  </div>
-    
-     <div class="accordion-item">
-
-    <div class="accordion-header">
-
-      <span class="accordion-title">
-       <i class="fa-solid fa-calculator"></i> Calculations and tables
-      </span>
-      <span>
-        <i class="fas fa-plus"></i>
-        <i class="fas fa-minus"></i>
-      </span>
-    </div>
-    <div class="accordion-content">
-      <div class="accordion-content-inner general-section"> 
-       <table class="result-table">
-    <thead>
-      <tr>
-        <th colspan="2">
-         Weight (kg)
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <th>Age 1-12 months</th>
-        <td>
-          <p>0.5 x Age (months) + 4</p> 
-        </td>
-      </tr>
-         <tr>
-        <th>Age 1-5 years</th>
-        <td>
-          <p>2 x Age (years) + 8</p> 
-        </td>
-      </tr>
-          <tr>
-        <th>Age 6-14 years</th>
-        <td>
-          <p>2 x Age (years) + 8</p> 
-          <p>3 x Age (years) + 7</p>
-        </td>
-      </tr>
-    </tbody>
-  </table>        
-
-        <table class="result-table">
-    <thead>
-      <tr>
-        <th colspan="2">
-         Airway and Ventilation
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-           <tr>
-        <th>ETT size</th>
-        <td>
-          <p>Uncuffed ETT size = (Age/4) + 4 [Cole formula]</p>
-          <p>Cuffed ETT size = (Age/4) + 3.5 [Modified Cole]</p>
-        </td>
-      </tr>
-      <tr>
-        <th>ETT depth (oral)</th>
-        <td>
-          <p>Above 1 year: Depth ≈ Age/2+12</p> 
-            <ul>Neonates
-              <li>Depth ≈ 1.17 × Birth weight (kg) + 5.58 (Tochen)</li>
-          <li>123–789 rule: 7 cm for a 1 kg baby, 8 cm for a 2 kg baby, and 9 cm for a 3 kg baby at the lips.</li>
-          </ul>
-        </td>
-      </tr>
-            <tr>
-        <th>ETT depth (nasal)</th>
-        <td>
-          <p>Above 1 year: Depth ≈ Age/2+15</p>
-        </td>
-      </tr>
-    </tbody>
-  </table>  
-         
-        <table class="result-table">
-    <thead>
-      <tr>
-        <th>
-         Circulation
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-           <tr>
-        <th>Lowest acceptable SBP</th>
-        <td>
-          <p>&lt;1 month: &ge;60 mmHg</p>
-          <p>1 month to 1 year: &ge;70 mmHg</p>
-          <p>1–10 years: 2 x Age + 70 mmHg</p>
-        </td>
-      </tr>
-      <tr>
-        <th>Lowest acceptable MAP</th>
-        <td>
-          <p>Age (in years) x 1.5 + 40 mmHg</p> 
-        </td>
-      </tr>
-            <tr>
-        <th>Premature Neonates</th>
-        <td>
-          <p>Gestational age ≈ Mean Arterial Pressure</p>
-        </td>
-      </tr>
-    </tbody>
-  </table>  
-         </div>
-    </div>
-  </div>
-        </div> 
-<div class="main-control-buttons">
-    <button type="button" class="reset-btn" onclick="resetForm()">Reset</button>
-    <button type="button" class="home-btn" onclick="goHome()">Home</button>
-  </div>
-  
-  <footer>
-    <small> 
-      <p>These tools and calculators do not have approval by the MHRA as medical devices and clinicians need to be aware that they use them at their own risk. Results should be verified and used in conjunction with the appropriate training and professional judgement, and according to your local hospital policies and procedures.</p>
-    </small>
-      <details>
-    <summary>Notes</summary>
-  <small>
-        <p>SBP: Systolic blood pressure; HR: Heart rate; RR: Respiratory rate; LMA: Laryngeal mask airway; ARDS: Acute respiratory distress syndrome; PO: By mouth; NAS: Intranasal; TOF: Train-of-four; PTC: Post-tetanic count</p>
-        </small>  
-    </details>
-        <p>
-<details>
-<summary>References</summary>
-<small>
-<ol>
-<li>Samuels M, Wieteska S, editors.
-  <em>Advanced Paediatric Life Support: a practical approach to emergencies</em>.
-  6th ed. Chichester (UK): Wiley-Blackwell; 2016. doi:10.1002/9781119241225.</li>
-  <li>Weiner GM, editor.
-  <em>Textbook of Neonatal Resuscitation (NRP)</em>.
-  9th ed. Itasca (IL): American Academy of Pediatrics; 2025.
-</li>
- <li>Paediatric Formulary Committee.
-  <em>BNF for Children (BNFC)</em>.
-  London: BMJ Group, Pharmaceutical Press, and RCPCH Publications.
-  Available from: <a href="https://bnfc.nice.org.uk/" target="_blank" rel="noopener noreferrer">https://bnfc.nice.org.uk/</a>
-  (accessed 20 Feb 2026).
-</li>
-      </ol>
-    </small>
-      </details></p>
-<small>        
-      <p><a href="disclaimer.html">Disclaimer</a></p>
-      <p>&copy; 2025 #OneTeam Anaesthesia. All rights reserved.</p>
-    </small>
-  </footer>
-
-<script src="paeds-bmi-data.js"></script>
-<script src="paeds-weight-data.js"></script>
- <script src="paeds-height-data.js"></script>
-<script src="paeds-script2.js"></script>
-    
-</body>
-</html>
