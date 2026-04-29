@@ -29,6 +29,66 @@ const genderContainer = document.getElementById("GenderBtn");
 // =========================
 // CONFIG (DRUGS, LISTS)
 // =========================
+const LARYNGOSCOPE_TABLE = [
+  { max: 1.5,  text: 'Miller 00 or 0', note: 'Extremely preterm' },
+  { max: 2.5,  text: 'Mac 0 / Miller 0', note: 'Preterm' },
+  { max: 4,    text: 'Mac 0–1 / Miller 0–1', note: 'Term neonate' },
+  { max: 6,    text: 'Mac 1 / Miller 1', note: '1–6 m' },
+  { max: 12,   text: 'Mac 1–2 / Miller 1–2', note: '6 m–2 y' },
+  { max: 30,   text: 'Mac 2', note: '2–10 y' },
+  { max: 60,   text: 'Mac 3', note: '>10 y' },
+  { max: Infinity, text: 'Mac 3–4', note: 'adult' }
+];
+
+const IGEL_TABLE = [
+  { max: 5,  label: '1.0 <small>(2–5 kg)</small>' },
+  { max: 10, label: '1.5 <small>(5–12 kg)</small>' },
+  { max: 25, label: '2.0 <small>(10–25 kg)</small>' },
+  { max: 35, label: '2.5 <small>(25–35 kg)</small>' },
+  { max: 60, label: '3.0 <small>(30–60 kg)</small>' },
+  { max: 90, label: '4.0 <small>(50–90 kg)</small>' },
+  { max: Infinity, label: '5.0 <small>(≥90 kg)</small>' }
+];
+
+const LMA_TABLE = [
+  { max: 5,   label: '1.0 <small>(&lt;5 kg)</small>' },
+  { max: 10,  label: '1.5 <small>(5–10 kg)</small>' },
+  { max: 20,  label: '2.0 <small>(10–20 kg)</small>' },
+  { max: 30,  label: '2.5 <small>(20–30 kg)</small>' },
+  { max: 50,  label: '3.0 <small>(30–50 kg)</small>' },
+  { max: 70,  label: '4.0 <small>(50–70 kg)</small>' },
+  { max: 100, label: '5.0 <small>(70–100 kg)</small>' }
+];
+
+const NEONATAL_ETT_SIZE_TABLE = [
+  { max: 0.799, size: '2.0–2.5' },
+  { max: 1.2, size: '2.5' },
+  { max: 2.2, size: '3.0' },
+  { max: Infinity, size: '3.5' }
+];
+
+const NEONATAL_ETT_DEPTH_TABLE = [
+  { max: 0.499, depth: '5–5.5' },
+  { max: 0.6, depth: '5.5' },
+  { max: 0.8, depth: '6' },
+  { max: 1.0, depth: '6.5' },
+  { max: 1.4, depth: '7' },
+  { max: 1.8, depth: '7.5' },
+  { max: 2.4, depth: '8' },
+  { max: 3.1, depth: '8.5' },
+  { max: Infinity, depth: '9' }
+];
+
+const ETT_INFANT_TABLE = [
+  { maxAge: 0.0833, unc: '3.0–3.5', cuff: '2.5–3.0' },
+  { maxAge: 1/12,   unc: '3.5',      cuff: '3.0' },
+  { maxAge: 2/12,   unc: '3.5',      cuff: '3.0' },
+  { maxAge: 4/12,   unc: '3.5',      cuff: '3.0' },
+  { maxAge: 5/12,   unc: '4.0',      cuff: '3.5' },
+  { maxAge: 6/12,   unc: '4.0',      cuff: '3.5' },
+  { maxAge: 1,      unc: '4.0–4.5',  cuff: '3.5–4.0' }
+];
+
 const EMERGENCY_DRUG_LIST = [
   'fentanyl',
   'ketamine',
@@ -1743,6 +1803,11 @@ function updateHeightCentileDisplay() {
       .forEach(el => el.style.display='inline');
   }
 
+function lookupByWeight(weight, table) {
+  const row = table.find(r => weight <= r.max);
+  return row ? (row.label || row.size || row.depth) : '';
+}
+
 function updateAirwayCalculations(ageYears, w) {
   // normalize age to years
   const y = ageUnit === 'months'
@@ -1760,45 +1825,13 @@ function updateAirwayCalculations(ageYears, w) {
     });
     return;
   }
-
-  // ==========================
-// NRP 2025 Neonatal ETT tables
-// ==========================
-
-const neonatalETTSizeTable = [
-  { max: 0.799,  size: '2.0–2.5' },
-  { max: 1.2,  size: '2.5' },
-  { max: 2.2,  size: '3.0' },
-  { max: Infinity, size: '3.5' }
-];
-
-const neonatalDepthTable = [
-  { max: 0.499,  depth: '5–5.5' },
-  { max: 0.6,  depth: '5.5' },
-  { max: 0.8,  depth: '6' },
-  { max: 1.0,  depth: '6.5' },
-  { max: 1.4,  depth: '7' },
-  { max: 1.8,  depth: '7.5' },
-  { max: 2.4,  depth: '8' },
-  { max: 3.1,  depth: '8.5' },
-  { max: Infinity,  depth: '9' }
-];
-
-function lookupByWeight(weight, table) {
-  const row = table.find(r => weight <= r.max);
-  return row ? (row.size || row.depth) : '';
-}
   
- // ==========================
-// NEONATAL (NRP 2025) — Age 0
-// ==========================
 if (y === 0 && w > 0) {
-
   const uncEl  = document.getElementById('ett-uncuffed');
   const cuffEl = document.getElementById('ett-cuffed');
 
-  const size = lookupByWeight(w, neonatalETTSizeTable);
-  const depth = lookupByWeight(w, neonatalDepthTable);
+const size = lookupByWeight(w, NEONATAL_ETT_SIZE_TABLE);
+const depth = lookupByWeight(w, NEONATAL_ETT_DEPTH_TABLE);
 
   // Neonates: uncuffed only
   uncEl.textContent = size;
@@ -1813,54 +1846,35 @@ if (y === 0 && w > 0) {
   depthEl.textContent = depth;
   depthEl.style.display = 'inline';
   depthUnit.style.display = 'inline';
-
 }
   else {
-    // ================================
-    // NEW ETT SELECTION LOGIC
-    // ================================
-
     let uncuffed = '';
     let cuffed   = '';
 
-    // --- AGE 0–12 MONTHS → Use your existing lookup table ---
     if (y < 1) {
-      const table = [
-        { maxAge: 0.0833, unc: '3.0–3.5',  cuff: '2.5–3.0' },
-        { maxAge: 1/12,   unc: '3.5',  cuff: '3.0' },
-        { maxAge: 2/12,   unc: '3.5',  cuff: '3.0' },
-        { maxAge: 4/12,   unc: '3.5',  cuff: '3.0' },
-        { maxAge: 5/12,   unc: '4.0',  cuff: '3.5' },
-        { maxAge: 6/12,   unc: '4.0',  cuff: '3.5' },
-        { maxAge: 1,      unc: '4.0–4.5', cuff: '3.5–4.0' }
-      ];
-      const row = table.find(r => y <= r.maxAge);
-      uncuffed = row.unc;
-      cuffed   = row.cuff;
+const row = ETT_INFANT_TABLE.find(r => y <= r.maxAge);
+  if (row) {
+  uncuffed = row.unc;
+  cuffed   = row.cuff;
+}
     }
 
-    // --- AGE ≥1 YEAR ---
     else {
-
-      // Uncuffed: 1–8 years → age/4 + 4
       if (y >= 1 && y <= 8) {
         const size = (y/4 + 4).toFixed(2);
         uncuffed = stripZeros(size);
       }
 
-      // Cuffed: 1–14 years → age/4 + 3.5
       if (y >= 1 && y <= 14) {
         const size = (y/4 + 3.5).toFixed(2);
         cuffed = stripZeros(size);
       }
 
-      // Cuffed: >14 years → "7.0–8.0"
       if (y > 14) {
         cuffed = '7.0–8.0';
       }
     }
 
-    // Inject into DOM
     const uncEl = document.getElementById('ett-uncuffed');
     if (uncuffed) {
       uncEl.textContent = uncuffed;
@@ -1879,13 +1893,9 @@ if (y === 0 && w > 0) {
       cuffEl.style.display = 'none';
     }
 
-    // ============================
-    // DEPTH RULES
-    // ============================
-    let depth = '';
+let depth = '';
 
 if (y >= 14) {
-  // Teens / adolescents
   depth = 20;
 } else if (y >= 1) {
   // 1–13 years
@@ -1902,7 +1912,6 @@ if (y >= 14) {
   depth = '12';
 }
 
-// Inject depth into DOM
 const depthEl = document.getElementById('ett-depth-lips');
 const depthUnit = depthEl.nextElementSibling;
 if (depth) {
@@ -1916,100 +1925,65 @@ if (depth) {
 }
   }
 
-  // ==========================
-  // I-GEL (unchanged)
-  // ==========================
-  const igelEl = document.getElementById('igel');
-  let igelSize = '';
-  if (w >= 2) {
-    if      (w <= 5)  igelSize = '1.0 <small>(2–5 kg)</small>';
-    else if (w <= 10) igelSize = '1.5 <small>(5–12 kg)</small>';
-    else if (w <= 25) igelSize = '2.0 <small>(10–25 kg)</small>';
-    else if (w <= 35) igelSize = '2.5 <small>(25–35 kg)</small>';
-    else if (w <= 60) igelSize = '3.0 <small>(30–60 kg)</small>';
-    else if (w <= 90) igelSize = '4.0 <small>(50–90 kg)</small>';
-    else              igelSize = '5.0 <small>(≥90 kg)</small>';
-  }
-  igelEl.innerHTML          = igelSize;
-  igelEl.style.display      = igelSize ? 'inline' : 'none';
+const igelEl = document.getElementById('igel');
 
-  // ==========================
-  // LMA (unchanged)
-  // ==========================
-  const lmaEl = document.getElementById('lma');
-  let lmaSize = '';
-  if (w > 0) {
-    if      (w <= 5)   lmaSize = '1.0 <small>(&lt;5 kg)</small>';
-    else if (w <= 10)  lmaSize = '1.5 <small>(5–10 kg)</small>';
-    else if (w <= 20)  lmaSize = '2.0 <small>(10–20 kg)</small>';
-    else if (w <= 30)  lmaSize = '2.5 <small>(20–30 kg)</small>';
-    else if (w <= 50)  lmaSize = '3.0 <small>(30–50 kg)</small>';
-    else if (w <= 70)  lmaSize = '4.0 <small>(50–70 kg)</small>';
-    else if (w <= 100) lmaSize = '5.0 <small>(70–100 kg)</small>';
-  }
-  lmaEl.innerHTML = lmaSize;
-  lmaEl.style.display = lmaSize ? 'inline-block' : 'none';
+const igelSize = w >= 2 ? lookupByWeight(w, IGEL_TABLE) : '';
 
-  // ==========================
-  // TIDAL VOLUME (unchanged)
-  // ==========================
+igelEl.innerHTML = igelSize;
+igelEl.style.display = igelSize ? 'inline' : 'none';
+
+const lmaEl = document.getElementById('lma');
+
+const lmaSize = w > 0 ? lookupByWeight(w, LMA_TABLE) : '';
+
+lmaEl.innerHTML = lmaSize;
+lmaEl.style.display = lmaSize ? 'inline-block' : 'none';
+
+const row = w > 0
+  ? LARYNGOSCOPE_TABLE.find(r => w <= r.max)
+  : null;
+
+if (row) {
+  showEl('laryngoscope', row.text);
+  if (row.note) {
+    document.getElementById('laryngoscope').innerHTML =
+      `${row.text}<br><small>${row.note}</small>`;
+  }
+} else {
+  hideEl('laryngoscope');
+}
+}
+
+function updateVentilation(w) {
   const tvEl = document.getElementById('tidalvolume');
-  if (w > 0) {
-    const tvMin = Math.round(6 * w),
-          tvMax = Math.round(8 * w);
-    tvEl.textContent   = `${tvMin}–${tvMax} mL`;
-    tvEl.style.display = 'inline';
-  } else {
-    tvEl.style.display = 'none';
+  const tvArdsEl = document.getElementById('tv-neonates-ards');
+
+  // --- Normal tidal volume (6–8 mL/kg) ---
+  if (tvEl) {
+    if (w > 0) {
+      const min = Math.round(6 * w);
+      const max = Math.round(8 * w);
+
+      tvEl.textContent = `${min}–${max} mL`;
+      tvEl.style.display = 'inline';
+    } else {
+      tvEl.textContent = '';
+      tvEl.style.display = 'none';
+    }
   }
 
-  // ARDS TV (unchanged)
-  const tvArdsEl = document.getElementById('tv-neonates-ards');
+  // --- ARDS tidal volume (4–6 mL/kg) ---
   if (tvArdsEl) {
     if (w > 0) {
-      const tvArdsMin = Math.round(4 * w),
-            tvArdsMax = Math.round(6 * w);
-      tvArdsEl.textContent   = `${tvArdsMin}–${tvArdsMax} mL`;
+      const min = Math.round(4 * w);
+      const max = Math.round(6 * w);
+
+      tvArdsEl.textContent = `${min}–${max} mL`;
       tvArdsEl.style.display = 'inline';
     } else {
-      tvArdsEl.textContent   = '';
+      tvArdsEl.textContent = '';
       tvArdsEl.style.display = 'none';
     }
-  }
-
-  // ==========================
-  // LARYNGOSCOPE BLADE (YOUR MISSING BLOCK)
-  // ==========================
-  const laryEl = document.getElementById('laryngoscope');
-  laryEl.innerHTML = '';
-
-  if (w > 0) {
-    let mainText = '';
-    let noteText = '';
-
-    if      (w < 1.5) { mainText = 'Miller 00 or 0';       noteText = '(Extremely preterm)'; }
-    else if (w < 2.5) { mainText = 'Mac 0 / Miller 0';     noteText = '(Preterm)'; }
-    else if (w < 4)   { mainText = 'Mac 0–1 / Miller 0–1'; }
-    else if (w < 6)   { mainText = 'Mac 1 / Miller 1';     noteText = '(1–6 m)'; }
-    else if (w < 12)  { mainText = 'Mac 1–2 / Miller 1–2'; noteText = '(6 m–2 y)'; }
-    else if (w < 30)  { mainText = 'Mac 2';    noteText = '(2–10 y)'; }
-    else if (w <= 60) { mainText = 'Mac 3';    noteText = '(>10 y)'; }
-    else              { mainText = 'Mac 3–4';  noteText = '(adult)'; }
-
-    laryEl.style.display = 'inline-block';
-    laryEl.appendChild(document.createTextNode(mainText));
-
-    if (noteText) {
-      laryEl.appendChild(document.createElement('br'));
-      const small = document.createElement('small');
-      small.textContent = noteText;
-      small.style.display   = 'block';
-      small.style.marginTop = '2px';
-      small.style.fontSize  = '0.8em';
-      laryEl.appendChild(small);
-    }
-  } else {
-    laryEl.style.display = 'none';
   }
 }
 
@@ -2143,6 +2117,7 @@ function clearWeight() {
   // Airway adjuncts
   // =========================
   hideEl('igel');
+  hideEl('lma');
   hideEl('tidalvolume');
   hideEl('tv-neonates-ards');
 
@@ -2257,6 +2232,7 @@ function updateAll() {
  const w = parseFloat(weightIn.value);
   
   updateAirwayCalculations(y, w);
+  updateVentilation(w);
   updateEmergencyDrugs(w); 
   updateSedation(w);
   updateGADrugs(w);
