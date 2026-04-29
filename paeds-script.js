@@ -2153,7 +2153,7 @@ function clearWeight() {
   // =========================
   // Airway
   // =========================
-  hideGroup(['ett-uncuffed','ett-cuffed','ett-depth-lips']);
+  hideGroup(['ett-uncuffed','ett-cuffed','ett-depth-lips','bougie']);
   clearText('laryngoscope');
   document.getElementById('laryngoscope').style.display = 'none';
 
