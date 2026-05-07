@@ -101,7 +101,7 @@ const ETT_AGE_TABLE = [
 const EMERGENCY_DRUG_LIST = [
   'fentanyl',
   'ketamine',
-  'rocuronium',
+  'rocuronium_emergency',
   'atropine',
   'adrenaline_iv',
   'sux_im',
@@ -114,7 +114,7 @@ const EMERGENCY_DRUG_LIST = [
 const GA_DRUG_LIST = [
   'fentanyl',
   'propofol',
-  'rocuronium',
+  'rocuronium_ga',
   'atracurium_ga',
   'dexamethasone',
   'atropine',
@@ -208,14 +208,25 @@ morphine_bag: {
   diluent: '0.9% sodium chloride',
   extraId: 'morphine-sed',
 },
-  rocuronium: {
+  rocuronium_emergency: {
   weight: 'IBW',
-  dose: [0.6, 1],
+  dose: [1, 1],
   unit: 'mg',
   conc: 10,
-  outputId: ['rocuronium', 'rocuronium-ga'],
-  extraId: ['rocuronium-vol-extra', 'rocuronium-ga-extra'],
-  labelId: ['rocuronium-dose-text', 'rocuronium-ga-dose-text']
+
+  outputId: 'rocuronium',
+  extraId: 'rocuronium-vol-extra',
+  labelId: 'rocuronium-dose-text'
+},
+rocuronium_ga: {
+  weight: 'IBW',
+  dose: [0.6, 0.6],
+  unit: 'mg',
+  conc: 10,
+
+  outputId: 'rocuronium-ga',
+  extraId: 'rocuronium-ga-extra',
+  labelId: 'rocuronium-ga-dose-text'
 },
   atropine: {
   weight: 'TBW',
