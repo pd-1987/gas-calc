@@ -81,10 +81,10 @@ const NEONATAL_ETT_DEPTH_TABLE = [
 
 const ETT_AGE_TABLE = [
   // Neonates handled separately
-
   { maxAge: 3/12,  unc: '3.5',     cuff: '3.0',     depth: '9.0–10.0', bougie: ['5'] },
   { maxAge: 6/12,  unc: '4.0',     cuff: '3.5',     depth: '10.0–11.0', bougie: ['5','10'] },
-  { maxAge: 1,     unc: '4.0–4.5', cuff: '3.5–4.0', depth: '12.0',      bougie: ['5','10'] },
+  { maxAge: 11/12, unc: '4.0–4.5', cuff: '3.5–5.0', depth: '12.0',      bougie: ['5','10'] },
+  { maxAge: 1,     unc: '4.0–4.5', cuff: '3.5–5.0', depth: '12.5',      bougie: ['5','10'] },
   { maxAge: 2,     unc: '4.5–5.0', cuff: '4.0–4.5', depth: '13.0',      bougie: ['10'] },
   { maxAge: 3,     unc: '4.5–5.0', cuff: '4.0–4.5', depth: '13.5',      bougie: ['10'] },
   { maxAge: 4,     unc: '5.0–5.5', cuff: '4.5–5.0', depth: '14.0',      bougie: ['10'] },
@@ -94,7 +94,11 @@ const ETT_AGE_TABLE = [
   { maxAge: 8,     unc: '6.5',     cuff: '6.0',     depth: '16.0',      bougie: ['15'] },
   { maxAge: 9,     unc: '6.5',     cuff: '6.0',     depth: '16.5',      bougie: ['15'] },
   { maxAge: 10,    unc: '7.0',     cuff: '6.5',     depth: '17.0',      bougie: ['15'] },
+  { maxAge: 11,    unc: '7.0',     cuff: '6.5',     depth: '17.5',      bougie: ['15'] },
   { maxAge: 12,    unc: '7.5',     cuff: '7.0',     depth: '18.0',      bougie: ['15'] },
+  { maxAge: 13,    unc: '7.5',     cuff: '7.0',     depth: '18.5',      bougie: ['15'] },
+  { maxAge: 14,    unc: '7.5',     cuff: '7.0',     depth: '19.0',      bougie: ['15'] },
+  { maxAge: 15,    unc: '7.5',     cuff: '7.0',     depth: '19.5',      bougie: ['15'] },
   { maxAge: Infinity, unc: '',     cuff: '7.0–8.0', depth: '20',        bougie: ['15'] }
 ];
 
