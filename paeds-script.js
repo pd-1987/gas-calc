@@ -2098,7 +2098,22 @@ function updateEstimateLock() {
 
 function clearWeight() {
   Object.keys(DRUGS).forEach(clearDrug);
-   // =========================
+  
+  // =========================
+  // BMI / weight context
+  // =========================
+  bmiOutput.innerHTML = '';
+  ibwOutput.textContent = '';
+  adjbwOutput.textContent = '';
+
+  const bmiWarning = document.getElementById("bmi-warning");
+  if (bmiWarning) bmiWarning.textContent = '';
+
+  window.weightContext.ibw = null;
+  window.weightContext.adjbw = null;
+  window.weightContext.isObese = false;
+  
+  // =========================
   // Calculations display
   // =========================
   calcDiv.innerHTML = '';
@@ -2360,4 +2375,3 @@ genderContainer.addEventListener("click", (e) => {
 
   updateAll();   // ✅ clean + centralised
 });
-
