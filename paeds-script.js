@@ -485,9 +485,9 @@ dexamethasone: {
     }
 
     return {
-      min: 5 * w,
+      min: 10 * w,
       max: 10 * w,
-      perKg: '5–10'
+      perKg: '10'
     };
   },
 
