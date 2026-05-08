@@ -87,7 +87,7 @@
   <div class="calc-section">
   <div class="input-group">
     <label for="weight">Weight (kg):</label>
-    <input type="number" id="weight" placeholder="0" min="0" oninput="updateInfusionRate()">
+    <input type="number" id="weight" value="70" placeholder="0" min="0" oninput="updateInfusionRate()">
   </div>
 
   <p class="input-note">
@@ -378,7 +378,7 @@ function updateInfusionRate2() {
 
 function resetForm() {
   // Reset Noradrenaline
-  document.getElementById('weight').placeholder = '0';
+  document.getElementById('weight').value = '70';
   document.getElementById('infusionInput').value = '';
   document.getElementById('unitToggle').textContent = 'ml/hr';
 
