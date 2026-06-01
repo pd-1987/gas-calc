@@ -85,10 +85,10 @@ const ETT_AGE_TABLE = [
   { minAge: 3/12,   maxAge: 6/12,  unc: '4.0',     cuff: '3.5',     depth: '10.0–11.0', bougie: ['5','10'] },
 
   // 6–12 months
-  { minAge: 6/12,   maxAge: 1,     unc: '4.0–4.5', cuff: '3.5–4.0', depth: '12.0',      bougie: ['5','10'] },
+  { minAge: 6/12,   maxAge: 1,     unc: '4.0–4.5', cuff: '3.5–5.0', depth: '12.0',      bougie: ['5','10'] },
 
   // 1–2 years
-  { minAge: 1,      maxAge: 2,     unc: '4.0–4.5', cuff: '3.5–4.0', depth: '12.5',      bougie: ['5','10'] },
+  { minAge: 1,      maxAge: 2,     unc: '4.0–4.5', cuff: '3.5–5.0', depth: '12.5',      bougie: ['5','10'] },
 
   // 2–3 years
   { minAge: 2,      maxAge: 3,     unc: '4.5–5.0', cuff: '4.0–4.5', depth: '13.0',      bougie: ['10'] },
@@ -258,7 +258,7 @@ morphine_bag: {
 },
 rocuronium_ga: {
   weight: 'IBW',
-  dose: [0.6, 0.6],
+  dose: [0.6, 1.0],
   unit: 'mg',
   conc: 10,
 
