@@ -109,10 +109,10 @@ const ETT_AGE_TABLE = [
   { minAge: 7,      maxAge: 8,     unc: '6.0',     cuff: '5.0–5.5', depth: '15.5',      bougie: ['10','15'] },
 
   // 8–9 years
-  { minAge: 8,      maxAge: 9,     unc: '6.5',     cuff: '6.0',     depth: '16.0',      bougie: ['15'] },
+  { minAge: 8,      maxAge: 9,     unc: '6.5',     cuff: '6.0',     depth: '16.0',      bougie: ['10','15'] },
 
   // 9–10 years
-  { minAge: 9,      maxAge: 10,    unc: '6.5',     cuff: '6.0',     depth: '16.5',      bougie: ['15'] },
+  { minAge: 9,      maxAge: 10,    unc: '6.5',     cuff: '6.0',     depth: '16.5',      bougie: ['10','15'] },
 
   // 10–11 years
   { minAge: 10,     maxAge: 11,    unc: '7.0',     cuff: '6.5',     depth: '17.0',      bougie: ['15'] },
