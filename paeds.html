@@ -222,9 +222,7 @@
   border: 1px solid var(--border-light);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.03),
-    0 4px 12px rgba(0,0,0,0.35);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 .result-table th,
 .result-table td {
@@ -252,16 +250,15 @@
 .result-table thead tr:first-child th:last-child {
   border-top-right-radius: 12px;
 }
-/* Row labels (left column) */
+
 .result-table tbody th {
   font-weight: 500;
-  background: rgba(255,255,255,0.03);
+  background: #ffffff;
 }
-/* Subtle alternating rows */
+
 .result-table tbody tr:not([class]):nth-child(even) td {
-  background: rgba(255,255,255,0.02);
+  background: #fafafa;
 }
-/* Remove harsh forced black text */
 .result table td,
 .result table th {
   color: var(--text-main);
