@@ -928,9 +928,9 @@ metronidazole: {
 },
 gentamicin: {
   weight: 'AdjBW',
-  dose: [2.5, 2.5],
+  dose: [3, 3],
   unit: 'mg',
-  cap: 160,
+  cap: 240,
   outputId: 'gentamicin',
   labelId: 'gentamicin-dose-text'
 },
