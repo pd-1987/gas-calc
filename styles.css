@@ -21,12 +21,12 @@
   /* Borders */
   --border-light: #d9dde2;  /* borders */
   --toggle-border: #c5cad1;
-  --bubble-border: #9bbce0;
 
   /* Bubbles */
-  --bubble-bg: #e8f1fb;
-  --bubble-text: #1565c0;
-  --bubble-active-bg: #0078d7;
+--bubble-bg: #e8f1fb;
+--bubble-text: #1565c0;
+--bubble-active-bg: #0078d7;
+--bubble-border: #a9c7e5;
 
   /* Category colours */
   --clr-general: #6c757d;
@@ -615,13 +615,13 @@ button .instruction-text {
   font-style: normal;
 }
 button.active {
-  background-color: var(--clr-dark-grey);
-  color: white;
-  border-color: var(--clr-dark-grey);
+  background-color: #dbeafe;
+  color: #1565c0;
+  border-color: #93c5fd;
 }
 
 button.active small {
-  color: white;
+  color: #1565c0;
 }
 
 .calc-button {
