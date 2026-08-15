@@ -3,32 +3,32 @@
 =============================================*/
 :root {
   /* Backgrounds */
-  --bg-main: #0f1115;
-  --bg-card: #1f232a;
-  --btn-bg: #2c3138;
-  --input-bg: #262b33;
+  --bg-main: #f8f9fa;       /* page background */
+  --bg-card: #ffffff;       /* cards / sections */
+  --btn-bg: #eef1f4;        /* secondary buttons / headers */
+  --input-bg: #ffffff;      /* inputs */
   --clr-primary: #2b7de9;
   --clr-dark-grey: #555;
   --radius: 5px;
   --gap: 0.5rem;
 
   /* Text */
-  --text-main: #f1f3f5;
-  --text-secondary: #a8adb3;
-  --link-color: #4da3ff;
-  --link-visited: #a78bfa;
+  --text-main: #212529;     /* primary text */
+  --text-secondary: #6c757d;/* secondary text */
+  --link-color: #007BFF;
+  --link-visited: #6d4aff;
 
   /* Borders */
-  --border-light: #3a4048;
-  --toggle-border: #4a515a;
-  --bubble-border: #355070;
+  --border-light: #d9dde2;  /* borders */
+  --toggle-border: #c5cad1;
+  --bubble-border: #9bbce0;
 
   /* Bubbles */
-  --bubble-bg: #1c2a3a;
-  --bubble-text: #7fb6ff;
+  --bubble-bg: #e8f1fb;
+  --bubble-text: #1565c0;
   --bubble-active-bg: #0078d7;
 
-  /* Category colours (UNCHANGED) */
+  /* Category colours */
   --clr-general: #6c757d;
   --clr-airway: #b71c1c;
   --clr-regional: #1565C0;
@@ -1270,18 +1270,6 @@ footer a:hover {
   background-color: #E57373;
   color: #212529;
 }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-main: #0f1115;
-    --bg-card: #1f232a;
-    --btn-bg: #2a2f36;
-    --input-bg: #262b33;
-    --text-main: #f1f3f5;
-    --text-secondary: #a8adb3;
-    --border-light: #3a4048;
-    --toggle-border: #4a515a;
-  }
     h1 {
     color: #ffffff;
   }
