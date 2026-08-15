@@ -1270,55 +1270,6 @@ footer a:hover {
   background-color: #E57373;
   color: #212529;
 }
-    h1 {
-    color: #ffffff;
-  }
-  .bubble {
-    background-color: #1c2a3a;
-    border-color: #355070;
-    color: #7fb6ff;
-  }
-    .toggle-container {
-    background: #2a2f36;
-  }
-
-  .toggle-slider {
-    border-color: #3a4048;
-  }
-  #shockClassificationTable th {
-  background-color: #2a2f36;
-  color: var(--text-main);
-}
-#shockClassificationTable td,
-#shockClassificationTable th {
-  border-color: #3a4048;
-}
-  #shockClassificationTable tr + tr td {
-  border-top: 1px solid #3a4048;
-}
-#shockClassificationTable th {
-  background: #2a2f36;
-}
-#shockClassificationTable .classI  { 
-  background-color: #5a1a1a;
-  color: #ffffff;
-}
-
-#shockClassificationTable .classII { 
-  background-color: #6e2222;
-  color: #ffffff;
-}
-
-#shockClassificationTable .classIII{ 
-  background-color: #8a2d2d;
-  color: #ffffff;
-}
-
-#shockClassificationTable .classIV { 
-  background-color: #a53a3a;
-  color: #ffffff;
-}
-}
  @media (max-width: 480px) {
   .button-group button {
     padding: 12px 10px;
