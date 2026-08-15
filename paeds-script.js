@@ -1857,8 +1857,50 @@ function lookupByWeight(weight, table) {
   return row ? (row.label || row.size || row.depth) : '';
 }
 
+function updateETTFormula(ageYears) {
+  const uncFormulaEl = document.getElementById('ett-uncuffed-formula');
+  const cuffFormulaEl = document.getElementById('ett-cuffed-formula');
+  const depthFormulaEl = document.getElementById('ett-depth-formula');
+
+  if (!uncFormulaEl || !cuffFormulaEl || !depthFormulaEl) return;
+
+  if (ageYears >= 3 / 12) {
+    const uncuffed = ageYears / 4 + 4;
+    const cuffed = ageYears / 4 + 3.5;
+    const depth = ageYears / 2 + 12;
+
+    uncFormulaEl.textContent =
+  `Age/4 + 4 = ${formatFormulaNumber(uncuffed)}`;
+
+cuffFormulaEl.textContent =
+  `Age/4 + 3.5 = ${formatFormulaNumber(cuffed)}`;
+
+depthFormulaEl.textContent =
+  `Age/2 + 12 = ${formatFormulaNumber(depth)} cm`;
+    
+    uncFormulaEl.style.display = 'block';
+    cuffFormulaEl.style.display = 'block';
+    depthFormulaEl.style.display = 'block';
+
+  } else {
+    uncFormulaEl.textContent = '';
+    cuffFormulaEl.textContent = '';
+    depthFormulaEl.textContent = '';
+
+    uncFormulaEl.style.display = 'none';
+    cuffFormulaEl.style.display = 'none';
+    depthFormulaEl.style.display = 'none';
+  }
+}
+
+function formatFormulaNumber(value) {
+  return parseFloat(value.toFixed(2)).toString();
+}
+
 function updateAirwayCalculations(ageYears, w) {
 
+  updateETTFormula(ageYears);
+  
   const y = ageUnit === 'months'
     ? parseFloat(ageInput.value) / 12
     : ageYears;
