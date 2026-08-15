@@ -460,6 +460,14 @@ small[class] {
  .result span:first-of-type {
   font-size: 1em;
 }
+.ett-formula {
+  display: block;
+  font-size: 0.7em;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  line-height: 1.2;
+}    
   </style>
 </head>
   
@@ -659,17 +667,20 @@ small[class] {
     </tr>
     <tr>
       <th>Uncuffed ETT</th>
-      <td><span id="ett-uncuffed"></span></td>
+      <td><span id="ett-uncuffed"></span>
+      <small id="ett-uncuffed-formula" class="ett-formula"></small></td>
     </tr>
     <tr>
       <th>Cuffed ETT</th>
-      <td><span id="ett-cuffed"></span></td>
+      <td><span id="ett-cuffed"></span>
+      <small id="ett-cuffed-formula" class="ett-formula"></small></td>
     </tr>
     <tr>
       <th>Depth at lips</th>
       <td>
         <span id="ett-depth-lips"></span>
         <span class="unit">cm</span>
+        <small id="ett-depth-formula" class="ett-formula"></small>
       </td>
     </tr>
 <tr>
