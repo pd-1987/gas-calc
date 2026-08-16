@@ -138,7 +138,8 @@
   padding: 12px 0;
   }
 .estimate-toggle {
-  display: inline-flex;
+  display: flex;
+  width: fit-content;
   align-items: center;
   cursor: pointer;
   user-select: none;
@@ -463,6 +464,11 @@ small[class] {
   margin-top: 2px;
   line-height: 1.2;
 }    
+.estimate-toggle .toggle-label small {
+  font-size: 0.8em;
+  color: var(--text-secondary);
+  margin-left: 3px;
+}    
   </style>
 </head>
   
@@ -499,6 +505,13 @@ small[class] {
   <span class="slider"></span>
   <span class="toggle-label">Estimate <small>(UK-WHO / UK90)</small></span>
 </label>
+    
+    <label class="estimate-toggle">
+  <input type="checkbox" id="RoundingToggle" checked>
+  <span class="slider"></span>
+  <span class="toggle-label">Rounding <small id="rounding-note">Nearest 0.1 kg</small></span>
+</label>
+    
   </div>
  
   <div class="accordion">
