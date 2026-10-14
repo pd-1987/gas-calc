@@ -9,8 +9,7 @@ window.weightContext = {
 
   
 let ageUnit = 'years';
-let autoEstimate = true;
-let autoRound = true;
+let autoEstimate = false;
 
 // =========================
 // DOM CACHE
@@ -26,8 +25,6 @@ const bmiOutput = document.getElementById("bmi-value");
 const ibwOutput = document.getElementById("ibw-value");
 const adjbwOutput = document.getElementById("adjbw-value");
 const genderContainer = document.getElementById("GenderBtn");
-const roundToggle = document.getElementById('RoundingToggle');
-const roundingNote = document.getElementById('rounding-note');
 
 // =========================
 // CONFIG (DRUGS, LISTS)
@@ -1765,42 +1762,8 @@ function estimateWeight() {
     return;
   }
 
-  // Apply optional rounding to the WHO-derived weight
-  const finalWeight = autoRound
-    ? roundWeight(estimatedWeight)
-    : estimatedWeight;
-
-  weightIn.value = stripZeros(finalWeight.toFixed(2));
-
-  updateRoundingNote(estimatedWeight);
+  weightIn.value = stripZeros(estimatedWeight.toFixed(2));
   updateWeightCentileDisplay();
-}
-
-  function getRoundingIncrement(weight) {
-  if (weight < 10) return 0.1;
-  if (weight <= 20) return 0.5;
-  return 1;
-}
-
-function roundWeight(weight) {
-  if (!autoRound || !isFinite(weight)) return weight;
-
-  const increment = getRoundingIncrement(weight);
-  return Math.round(weight / increment) * increment;
-}
-
-function updateRoundingNote(weight) {
-  if (!roundingNote) return;
-
-  if (!autoEstimate || !autoRound || !isFinite(weight)) {
-    roundingNote.textContent = 'Off';
-    return;
-  }
-
-  const increment = getRoundingIncrement(weight);
-
-  roundingNote.textContent =
-    `Nearest ${increment.toString()} kg`;
 }
 
 function estimateHeight() {
@@ -2275,13 +2238,9 @@ function resetForm() {
   ageUnit = 'years';
   unitBtn.textContent = 'years';
 
-  autoEstimate = true;
-  estToggle.checked = true;
+  autoEstimate = false;
+  estToggle.checked = false;
   updateEstimateLock();
-  
-  autoRound = true;
-  roundToggle.checked = true;
-  updateRoundingNote(null);
 
   // Reset gender (optional)
   const genderContainer = document.getElementById("GenderBtn");
@@ -2394,41 +2353,17 @@ function updateAll() {
  estToggle.addEventListener('change', () => {
   autoEstimate = estToggle.checked;
 
-  if (!autoEstimate) {
-    autoRound = false;
-    roundToggle.checked = false;
-  }
-
   updateEstimateLock();
 
   if (autoEstimate) {
     clearWeight();
     updateAll();
   } else {
-    updateRoundingNote(null);
     updateAll();
-  }
-});
-
-roundToggle.addEventListener('change', () => {
-  autoRound = roundToggle.checked;
-
-  if (autoEstimate) {
-    updateAll();
-  } else {
-    updateRoundingNote(null);
   }
 });
 
 ageInput.addEventListener('input', () => {
-  const val = parseFloat(ageInput.value);
-
-  if (!isNaN(val) && val >= 0 && !autoEstimate) {
-    autoEstimate = true;
-    estToggle.checked = true;
-    updateEstimateLock();
-  }
-
   updateAll();
 });
 
@@ -2479,8 +2414,8 @@ heightIn.addEventListener('input', () => {
 
 document.addEventListener('DOMContentLoaded', () => {
   clearWeight();
-  estToggle.checked = true;
-  autoEstimate = true;
+  estToggle.checked = false;
+  autoEstimate = false;
   updateEstimateLock();
   
   enableSelectAllOnFocus(weightIn);
