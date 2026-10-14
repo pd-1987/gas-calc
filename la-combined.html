@@ -20,6 +20,14 @@
   margin-bottom: 4px;
   color: var(--text-primary);
     }
+.preset-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Adds the gap between the buttons */
+  text-align: center;
+  margin-top: 16px;
+  margin-bottom: 10px;
+}       
 </style>
 </head>
 <body>
@@ -82,7 +90,9 @@
   
 <div class="preset-container">
   <button class="preset-btn" id="tkr-btn">TKR – ESH (Spinal, Adductor canal + LIA)</button>
-</div>  
+  <button class="preset-btn" id="lido-levo-btn">Lidocaine 1% w/ Adrenaline BPB + Levobupivacaine 0.25% Peripheral Top ups</button>
+</div>
+  
   <div class="main-control-buttons">
     <button class="reset-btn">Reset</button>
     <button class="home-btn">Home</button>
@@ -403,6 +413,28 @@ document.getElementById('tkr-btn').addEventListener('click', () => {
 
   updateCombinedTotals();
 });
+  
+// --- Lidocaine & Levobupivacaine Preset ---
+document.getElementById('lido-levo-btn').addEventListener('click', () => {
+  // Clear any previous entries
+  resultsContainer.innerHTML = '';
+
+  // 1. Lidocaine 1% (WITH adrenaline)
+  let block1 = createBlock('Lidocaine', true);
+  addConcRow(block1, '1%');
+  let input1 = block1.querySelector('.concentration-row input');
+  input1.value = 30; // Defaulting to 0ml to allow manual entry
+  input1.dispatchEvent(new Event('input'));
+
+  // 2. Levobupivacaine 0.25% (WITHOUT adrenaline)
+  let block2 = createBlock('Levobupivacaine', false);
+  addConcRow(block2, '0.25%');
+  let input2 = block2.querySelector('.concentration-row input');
+  input2.value = 10; // Defaulting to 0ml to allow manual entry
+  input2.dispatchEvent(new Event('input'));
+
+  updateCombinedTotals();
+});  
 </script>
 
 
