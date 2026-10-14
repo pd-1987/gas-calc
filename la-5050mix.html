@@ -52,6 +52,16 @@
 .la-mixture-total .result-value {
   margin-left: 6px;
 }
+    .drug-label .cycle-icon {
+  position: static; /* Stops the icon from floating over the text */
+  margin-left: 4px; /* Adds a little breathing room */
+}
+    .la-cycle-btn .dose-label {
+  font-size: 15px; /* Increases the size */
+  font-weight: 700; /* Makes it bold */
+  color: var(--clr-regional); /* Changes it from grey to the prominent blue used in your theme */
+  margin-top: 2px; /* Adds a tiny bit of spacing */
+    }
   </style>
 </head>
 <body>
@@ -75,19 +85,23 @@
 
     </div>
   <div class="calc-section" id="la1">
-          <!-- LA 1 -->
-      <div class="instruction-header">LA 1: Short-acting</div>
-     <div class="la-buttons">
-  <button type="button" class="la-cycle-btn" disabled>
-    Lidocaine 2% + 1:200,000 adrenaline
-  <small>Max: 7 mg/kg; 500 mg</small>
-  </button>
+<!-- LA 1 -->
+<div class="calc-section" id="la1">
+  <div class="instruction-header">LA 1: Short-acting</div>
+  <div class="la-buttons">
+    <button type="button" class="la-cycle-btn" id="la1-name-btn">
+      <span class="drug-label">
+        <span class="drug-name">Lidocaine + Adrenaline</span>
+        <span class="cycle-icon">⟳</span>
+      </span>
+      <span class="dose-label" id="la1-dose-label">2%</span>
+      <small>Max: 7 mg/kg; 500 mg</small>
+    </button>
+  </div>
+  <div class="maxresult">
+    Max single dose: <span id="la1-max">0</span><span class="unit"> mg</span>
+  </div>
 </div>
-
-     <div class="maxresult">
-        Max single dose: <span id="la1-max">0</span><span class="unit"> mg</span>
-      </div>
-    </div>
 
     <!-- LA 2 -->
     <div class="calc-section" id="la2">
@@ -206,12 +220,15 @@ Combined 50:50 mixture
   const defaultDoseBtn = document.querySelector('#dose-options .bubble[data-dose="2"]');
   const resetBtn      = document.querySelector('.reset-btn');
   const homeBtn       = document.querySelector('.home-btn');
-  const la1NameBtn    = document.querySelector('#la1 .la-buttons button');
+const la1NameBtn    = document.getElementById('la1-name-btn');
+const la1DrugName   = la1NameBtn.querySelector('.drug-name');
+const la1DoseLabel  = document.getElementById('la1-dose-label');
+let isLido2Percent  = true; // Tracks if LA1 is 2% (true) or 1% (false)
   const la2NameBtn = document.getElementById('la2-name-btn');
   const comb1Label    = document.getElementById('comb1-label');
   const comb2Label    = document.getElementById('comb2-label');
   const totalVolSpan  = document.getElementById('total-vol');
-
+  
   const modeVolumeBtn = document.getElementById('mode-volume');
 const modeDoseBtn   = document.getElementById('mode-dose');
 let mode = 'volume';  // default
@@ -229,6 +246,13 @@ function toggleExtraDoseButtons() {
     extraDoseButtons.forEach(btn => btn.style.display = 'inline-block');
   }
 }  
+
+// Toggle LA-1 between 2% and 1%
+la1NameBtn.addEventListener('click', () => {
+  isLido2Percent = !isLido2Percent;
+  la1DoseLabel.textContent = isLido2Percent ? '2%' : '1%';
+  updateDoses();
+});  
   
 modeVolumeBtn.addEventListener('click', () => {
   mode = 'volume';
@@ -253,7 +277,7 @@ modeDoseBtn.addEventListener('click', () => {
 });
   
   let levaPerKg = parseFloat(defaultDoseBtn.dataset.dose);
-  let isLevo    = true;   // are we showing Levobupivacaine? (true) or Bupivacaine? (false)
+let isLevo05Percent = true; // Tracks if LA2 is 0.5% (true) or 0.25% (false)
   defaultDoseBtn.classList.add('active');
 
   
@@ -264,33 +288,23 @@ modeDoseBtn.addEventListener('click', () => {
   }
 
   // Compute safe single doses for LA1 and LA2
-  function getSafeDoses() {
-    const w = parseFloat(weightInput.value) || 0;
+// Compute safe single doses for LA1 and LA2
+function getSafeDoses() {
+  const w = parseFloat(weightInput.value) || 0;
 
-    // LA1: lidocaine 7 mg/kg, cap 500 mg
-    const s1 = Math.min(w * 7, 500);
+  // LA1: lidocaine 7 mg/kg, cap 500 mg
+  const s1 = Math.min(w * 7, 500);
 
-    // LA2: raw = weight × mg/kg
-    let s2 = levaPerKg ? w * levaPerKg : 0;
+  // LA2: raw = weight × mg/kg
+  let s2 = levaPerKg ? w * levaPerKg : 0;
 
-    if (levaPerKg) {
-      if (isLevo) {
-        // levobupivacaine caps
-        s2 = Math.min(
-          s2,
-          levaPerKg < 3 ? 200 : 225
-        );
-      } else {
-        // bupivacaine caps
-        s2 = Math.min(
-          s2,
-          levaPerKg < 3 ? 175 : 225
-        );
-      }
-    }
-
-    return { s1, s2 };
+  if (levaPerKg) {
+    // Levobupivacaine caps
+    s2 = Math.min(s2, levaPerKg < 3 ? 200 : 225);
   }
+
+  return { s1, s2 };
+}
 
   // helper: given a button, remove any <small> text and return just the “big” label
 function getMainLabel(btn) {
@@ -301,19 +315,24 @@ function getMainLabel(btn) {
   }
   
   // Update the LA max-dose displays and recalc combined mix
-  function updateDoses() {
-    comb1Label.textContent = getMainLabel(la1NameBtn);
-   comb2Label.textContent = `${la2DrugName.textContent} ${la2DoseLabel.textContent}`;
-    const { s1, s2 } = getSafeDoses();
-    la1Max.textContent = Math.round(s1);
-    la2Max.textContent = Math.round(s2);
-    updateCombined(s1, s2);
-  }
+  // Update the LA max-dose displays and recalc combined mix
+function updateDoses() {
+  comb1Label.textContent = `${la1DrugName.textContent} ${la1DoseLabel.textContent}`;
+  comb2Label.textContent = `${la2DrugName.textContent} ${la2DoseLabel.textContent}`;
+  const { s1, s2 } = getSafeDoses();
+  la1Max.textContent = Math.round(s1);
+  la2Max.textContent = Math.round(s2);
+  updateCombined(s1, s2);
+}
 
   // Calculate and display 50:50 combined volumes, doses & percents
- function updateCombined(s1, s2) {
-  const c1 = 2   * 10;  // 2% → 20 mg/mL
-  const c2 = 0.5 * 10;  // 0.5% → 5  mg/mL
+function updateCombined(s1, s2) {
+  // Dynamically calculate c1 based on the button state (2% = 20mg/mL, 1% = 10mg/mL)
+  const lidoConcentration = isLido2Percent ? 2 : 1;
+  const c1 = lidoConcentration * 10; 
+// Dynamically calculate c2 based on button state (0.5% = 5mg/mL, 0.25% = 2.5mg/mL)
+const levoConcentration = isLevo05Percent ? 0.5 : 0.25;
+const c2 = levoConcentration * 10;
 
   let d1 = 0, d2 = 0, V1 = 0, V2 = 0;
 
@@ -366,21 +385,23 @@ function getMainLabel(btn) {
 
   // Toggle LA-2 between Levobupivacaine and Bupivacaine
   la2NameBtn.style.cursor = 'pointer';
-  la2NameBtn.addEventListener('click', () => {
-    isLevo = !isLevo;
-la2DrugName.textContent = isLevo ? 'Levobupivacaine' : 'Bupivacaine';
-la2DoseLabel.textContent = '0.5%';
-    updateDoses();
-  });
+ // Toggle LA-2 between 0.5% and 0.25% Levobupivacaine
+la2NameBtn.style.cursor = 'pointer';
+la2NameBtn.addEventListener('click', () => {
+  isLevo05Percent = !isLevo05Percent;
+  la2DrugName.textContent = 'Levobupivacaine';
+  la2DoseLabel.textContent = isLevo05Percent ? '0.5%' : '0.25%';
+  updateDoses();
+});
 
   // Recalc when weight changes
   weightInput.addEventListener('input', updateDoses);
 
   // Reset everything
   resetBtn.addEventListener('click', () => {
-  isLevo           = true;
-  la2DrugName.textContent = 'Levobupivacaine';
-  la2DoseLabel.textContent = '0.5%';
+isLevo05Percent = true;
+la2DrugName.textContent = 'Levobupivacaine';
+la2DoseLabel.textContent = '0.5%';
 
   // reset mode toggle
   mode = 'volume';
@@ -388,6 +409,10 @@ modeVolumeBtn.classList.add('active');
 modeDoseBtn.classList.remove('active');
 toggleExtraDoseButtons();
 
+// Inside resetBtn.addEventListener('click', () => { ...
+isLido2Percent = true;
+la1DoseLabel.textContent = '2%';   
+    
   // clear & restore the dose-buttons
   doseButtons.forEach(b => b.classList.remove('active'));
   // this one line both re-activates and re-sets levaPerKg:
