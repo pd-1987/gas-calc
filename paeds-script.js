@@ -920,7 +920,7 @@ flucloxacillin: {
 },
 metronidazole: {
   weight: 'TBW',
-  dose: [30, 30],
+  dose: [7.5, 7.5],
   unit: 'mg',
   cap: 500,
   outputId: 'metronidazole',
