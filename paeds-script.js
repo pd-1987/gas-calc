@@ -912,7 +912,7 @@ cefuroxime: {
 
 flucloxacillin: {
   weight: 'TBW',
-  dose: [25, 25],
+  dose: [25, 50],
   unit: 'mg',
   cap: 2000,
   outputId: 'flucloxacillin',
