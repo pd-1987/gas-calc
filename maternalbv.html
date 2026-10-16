@@ -153,24 +153,27 @@
 <div class="calc-section">
     <div class="instruction-header">Transfusion Targets (RCOG / OAA)</div>
     
-    <table class="classification-table" style="max-width: 300px; margin: 0 auto;">
-      <tr>
-        <th class="text-left">Haemoglobin</th>
-        <td>&gt; 80 g/L</td>
-      </tr>
-      <tr>
-        <th class="text-left">Fibrinogen *</th>
-        <td>&gt; 2.0 g/L</td>
-      </tr>
-      <tr>
-        <th class="text-left">Platelets</th>
-        <td>&gt; 75 &times; 10&sup9;/L</td>
-      </tr>
-      <tr>
-        <th class="text-left">PT / APTT</th>
-        <td>&lt; 1.5&times; normal</td>
-      </tr>
-    </table>
+    <!-- 👇 This div creates the faint, rounded box 👇 -->
+    <div style="max-width: 300px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
+      <table class="classification-table" style="width: 100%; border-collapse: collapse; margin: 0; border: none;">
+        <tr>
+          <th class="text-left" style="border-bottom: 1px solid #e2e8f0;">Haemoglobin</th>
+          <td style="border-bottom: 1px solid #e2e8f0;">&gt; 80 g/L</td>
+        </tr>
+        <tr>
+          <th class="text-left" style="border-bottom: 1px solid #e2e8f0;">Fibrinogen *</th>
+          <td style="border-bottom: 1px solid #e2e8f0;">&gt; 2.0 g/L</td>
+        </tr>
+        <tr>
+          <th class="text-left" style="border-bottom: 1px solid #e2e8f0;">Platelets</th>
+          <td style="border-bottom: 1px solid #e2e8f0;">&gt; 75 &times; 10<sup>9</sup>/L</td>
+        </tr>
+        <tr>
+          <th class="text-left">PT / APTT</th>
+          <td>&lt; 1.5&times; normal</td>
+        </tr>
+      </table>
+    </div>
     
     <p style="font-size: 11px; color: var(--text-secondary); margin-top: 12px; line-height: 1.4;">
       <strong>*Fibrinogen:</strong> Pregnancy is a prothrombotic state with a high baseline fibrinogen (4–6 g/L). It drops rapidly during major haemorrhage, so the obstetric target (&gt; 2.0 g/L) is higher than the standard adult target.
