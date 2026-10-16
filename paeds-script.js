@@ -913,7 +913,7 @@ flucloxacillin: {
   weight: 'TBW',
   dose: [25, 25],
   unit: 'mg',
-  cap: 1000,
+  cap: 2000,
   outputId: 'flucloxacillin',
   labelId: 'flucloxacillin-dose-text'
 },
