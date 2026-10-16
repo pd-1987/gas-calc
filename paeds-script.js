@@ -188,7 +188,6 @@ const ANTIBIOTIC_LIST = [
   'cefuroxime',
   'co-amoxiclav',
   'flucloxacillin',
-  'flucloxacillin-bone',
   'metronidazole',
   'gentamicin',
   'gentamicin-high',
@@ -912,7 +911,7 @@ cefuroxime: {
 
 flucloxacillin: {
   weight: 'TBW',
-  dose: [25, 50],
+  dose: [25, 25],
   unit: 'mg',
   cap: 2000,
   outputId: 'flucloxacillin',
