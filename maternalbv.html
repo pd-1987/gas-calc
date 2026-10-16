@@ -212,10 +212,15 @@
       
       <div style="margin-top: 12px; text-align: center;">
         <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 8px;">
-          Tap image to view full screen
+          Tap image to open in new browser window
         </p>
         
-        <a href="Obs-UK-ROTEM-protocol.png" target="_blank" rel="noopener">
+        <a 
+          href="Obs-UK-ROTEM-protocol.png" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          onclick="window.open(this.href, '_system', 'location=yes'); return false;"
+        >
           <img 
             src="Obs-UK-ROTEM-protocol.png" 
             alt="OBS UK ROTEM Protocol for Obstetric Haemorrhage" 
