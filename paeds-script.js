@@ -355,6 +355,7 @@ blood_volume: {
   weight: 'TBW',
   unit: 'mg',
   conc: 50,
+  cap: 150,
   outputId: ['sux-iv', 'sux-iv-ga'],
   extraId: ['sux-iv-vol-extra', 'sux-iv-ga-extra'],
   labelId: ['sux-range', 'sux-ga-range'],
@@ -2166,12 +2167,13 @@ if (lms) {
  
   window.weightContext.ibw = ibw;
   window.weightContext.adjbw = adjbw;
-  window.weightContext.isObese = result.centile >= 98;
+  // Only apply obesity drug reductions if the child is >= 2 years old
+  window.weightContext.isObese = (result.centile >= 98 && ageYears >= 2);
   
   const warning = document.getElementById("bmi-warning");
 
 if (ageYears < 2) {
-  warning.textContent = "*BMI centiles not validated <2 years";
+  warning.textContent = "*BMI centiles not validated <2 years. All dosing based on TBW.";
 } else {
   warning.textContent = "";
 }
