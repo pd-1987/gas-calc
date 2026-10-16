@@ -1381,11 +1381,15 @@ if (dMin === 0 && dMax === 0) {
   return;
 }
   
-  const sameDose = Math.abs(dMin - dMax) < 0.0001;
+  // 1. Round the dose to 2 decimal places to capture small paediatric doses safely
+  const displayDMin = Math.round(dMin * 100) / 100;
+  const displayDMax = Math.round(dMax * 100) / 100;
+  
+  const sameDose = Math.abs(displayDMin - displayDMax) < 0.0001;
 
   const doseText = sameDose
-    ? stripZeros(dMin.toFixed(1))
-    : `${stripZeros(dMin.toFixed(1))}–${stripZeros(dMax.toFixed(1))}`;
+    ? stripZeros(displayDMin.toFixed(2))
+    : `${stripZeros(displayDMin.toFixed(2))}–${stripZeros(displayDMax.toFixed(2))}`;
 
   // --- OUTPUT ---
   outputIds.forEach(id => {
@@ -1403,8 +1407,9 @@ if (dMin === 0 && dMax === 0) {
 
    // --- VOLUME ---
   if (config.conc && extraIds.length) {
-    const vMin = dMin / config.conc;
-    const vMax = dMax / config.conc;
+    // 2. Calculate volume using the ROUNDED dose the user actually sees!
+    const vMin = displayDMin / config.conc;
+    const vMax = displayDMax / config.conc;
 
     const sameVol = Math.abs(vMin - vMax) < 0.0001;
 
@@ -2448,5 +2453,5 @@ genderContainer.addEventListener("click", (e) => {
 
   genderContainer.dataset.gender = btn.dataset.value;
 
-  updateAll();   // ✅ clean + centralised
+  updateAll();
 });
