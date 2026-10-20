@@ -208,17 +208,24 @@
 <div class="calc-section">
     <div class="instruction-header">Point-of-Care Algorithms</div>
     
-    <!-- Visible Trauma Algorithm -->
-    <div style="text-align: center; margin-bottom: 16px;">
-      <a href="images/ROTEM-trauma-algorithm.png" target="_blank" rel="noopener noreferrer">
-        <img src="images/ROTEM-trauma-algorithm.png" alt="ROTEM Trauma A5 Algorithm" style="max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border-light);">
-      </a>
-      <p style="font-size: 11px; color: var(--text-secondary); margin-top: 6px;">
-        <em>Tap image to enlarge in a new window.</em>
-      </p>
-    </div>
+    <!-- Expandable Trauma Algorithm -->
+    <details style="margin-bottom: 8px; border: 1px solid var(--border-light); border-radius: 8px; padding: 8px; background-color: var(--bg-card);">
+      <summary style="font-weight: 600; font-size: 13px; cursor: pointer; color: var(--text-main);">ROTEM Trauma A5 Algorithm</summary>
+      <div style="margin-top: 10px;">
+          <div style="text-align: center;">
+          <a href="images/ROTEM-trauma-algorithm.png" target="_blank" rel="noopener noreferrer">
+            <img src="images/ROTEM-trauma-algorithm.png" alt="ROTEM Trauma A5 Algorithm" style="max-width: 100%; height: auto; border-radius: 4px; border: 1px solid var(--border-light);">
+          </a>
+          <p style="font-size: 10px; color: var(--text-secondary); margin-top: 6px;">
+            <em>Tap image to enlarge in a new window.</em>
+          </p>
+                  <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.4;">
+          <strong>Clinical Application:</strong> While designed for trauma-induced coagulopathy, this pathway serves as the standard baseline for most adult non-obstetric major haemorrhage (e.g., severe gastrointestinal bleeding, ruptured AAA, and major general surgical bleeding). <em>Do not apply to obstetric haemorrhage</em>, which requires higher baseline fibrinogen targets.
+        </p>
+        </div>
+      </div>
+    </details>
 
-    <!-- Expandable Details Containers for Reference Guides -->
     <details style="margin-bottom: 8px; border: 1px solid var(--border-light); border-radius: 8px; padding: 8px; background-color: var(--bg-card);">
       <summary style="font-weight: 600; font-size: 13px; cursor: pointer; color: var(--text-main);">ROTEM Trace Guide ('Temogram')</summary>
       <div style="margin-top: 10px; text-align: center;">
@@ -248,10 +255,11 @@
         </a>
       </div>
     </details>
-<p style="font-size: 10px; color: var(--text-secondary); margin-top: 12px; line-height: 1.4; text-align: center;">
+    
+    <p style="font-size: 10px; color: var(--text-secondary); margin-top: 12px; line-height: 1.4; text-align: center;">
       <em>Point-of-care coagulation algorithms and ROTEM traces: Görlinger K, et al. Viscoelastic coagulation testing and target-guided hemostatic therapy.</em>
     </p>
-  </div>  
+  </div>
   
 <div class="main-control-buttons">
     <button type="button" class="reset-btn" onclick="resetForm()">Reset</button>
