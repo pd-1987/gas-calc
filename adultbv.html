@@ -10,7 +10,7 @@
   
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  <title>Adult blood volume</title>
+  <title>Adult blood volume & Haemorrhage</title>
   <style>
    .unit-toggle {
   width: auto;
@@ -41,7 +41,7 @@
 <body>
   
 <header class="calc-header critical">
-  Adult Blood Volume
+  Adult Blood Volume & Haemorrhage
 </header>
 <div class="calc-wrapper">
   <div class="calc-section">
@@ -91,7 +91,20 @@
       <strong>Note:</strong> Range spans from the Bourke equation (simplified, conservative) to the Gross equation (assumes perfect isovolaemic haemodilution). This is a guide for controlled, steady blood loss with fluid replacement. In rapid or massive haemorrhage, clinical triggers and local protocols always supersede calculated limits.
     </p>
   </div>  
-  
+  <div class="calc-section">
+  <div class="instruction-header">AoA QRH Guidelines</div>
+  <details style="border: 1px solid var(--border-light); border-radius: 8px; padding: 8px; background-color: var(--bg-card);">
+    <summary style="font-weight: 600; font-size: 13px; cursor: pointer; color: var(--text-main);">Massive Blood Loss</summary>
+    <div style="margin-top: 10px; text-align: center;">
+      <a href="images/AoA-QRH-MBL.jpg" target="_blank" rel="noopener noreferrer">
+        <img src="images/AoA-QRH-MBL.jpg" alt="AoA QRH Massive Blood Loss" style="max-width: 100%; height: auto; border-radius: 4px; border: 1px solid var(--border-light);">
+      </a>
+      <p style="font-size: 10px; color: var(--text-secondary); margin-top: 6px;">
+        <em>Tap image to enlarge in a new window.</em>
+      </p>
+    </div>     
+  </details>
+</div>
   <div class="calc-section">
     <div class="instruction-header">Classification of Haemorrhagic Shock (ATLS)</div>
     <table id="shockClassificationTable" class="classification-table">
@@ -265,20 +278,31 @@
     <button type="button" class="reset-btn" onclick="resetForm()">Reset</button>
     <button type="button" class="home-btn" onclick="goHome()">Home</button>
   </div>
-  
-  <!-- Footer -->
+<!-- Footer -->
   <footer>
     <details>
-    <summary>Notes and references</summary>
+      <summary>Notes and references</summary>
       <small>
-      <p>Circulating blood volume — Lemmens–Bernstein–Brodsky equation: 70÷[√(BMI÷22)]</p>
-     <p><a href="https://pubmed.ncbi.nlm.nih.gov/16756741/" target="_blank" rel="noopener noreferrer">Lemmens HJ, Bernstein DP, Brodsky JB. Estimating blood volume in obese and morbidly obese patients. Obes Surg. 2006;16(6):773-776. doi:10.1381/096089206777346673</a></p>
-        <p>Point-of-care coagulation algorithms and ROTEM traces: Görlinger K, et al. Viscoelastic coagulation testing and target-guided hemostatic therapy.</p>
-    </small>
+        <ul>
+          <li>
+            <strong>Circulating blood volume:</strong> Lemmens-Bernstein-Brodsky equation: 70÷[√(BMI÷22)].<br>
+            <a href="https://pubmed.ncbi.nlm.nih.gov/16756741/" target="_blank" rel="noopener noreferrer">Lemmens HJ, Bernstein DP, Brodsky JB. Estimating blood volume in obese and morbidly obese patients. <em>Obes Surg.</em> 2006;16(6):773-776. doi:10.1381/096089206777346673</a>
+          </li>
+          <li style="margin-top: 8px;">
+            <strong>AoA Quick Reference Handbook (QRH):</strong> Association of Anaesthetists.<br>
+            <a href="https://anaesthetists.org/qrh" target="_blank" rel="noopener noreferrer">anaesthetists.org/qrh</a>
+          </li>
+          <li style="margin-top: 8px;">
+            <strong>Point-of-care coagulation algorithms and ROTEM traces:</strong><br>
+            Görlinger K, et al. <em>Viscoelastic coagulation testing and target-guided hemostatic therapy.</em>
+          </li>
+        </ul>
+      </small>
     </details>
-  <small>
-       <p><a href="disclaimer.html">Disclaimer</a></p>
-      <p>&copy; 2025 #OneTeam Anaesthesia. All rights reserved.</p></small>
+    <small>
+      <p><a href="disclaimer.html">Disclaimer</a></p>
+      <p>&copy; 2026 #OneTeam Anaesthesia. All rights reserved.</p>
+    </small>
   </footer>
   
   <script>
