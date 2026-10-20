@@ -27,6 +27,15 @@
       text-align: left;
       padding-left: 12px !important;
     }
+    .instruction-header {
+  color: #0f172a !important; /* Deep navy blue-black */
+  font-weight: 700 !important;
+  font-size: 14px;
+  margin-bottom: 12px;
+  padding-left: 8px;
+  border-left: 4px solid #5E35B1; /* Primary theme accent strip */
+  line-height: 1.2;
+}
   </style>
 </head>
 <body>
@@ -79,7 +88,7 @@
       <span id="mablOutput">-</span>
     </div>
     <p style="font-size: 10px; color: var(--text-secondary); margin-top: 12px; line-height: 1.4;">
-      <strong>Note:</strong> Range spans from the simplified equation (conservative) to the Gross equation (assumes perfect isovolaemic haemodilution). This is a guide for controlled, steady blood loss with fluid replacement. In rapid or massive haemorrhage, clinical triggers and local protocols always supersede calculated limits.
+      <strong>Note:</strong> Range spans from the Bourke equation (simplified, conservative) to the Gross equation (assumes perfect isovolaemic haemodilution). This is a guide for controlled, steady blood loss with fluid replacement. In rapid or massive haemorrhage, clinical triggers and local protocols always supersede calculated limits.
     </p>
   </div>  
   
@@ -190,7 +199,57 @@
     </div>
     
     <p style="font-size: 11px; color: var(--text-secondary); margin-top: 12px; line-height: 1.4;">
-      <em>Note: Administer Tranexamic Acid (1g IV) as early as possible (ideally within 3 hours of bleeding onset). Guide subsequent product administration with laboratory assays or viscoelastometry (ROTEM/TEG).</em>
+      <strong>*Tranexamic Acid (TXA):</strong> Administer 1 g IV over 10 min as early as possible (strictly within 3 hours of bleeding onset). Follow with a continuous IV infusion of 1 g over 8 hours. 
+      <br><br>
+      <em>Note: Guide subsequent product administration with laboratory assays or viscoelastometry (ROTEM/TEG). TXA is generally not recommended for severe gastrointestinal bleeding.</em>
+    </p>
+  </div>  
+
+<div class="calc-section">
+    <div class="instruction-header">Point-of-Care Algorithms</div>
+    
+    <!-- Visible Trauma Algorithm -->
+    <div style="text-align: center; margin-bottom: 16px;">
+      <a href="images/ROTEM-trauma-algorithm.png" target="_blank" rel="noopener noreferrer">
+        <img src="images/ROTEM-trauma-algorithm.png" alt="ROTEM Trauma A5 Algorithm" style="max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border-light);">
+      </a>
+      <p style="font-size: 11px; color: var(--text-secondary); margin-top: 6px;">
+        <em>Tap image to enlarge in a new window.</em>
+      </p>
+    </div>
+
+    <!-- Expandable Details Containers for Reference Guides -->
+    <details style="margin-bottom: 8px; border: 1px solid var(--border-light); border-radius: 8px; padding: 8px; background-color: var(--bg-card);">
+      <summary style="font-weight: 600; font-size: 13px; cursor: pointer; color: var(--text-main);">ROTEM Trace Guide ('Temogram')</summary>
+      <div style="margin-top: 10px; text-align: center;">
+        <a href="images/ROTEM-trace.png" target="_blank" rel="noopener noreferrer">
+          <img src="images/ROTEM-trace.png" alt="ROTEM Trace Guide" style="max-width: 100%; height: auto; border-radius: 4px; border: 1px solid var(--border-light);">
+        </a>
+      </div>
+    </details>
+
+    <details style="margin-bottom: 8px; border: 1px solid var(--border-light); border-radius: 8px; padding: 8px; background-color: var(--bg-card);">
+      <summary style="font-weight: 600; font-size: 13px; cursor: pointer; color: var(--text-main);">Characteristic ROTEM Traces</summary>
+      <div style="margin-top: 10px; text-align: center;">
+        <a href="images/ROTEM-traces-1.jpg" target="_blank" rel="noopener noreferrer">
+          <img src="images/ROTEM-traces-1.jpg" alt="Characteristic ROTEM Traces Part 1" style="max-width: 100%; height: auto; border-radius: 4px; margin-bottom: 8px; border: 1px solid var(--border-light);">
+        </a>
+        <a href="images/ROTEM-traces-2.jpg" target="_blank" rel="noopener noreferrer">
+          <img src="images/ROTEM-traces-2.jpg" alt="Characteristic ROTEM Traces Part 2" style="max-width: 100%; height: auto; border-radius: 4px; border: 1px solid var(--border-light);">
+        </a>
+      </div>
+    </details>
+
+    <details style="border: 1px solid var(--border-light); border-radius: 8px; padding: 8px; background-color: var(--bg-card);">
+      <summary style="font-weight: 600; font-size: 13px; cursor: pointer; color: var(--text-main);">ROTEM Assays Guide (EXTEM, FIBTEM, etc.)</summary>
+      <div style="margin-top: 10px; text-align: center;">
+        <a href="images/ROTEM-assays.jpg" target="_blank" rel="noopener noreferrer">
+          <img src="images/ROTEM-assays.jpg" alt="ROTEM Assays Guide" style="max-width: 100%; height: auto; border-radius: 4px; border: 1px solid var(--border-light);">
+        </a>
+      </div>
+    </details>
+<p style="font-size: 10px; color: var(--text-secondary); margin-top: 12px; line-height: 1.4; text-align: center;">
+      <em>Point-of-care coagulation algorithms and ROTEM traces: Görlinger K, et al. Viscoelastic coagulation testing and target-guided hemostatic therapy.</em>
     </p>
   </div>  
   
@@ -206,6 +265,7 @@
       <small>
       <p>Circulating blood volume — Lemmens–Bernstein–Brodsky equation: 70÷[√(BMI÷22)]</p>
      <p><a href="https://pubmed.ncbi.nlm.nih.gov/16756741/" target="_blank" rel="noopener noreferrer">Lemmens HJ, Bernstein DP, Brodsky JB. Estimating blood volume in obese and morbidly obese patients. Obes Surg. 2006;16(6):773-776. doi:10.1381/096089206777346673</a></p>
+        <p>Point-of-care coagulation algorithms and ROTEM traces: Görlinger K, et al. Viscoelastic coagulation testing and target-guided hemostatic therapy.</p>
     </small>
     </details>
   <small>
